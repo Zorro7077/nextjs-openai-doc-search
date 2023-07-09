@@ -1,0 +1,11 @@
+# ﻿Plotting datasets 
+
+## dataChart (int Handle, string Filename, CONTOUR, NULL) 
+
+Generates a **contour chart** of a 3-field dataset. The resulting image is stored under **Filename** when **PL\_FILE** is set, otherwise displayed on the interactive chart. The value in the first field of a record is displayed as a contour color ranging from red to green. The second field is the x coordinate and the third field the y coordinate (see example). All fields must contain valid 
+
+data. **CONTOUR|DOT** plots a cross at every xy coordinate. This function can be used to display parameter contour charts from CSV files exported by genetic or brute force training.
+
+## dataChart (int Handle, string Filename, HEATMAP, NULL) 
+
+Generates a **heatmap** from a 2D dataset. The resulting image is stored under **Filename** when **PL\_FILE** is set, otherwise displayed on the interactive chart. The dataset contains heat values in a column x row matrix that are displayed in colors ranging from blue to red. All fields must contain valid data. This function can be used to display correlation or weight heatmaps.

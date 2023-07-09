@@ -1,0 +1,384 @@
+# ﻿Expressions 
+
+An expression is an arithmetical operation that delivers a result, which can then be assigned to a variable or object parameter. The arithmetic expression may be composed of any numbers, further variables or object parameters, function calls, brackets, and arithmetic operators. 
+
+The following operators are available in expressions:
+
+- Assigns the result right of the '=' to the variable left of the '='. 
++ The usual mathematical operators. \* and / have a higher priority than + and **-\*** -. 
+
+## / 
+
+- Modulo operator, the integer remainder of a division. 
+
+## |  Bitwise OR, can be used to set certains bits in a variable. 
+
+- Bitwise exclusive OR, can be used to toggle certain bits in a variable. 
+
+~  Bitwise invert, toggles all bits of a variable. 
+
+- Bitwise AND, can be used to reset certains bits in a variable. 
+- Bitwise right shift, can be used to divide a positive integer value by 2. 
+
+## > 
+
+- Bitwise left shift, can be used to multiply a positive integer value by 2. 
+
+## < 
+
+## ()  Parentheses for defining the priority of mathematical operations. *Examples:* 
+
+## x = (a + 1) \* b / c; 
+
+## z = 10; 
+
+## x = x >> 2; *// divides x by 4* *(integer only)* 
+
+## x = x << 3; *// multiplies x by 8*  *(integer only)* 
+
+## x = fraction(x) << 10; *// copies the fractional part of x (10 bits) into the integer part* 
+
+## *Assignment operators* 
+
+The "**=**"-character can be combined with the basic operators: 
+
++ Adds the result right of the operator to the variable left of the operator. 
+
+## = 
+
+## -=  Subtracts the result right of the operator from the variable left of the operator. \* Multiplies the variable left of the operator by the result right of the operator. 
+
+## = 
+
+## /=  Divides the variable left of the operator by the result right of the operator. 
+
+- Sets the variable left of the operator to the remainder of the division by the result right of th
+- operator. 
+
+|=  Bitwise OR's the the result right of the operator and the variable left of the operator. 
+
+- Bitwise AND's the the result right of the operator and the variable left of the operator. 
+
+\= 
+
+- Bitwise exclusive OR's the the result right of the operator and the variable left of the operat = 
+- Bitwise right shift the variable left of the operator by the result right of the operator. 
+
+\>
+
+\= 
+
+- Bitwise left shift the variable left of the operator by the result right of the operator. 
+
+<
+
+\= 
+
+## *Increment and decrement operators* 
+
+Variables can be counted up or down by attaching '**++**' or '**--**' before or after a variable. 
+
+## x Increments x by 1; the result is the previous value of x (before incrementing). 
+
+## +
+
+## + 
+
++ Increments **x** by **1**; the result is the current (incremented) value of **x**. This is slightly faster 
++ than **x++**. 
+
+## x 
+
+## x- Decrements x by 1; the result is the previous value of x (before decrementing). 
+
+## - 
+
+## -- Decrements x by 1; the result is the current (decremented) value of x. This is slightly faster x  than x--. 
+
+## *Examples:* 
+
+## x = x + 1; *// add 1 to x* x += 1; *// add 1 to x* ++x; *// add 1 to x* 
+
+## *Remarks:* 
+
+For setting and resetting flags through the **&** or **|** operators, 
+
+use **long** or **int** variables. 
+\***
+`   `The precedence of comparison and expression operators follows the C/C++ standard. Use parentheses in case of doubt. For instance, the expressions **(x & y == z)** and **((x & y) == z)** give different results because the **&** operator has lower precedence than the **==** operator. 
+
+Bugs in expressions - for instance, division by zero - generate results that are not a number (**NaN**). They are printed 
+
+like **"1.#J"** or **"1.#IND"**. If you see such a number in the log, there's a faulty expression somewhere in your script. 
+
+## Comparisons 
+
+A comparison is a special type of **expression** that delivers either **true** (nonzero) or **false** (zero) as a result. There are special comparison operators for comparing variables or expressions: 
+
+## ==  True if the expressions left and right of the operator are equal. 
+
+## !=  True if the expressions left and right of the operator are not equal. 
+
+- True if the expression left of the operator is greater than the expression right of the op
+
+## >=  True if the expression left of the operator is greater than or equal to the expression rig
+
+operator. 
+
+- True if the expression right of the operator is greater than the expression left of the operat **<=**  True if the expression* right of the operator is greater than or equal to the expression left of operator. 
+
+## and,  True if the expressions left and right of the operator are both true. 
+
+## && 
+
+## or, ||  True if any one of the expressions left and right of the operator is true. 
+
+## not, !  True if the expression right of the operator is not true. 
+
+## ()  Brackets, for defining the priority of comparisions. Always use brackets when priority m *Remarks:* 
+
+The "equals" comparison is done with '==', to differentiate it from the assignment instruction with '**=**'. Wrongly **using '=' instead of '=='** causes no error message from the compiler because it's a valid assignment, but is a frequent bug in scripts. 
+
+## Comparing floating point variables (var, double, float, DATE) with '==' returns normally false because they are almost never absolutely identical. Only exception are simple cases such as comparison with 0. Otherwise, use only >, >=, <, <=, or the between function for comparing floating point variables with each other. 
+
+For comparing the content of structs or arrays, compare their elements. **Strings can be compared** with each other with the **strstr** or **strcmp** functions. For case insensitive comparing strings with string constants, (f.i. **if(Asset == "EUR/USD) ...** ) the operators  **'=='** and '**!=**' can be also used. 
+
+The **precedence** of comparison and expression operators follows the C/C++ standard. Use parentheses in case of doubt. For instance, the expressions **(x & y == z)** and **((x & y) == z)** give different results because the **&** operator has lower precedence than the **==** operator. 
+
+Unlike C/C++, **lite-C evaluates all parts** in a **&&** or **||** comparison, even if one of it evaluates to false. Therefore, avoid constructs like **if (p && p->data == 1)..;** use **if (p) if (p->data == 1)..** instead. 
+
+## *Examples:* 
+
+## 10 < x *// true if x is greater than 10* 
+
+## (10 <= x) and (15 => x) *// true if x is between 10 and 15* !((10 <= x) and (15 => x)) *// true if x is less than 10 or greater than 15 (lite-C only)* 
+
+## if (comparison) { ... } else { ... } 
+
+If the **comparison** or expression between the round brackets is **true** or non-zero, all commands between the first pair of winged brackets are executed. Otherwise all commands between the second pair of winged brackets following **else** will be executed. The **else** part with the second set of commands can be omitted. The winged brackets can be omitted when only one instruction is to be executed dependent on the comparison.*** 
+
+## *Example:* 
+
+## if (((x+3)<9) or (y==0))   *// set z to 10 if x+3 is below 9, or if y is equal to 0* 
+
+`  `**z = 10;** 
+
+## else     
+
+`  `**z = 5;*// set z to 5 in all other cases*** 
+
+## while (comparison) { instructions... } 
+
+## do { instructions... } while (comparison) ; 
+
+Repeats all instructions between the winged brackets as long as 
+
+the **comparison** between the round brackets is true or evaluates to non-zero. This repetition of instructions is called a loop. The **while** statement evaluates the comparison at the begin, the **do..while** statement at the end of each repetition. ***Remarks:*** 
+
+If you want the loop to run forever, simply use the value 1 for the comparison - 1 is always true. 
+
+Loops can be prematurely terminated by **break**, and prematurely repeated by **continue**. 
+
+The winged brackets can be omitted when the loop contains only one instruction. 
+
+## *Example:* 
+
+## x = 0; 
+
+## while(x < 100) *// repeat while x is lower than 100*   x += 1;  
+
+## for (initialization; comparison; continuation) { ... } 
+
+Performs the initialization, then evaluates the **comparison** and repeats all instructions between the winged brackets as long as the comparison is true or non-zero. The continuation statement will be executed after the instructions and before the next repetition. This repetition of instructions is called a loop. Initialization and continuation can be any **expression** or function call. A **for** loop is often used to increment a counter for a fixed number of repetitions. ***Remarks:*** 
+
+Loops can be prematurely terminated with **break**, and prematurely continued with **continue**. 
+
+The winged brackets can be omitted when the loop contains only one instruction. 
+
+The notorious infinite **for** loop - **for(;;)** - is not supported in lite-C. For infinite loops, use **while(1)**. 
+
+## *Example:* 
+
+## int i; 
+
+## for(i=0; i<5; i++) *// repeat 5 times*   x += i;  
+
+## switch (expression) { case value: instructions...  default: instructions... } 
+
+The **switch** statement allows for branching on multiple values of an **int** variable or expression. The expression is evaluated and compared with the **case** values. If it matches any of the **case** values, the instructions following the colon are executed. The execution continues until either the closing bracket or a **break** statement is encountered. If the expression does not match any of the **case** statements, and if there is a **default** statement, the instructions following **default:** are executed, otherwise the switch 
+
+statement ends.*** 
+
+## *Example:* 
+
+## int choice; 
+
+## ... 
+
+## switch(choice) 
+
+## { 
+
+`  `**case 0:** 
+
+`    `**printf("Zero! ");** 
+
+`    `**break;** 
+
+`  `**case 1:** 
+
+`    `**printf("One! ");** 
+
+`    `**break;** 
+
+`  `**case 2:**  
+
+`    `**printf("Two! ");** 
+
+`    `**break;** 
+
+`  `**default:** 
+
+`    `**printf("None of them! "); }** 
+
+## break 
+
+The **break** statement terminates a **while** or **for** loop or a **switch..case** statement, and continues with the first instruction after the closing bracket.*** 
+
+## *Example:* 
+
+## while (x < 100) 
+
+## {  
+
+`  `**x+=1;** 
+
+`  `**if (x == 50) break; *// loop will be ended prematurely* }**  
+
+## continue 
+
+Jumps to the begin of a **while** loop or the continuation part of a **for** loop.*** 
+
+## *Example:* 
+
+## int x = 0; 
+
+## int y = 0; 
+
+## while (x < 100) 
+
+## {  
+
+## x+=1; 
+
+## if(x % 2) *// only odd numbers* 
+
+`  `**continue; *// loop continuing from the start*** 
+
+## y += x; *// all odd numbers up to 100 will be sum* }  
+
+## #include "filename" #include <filename> 
+
+Reads an additional script from the given file name and then continues compiling the original script file. This way a strategy can consist of an arbitrary number of scripts.*** 
+
+## *Remarks:* 
+
+If the script name is given in angular brackets **<..>**, it is searched in the Zorro **include** folder. The **include** folder contains all 
+
+common **.h** include files and the **default.c** script with all the trading definitions. 
+
+If the script name is given in double quotes **"..."**, it can be in any folder; the path must then be given, either an absolute path (f.i. **"C:\..."**) or relative to the **Zorro** folder (f.i. **"Strategy\MyIncludes\..."**). You can omit the **"Strategy\..."** for including files directly from the **Strategy** folder, since this folder is automatically in the include path. 
+
+If no **#include** statement is found in the main script, **default.c** is automatically included. Otherwise you need to add **#include** 
+
+## <default.c> either in the included file, or in the main file before any 
+
+other **#include** statements. 
+
+## *Example* 
+
+## #include <default.c> *// default trading functions* #include <windows.h> *// include the Windows API* #include "Strategy\common.c" 
+
+## #ifdef name #ifndef name #else 
+
+## #endif 
+
+Defined names can be used to to skip certain script lines dependent on previous **#define**s. All script lines between **#ifdef** and **#endif** are skipped if **name** was not defined. Likewise, all lines between **#ifndef** and **#endif** are skipped if **name** was #defined. The **#else** statement reverses the line skipping or non-skipping.*** 
+
+## *Example:* 
+
+## #define SCALPING 
+
+## ...  
+
+## #ifdef SCALPING 
+
+`  `**aut.nBarMinutes = 0; #endif** 
+
+## #define name 
+
+Defines the name as a condition for later including or excluding lines (see **#ifdef**), or for setting other special conditions during compilation.*** 
+
+## *Example:* 
+
+## #define TEST 
+
+## ... 
+
+## #ifdef TEST 
+
+## printf("This is a test!"); #endif 
+
+## #define name value 
+
+Every time the **name** appears in the script below the **#define**, it will be replaced by the **value**, which can be another name, a number, or a simple arithmetic expression. Replacing names makes functions more 'readable', for instance by giving **general purpose variables** some meaningful names.*** 
+
+## *Examples:* 
+
+## #define PI 3.14159 #define HEALTH skill17 #define WINAPI \_\_stdcall ... 
+
+## x = 2.0\*PI; 
+
+## my.HEALTH -= 50; 
+
+## long WINAPI MessageBox(HWND,char \*,char \*,long); *Remarks* 
+
+## #defines are valid within all subsequent code. 
+
+## #defines are only evaluated during compilation, not in already-compiled scripts. 
+
+A **#define** can be given in the **command line** with a **-d** statement (Zorro S only). 
+
+As a convention, defined names are normally written in uppercase. 
+
+## #undef name 
+
+Undefines a previously defined name.
+
+## #define macro(parameter,..)  expression(parameter,..) 
+
+Defines a **macro** as a replacement or abbreviation for a numerical expression. Whenever the macro is encountered in the code, the expression is executed. Macros work rather like functions, but with some minor differences. Since macros are implemented as a textual substitution, there is no effect on program performance (as with functions), however they produce larger code than functions. They are normally only used for fairly small expressions.*** 
+
+## *Examples:* 
+
+## #define set(obj,flag) obj.flags |= (flag) 
+
+## #define reset(obj,flag) obj.flags &= ~(flag) #define toggle(obj,flag) obj.flags ^= (flag) #define is(obj,flag) (obj.flags & (flag)) 
+
+## #define zero(ptr) memset((void\*)&ptr,0,sizeof(ptr)) 
+
+## #define 
+
+## macro(parameter,..)  expression(parameter##token,..) 
+
+The merging operator **##** adds the token to the parameter. Useful for redefining variable or functions names in a macro.*** 
+
+## *Example:* 
+
+## #define merge3(name) merge(name##1,name##2,name##3) *// merge3(test) is evaluated to merge(test1,test2,test3)*  
+
+## *Remarks* 
+
+Check for already-defined names 
+
+in **include\trading.h** and **include\variables.h** when using **#define** in the script. Re-defining or inadvertently using a system define can lead to unexpected script behavior. 

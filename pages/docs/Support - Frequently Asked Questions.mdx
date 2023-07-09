@@ -1,0 +1,97 @@
+# ﻿Support - Frequently Asked Questions 
+
+When you're a Zorro **Sponsor**, you are entitled to a time period of free technical support by email. Otherwise you can post your question on the user forum, or subscribe a **support ticket** in the web store. For technical support please email your question to **support (at) opgroup.de**, and give your support ticket number or your user name that is displayed in Zorro's startup message. 
+
+General questions about financial trading are answered on the **Trading FAQ page**. The most frequent technical questions are listed below. 
+
+## *Strategy development* 
+
+Q. I'm using global variables in my script. When I run it the second time, 
+
+it **behaves differently** than the first time. A. Static and global variables keep their content until the script is modified or compiled. If necessary, set them to their initial values on script start, like this: **if(Init) MyStaticVar = 0;**. Read more 
+
+about local, global, and static variables **here**. 
+
+Q. How can I find out **if the last trade was a winner or a loser**? A. If **LossStreakTotal** is **> 0**, the last trade was lost. 
+
+Q. How do I place two pending orders so that the order that's opened first **cancels the other** one? A. Place the first pending order, and check in 
+
+its **TMF** if the entry condition of the second order is fulfilled. In that case enter the 
+
+second order at market, and close the first while it's still pending. 
+
+Q. How can I count the **number of winning trades** within the last N trades? A. Use a **for(all\_trades)** loop, and count the number of closed trades. As soon as the number is above the total number of closed trades 
+
+(**NumWinTotal+NumLossTotal**) minus **N**, start counting the number of winning trades. 
+
+Q. How can I place two different profit targets so that **half of the position** closes when the first one is hit, and the rest on the second? A. The best and simplest solution is opening two trades with two different profit targets, each with half the lot volume. If your broker does not allow opening several trades at the same time, use **OrderDelay** for delaying the second trade a few seconds. 
+
+Q. How can I run a function **on every price tick** of a certain asset? A. Use 
+
+a **tick** function. It will be executed every time when a new price quote arrives. Note that the tick execution frequency will be different in real trading and in the backtest, due to the fewer price ticks in M1 price data. If this is an issue for the 
+
+particular strategy, use **t1** price data. 
+
+Q. My candles appear **time shifted** compared to the same candles in another trading platform. A. The other platform probably uses a different time zone, and/or timestamps from the candle open prices. Zorro uses UTC time and timestamps from the candle close prices. Read **here** about bars and time stamps. 
+
+Q. How can I skip all bars that fall **outside market hours**? A. Bars are normally added whenever price quotes of the traded assets arrive from the broker API, regardless of the market hour. For skipping them, either set 
+
+the **BR\_MARKET** flag, or use the **TimeFrame** mechanism with 
+
+individual **AssetMarket** time zones. If you only want to skip bars for a certain indicator, you can use a **static series** and **shift** it during market hours. 
+
+Q. How can I **store variables** so that a new trading session automatically starts with their their last values? A. Use **AlgoVar** or **TradeVar** variables. They are preserved among sessions. If you have to store a lot more data, save and load them with **file** functions. 
+
+Q. How can I **evaluate online data** that is available on a website? A. Use a **http** function (for accessing data directly from a website) or 
+
+the **dataDownload** or **assetHistory** functions (for retrieving data from a web service). Google, Stooq, AlphaVantage, Quandl, CryptoCompare, and many other services provide historical or current data for most existing assets and indices, so you can use them for live trading as well as in the backtest. 
+
+## *Live trading* 
+
+Q. How many **Zorro S instances** can simultaneously** trade on a PC or 
+
+VPS? A. The number of parallel running programs on a PC is limited by the available memory, the internet bandwidth, and the CPU performance. In the case of Zorro, on an average PC the limit is 
+
+about 8..10 instances.
+
+Q. I'm getting **error messages** when I try to connect to IB / Oanda / FXCM / MT4. A. Read the manual about **IB** / **Oanda** / **FXCM** / **MT4** etc for learning how to connect to your broker and which assets are available. The 3 most frequent reasons for connection failure are wrong login data, a wrong account type (demo / real) or a server outage (at weekends or holidays). The reasons of the errors are printed in the Zorro log or in the case of MT4 or MT5, in their "Experts Log". 
+
+Q. I want to trade with the MT4 bridge, but my MT4 has **no Zorro EA**. A. You must install the MT4 bridge as described **here**. Please also read 
+
+the **remarks** that cover all known issues of MT4 or MT5. 
+
+Q. Ok, I have now installed the **MT4 bridge**, but it doesn't work. I'm getting error messages. A. You made a mistake with the installation. Just try again. You will succeed when you follow the instructions in the manual – we guarantee that. You 
+
+can repeat the MT4/MT5 bridge installation as often as you want.   Since installing the bridge involves an unzip and copy operation on your PC, some basic PC knowledge is required. If you cannot do it, ask someone for assistance. 
+
+Alternatively, oP group offers a **Zorro/MT4 installation** service by remote access. This, also, has 100% success guarantee. 
+
+Q. I've set the **stop loss** in my script to 10 pips from the entry price, but in my trading platform it looks like 15 pips. A. The stop loss that really stops your trade and the stop loss that you see in your trading platform are two very different things. For details, look in the manual under **StopFactor**.  
+
+Q. My system does **not close trades** in live trading. It works in the 
+
+backtest. A.A. US citizens are often not allowed to directly close Forex trades (no joke!); they have to open a new position in opposite direction for that. Zorro 
+
+handles this automatically in **NFA compliant mode**. 
+
+Q. My live system does often **not open or close trades** - - and I'm sure that I don't live in the US. A. There can be many reasons for rejecting orders, but unless you're trading a very illiquid asset, it should not happen often. Otherwise something is wrong. You can normally see the reason of the rejection in the error message from your broker (such as: "No tradeable price"). The two most frequent reasons that you can fix in your script: Sending orders at a wrong time when the market is closed, or sending orders with a too small or too large stop distance. If an open order failed, **enterLong** / **enterShort** return **0**. 
+
+Q. Where is the **live chart**? How can I visualize the price curve and the trade entries and exits in real time? A. For live charts use your broker's trading platform. Zorro is purely for automated trading and does not display live charts, aside from the profit curve on the trade status page. 
+
+Q. The candles on the Zorro chart are **different to the candles** that I see on the MT4 chart, and the prices in the Zorro log are also different to the open/close 
+
+prices in my platform log.  A. Zorro displays generally ask prices in logs and on charts, while some platforms, f.i. MT4, display bid prices on charts by default. And your live chart is usually based on a different time zone and thus will display different candles. Check the help file of your platform about switching it to ask 
+
+prices and UTC time zone. 
+
+Q. How can I **change the sounds** for entering, winning, or losing trades? A. In your Zorro folder you'll find sound files with names like "**win.wav**", "**loss.wav**", or "**open.wav**". Replace them with your own sounds in **.wav** format. 
+
+Use **Mute** in **Zorro.ini** for permanently disabling sounds. 
+
+Q. I run the same strategy with the same broker on two different VPS. Both versions **open different trades** although they should be identical. A. With the same broker and account you'll normally get rather similar trades. But they are not necessarily identical, especially not with Forex or CFDs since any trade entry and exit is based on a individual price quote. Differences in latency can also contribute to different trade entries and exits. 
+
+Q. I'm a Zorro S owner and use two Zorros for trading two strategies on the same real money account. In the moment when the second Zorro logs in to the account, the first one **logs off** and the server indicator gets red. A. Your account is limited to a single session by your broker. Contact your broker and ask for activation of multiple sessions for your account. 
+
+Q. Sometimes my system opens **trades that do not appear** in the broker platform. A. Those are **phantom trades**, used for equity curve trading or 
+
+for **virtual hedging**. You can distinguish them in the log from real trades by their winged brackets **{..}** as opposed to the rectangular brackets **[..]** of real trades. 

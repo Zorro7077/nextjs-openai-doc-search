@@ -1,0 +1,294 @@
+# ﻿Format Codes - C Programmer's Cheat Sheet 
+
+## *DATE format codes, for wdate, strdate, dataParse, etc:* 
+
+- Abbreviated weekday name 
+
+## a 
+
+- Full weekday name 
+
+## A 
+
+- Abbreviated month name 
+
+## b 
+
+- Full month name 
+
+## B 
+
+- Day of month as decimal number (01..31) 
+
+## d 
+
+- Hour in 24-hour format (00..23) 
+
+## H 
+
+- Day of year as decimal number (001..366) 
+
+## j 
+
+- Month as decimal number (01..12) 
+
+## m 
+
+- Minute as decimal number (00..59) 
+
+## M 
+
+- Second (00..59) or second with decimals (**dataParse**, 00.000000 .. 59.999999) **S** 
+- Second with milliseconds (**strdate**) 
+
+## S. 
+
+- Unix time stamp in seconds or milliseconds since 1/1/1970 (**dataParse**, **wdatef**) **t** 
+- Week of year as decimal number, with Sunday as first day of week (00..53) 
+
+## U 
+
+- Week of year as decimal number, with Monday as first day of week (00..53) 
+
+## W 
+
+- Year without century, as decimal number (00..99) 
+
+## y 
+
+- Year with century, as decimal number (1900..2999) 
+
+## Y 
+
+- Percent sign 
+
+## % 
+
+The **DATE** format is equivalent to a **double** / **var** variable and counts the number 
+
+of days since 12-31-1899 with a resolution of 1 µsec. 
+
+## *Variable / string format codes, for printf, print, strf, etc:* 
+
+Format specifiers: 
+
+- ANSI character (int, char) 
+
+## c 
+
+- Decimal number (int, char) 
+
+## d 
+
+- Exponential floating-point number (var, double) **e** 
+- Floating-point number (var, double) 
+
+## f 
+
+- Either **%e** or **%f**, whichever is more compact 
+
+## g 
+
+- Decimal number (int, char) 
+
+## i 
+
+- Octal number (int, char) 
+
+## o 
+
+- Hexadecimal pointer (void\*) 
+
+## p 
+
+- Null-terminated text (string, char\*, char[]) 
+
+## s 
+
+- Unsigned decimal number (int, char) 
+
+## u 
+
+- Hexadecimal number (int, char), lowercase 
+
+## x 
+
+- Hexadecimal number (int, char), uppercase 
+
+## X 
+
+- Percent sign 
+
+## % 
+
+Format modifiers (optional, after the %) : 
+
+## n  Field width, minimum number of digits. 
+
+## . Precision, maximum number of digits after the decimal. m 
+
+## -  Left align the result within the given field width. 
+
+## +  Prefix the output value with a sign (+ or –). 
+
+## 0  Add zeros until the number of digits is reached. 
+
+## ' '  Add a blank ' ' if the output value is signed and positive. Special characters 
+
+## \a  Audible alert 
+
+## \b  Backspace 
+
+## \f  Form feed 
+
+## \n  New line, or linefeed \r  Carriage return 
+
+## \t  Tab 
+
+## \v  Vertical tab 
+
+## \\  Backslash 
+
+## #. Print to log only 
+
+## .. 
+
+## *Regular expressions, for the Npp search functions* 
+
+Code Matches Example **\*** 
+
+Preceding item zero or more times; like **{0,}**. 
+
+zo\* matches "z" and "zoo". 
+
+## + 
+
+Preceding item one or more times; like **{1,}**. 
+
+zo+ matches "zo" and "zoo", but not "z". 
+
+## ? 
+
+Preceding item zero or one time; like **{0,1}**. 
+
+zo? matches "z" and "zo", but not "zoo". 
+
+## ^ 
+
+The position at string start. 
+
+^\d{3} matches 3 numeric digits at the start of the searched string. **$** 
+
+The position at string end. 
+
+\d{3}$ matches 3 numeric digits at the end of the searched string. **.** 
+
+Any single character except newline **\n**. 
+
+a.c matches "abc", "a1c", and "a-c". 
+
+## | 
+
+Choice between two or more items. 
+
+z|food matches "z" or "food". (z|f)ood matches "zood" or "food". 
+
+## \\* 
+
+The **\*** character; similar with **\+**, **\?**, **\.**, **\[**, **\(**, etc. 
+
+## \b 
+
+Word boundary. 
+
+er\b matches the "er" in "never" but not the "er" in "verb". 
+
+## \B 
+
+Word non-boundary. 
+
+er\B matches the "er" in "verb" but not the "er" in "never". 
+
+## \d 
+
+Digit character; equivalent to **[0-9]**. 
+
+In "12 345", \d{2} matches "12" and "34". \d matches "1", 2", "3", "4", "5". **\D** 
+
+Nondigit character; equivalent to **[^0-9]**. 
+
+\D+ matches "abc" and " def" in "abc123 def". 
+
+## \s 
+
+Any white-space character; like **[ \f\n\r\t\v]**. 
+
+## \S 
+
+Any non-white-space character; like **[^ \f\n\r\t\v]**. 
+
+## \w 
+
+## A-Z, a-z, 0-9, and underscore, like [A-Za-z0-9\_]. 
+
+In "The quick brown fox…", \w+ matches "The", "quick", "brown", "fox". **\W** 
+
+Any character except **A-Z**, **a-z**, **0-9**, underscore. 
+
+In "The quick brown fox…", \W+ matches "…" and all of the spaces. **()** 
+
+Start and end of a subexpression. 
+
+A(\d) matches "A0" to "A9". (f|b)\*oo matches foo, boo, and oo. **[abc]** 
+
+A character set; matches any specified character. 
+
+[abc] matches the "a" in "plain". 
+
+## [^abc] 
+
+Negative character set; any not specified character. 
+
+[^abc] matches the "p", "l", "i", and "n" in "plain". 
+
+## [a-z] 
+
+A range of characters; any character in the range. 
+
+[a-z] matches any lowercase character in the range "a" through "z". **[^a-z]** 
+
+Negative range; any character not in the range. 
+
+[^a-z] matches any character that is not in the range "a" through "z". **[a,b]** 
+
+All items separated with commas. 
+
+[a-z,-] matches all characters in "my-file". 
+
+## {n} 
+
+Preceding item exactly **n** times.  
+
+o{2} does not match the "o" in "Bob", but the two "o"s in "food". 
+
+## {n,} 
+
+Preceding item at least **n** times.  
+
+o{2,} does not match the "o" in "Bob" but all the "o"s in "foooood". **{n,m}** 
+
+Preceding item at least **n** and at most **m** times.  
+
+In "1234567", \d{1,3} matches "123", "456", and "7". 
+
+## \cx 
+
+The control character indicated by **x**. 
+
+\cM matches a CTRL+M or carriage return character. 
+
+## \xnn 
+
+A 2 digits hexadecimal character. 
+
+\x41 matches "A". (\x041 is wrong!) 

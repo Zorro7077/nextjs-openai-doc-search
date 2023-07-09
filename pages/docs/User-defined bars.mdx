@@ -1,0 +1,798 @@
+# ﻿User-defined bars 
+
+Instead of fixed bar periods, bars can also cover fixed price ranges or can be defined by other criteria. Some traders believe that those special bars help their trading, because they make the chart look simpler. Zorro supports a user-defined **bar** function for special bars of any kind. Predefined functions for Range, Renko, Haiken Ashi, or Point-and-Figure bars are included. 
+
+The **bar** function can be used for single-asset or multiple-asset strategies, or for strategies that use multiple bar types simultaneously. In the case of single-asset strategies the individual bars are also plotted in the chart. 
+
+Range bars (see code)
+
+## bar(vars Open, vars High, vars Low, vars Close, *vars Price, DATE Start, DATE Time*): int 
+
+User-supplied function for defining a **bar**. Used to create special bar types or to replace the mean price by a different algorithm. The **bar** function is automatically called whenever a new price quote arrives or a price tick is read from a historical file. It can modify the candle and determine when the bar ends. 
+
+## *Parameters:* 
+
+## Open, High,  Series with two elements of the corresponding price; f.i. Close[1] is the close price Low, Close,  and Close[0] is the most recent price. The prices of the current bar can be modifi Price  the mean price and can be omitted when not used in the function. 
+
+## Start  Optional start time of the bar in the OLE DATE format. Can be omitted when not u Time  Optional time of the most recent tick or price quote. Can be omitted when not us *Returns:* 
+
+## 0 - close the bar at the normal end of the BarPeriod.** 
+
+## 1 - close the bar now, and call the bar function again at the next price tick. 4 - keep the bar open, and call the bar function again at the next price tick. 8 - call the bar function only at the end of every bar.*** 
+
+## *Remarks:* 
+
+The **bar** function in a single asset strategy is automatically called during the history building process and has access to the current and previous candle. Indicators, series, price, or trade functions cannot be called from inside a **bar** function. If needed for a very special bar, calculate the candle in the **run** function and pass it to the **bar** function through global variables. 
+
+If prices are not otherwise modified by the **bar** function, they are set up as for a normal candle, i.e. **Open[0]** is the first price of the 
+
+bar, **High[0]** is the highest price so far, **Low[0]** the lowest price 
+
+and **Price[0]** the current mean price of the bar. 
+
+Modified prices also determine the corresponding price functions (**priceO**, **priceH**, **priceL**, **priceC**, **price**) and all price-dependent indicators. This can cause **data-snooping** and therefore unrealistic backtests when the bar open price is affected by its close price or by the high or low. Backtest with the **TICKS** flag for making sure that the trades open and close at the recent tick instead of the back candle,thus eliminating snooping bias. 
+
+Set **Slippage = 0** for backtests with user defined bars. Slippage simulation works only with normal bars. 
+
+The price history should have **sufficient resolution** so that any special bar covers at least one price quote. Special bars cannot have higher resolution than the price history. 
+
+Most special bars, such as Haiken Ashi or Range/Renko bars, 
+
+are **affected by any preceding bar** and thus depend on the time stamp or price at the very first bar. Their candles therefore depends on start date, lookback period, bar period, bar offset, time zone, or any other settings 
+
+that affect the first bar. 
+
+## BarPeriod has no effect on range dependent bars except for the above mentioned start time and the pre-allocation of bar memory. For allocating enough bars without wasting memory, set BarPeriod to the approximate average bar duration that is displayed in the performance report. If you don't know it, set BarPeriod = 1. Bar zones and bar offsets should not be set when using special bar types. 
+
+In **multi-asset strategies**, or in strategies with multiple bar types, the bar defining function must be called in the script individually per asset or algo, and thus needs a different name than **bar** for not being called automatically. Since any asset has different bars, **series** must be static and shifted by script. An example for a multiple asset strategy with Renko bars can be found in the **SpecialBars** script. 
+
+## Renko bars are described slightly differently on different websites. The examples below contain 3 known variants. 
+
+Traditional price-distance bars, such as Renko, Range, or Point-and-Figure bars, are not really recommended for serious trading systems, since they ignore the time component and have normally a negative effect on the performance. This may be different for special bars sampled by other criteria such as trade volume or tick rate. Experiment with your own bar types! 
+
+## *Examples (see also SpecialBars.c):* 
+
+## var BarRange = 0.0030; *// 0.3 cents bar range* 
+
+## *// Range Bars* 
+
+## int bar(vars Open,vars High,vars Low,vars Close) 
+
+## { 
+
+`  `**if(Open[0] != Close[1]) {** 
+
+`    `**High[0] = max(Open[0],Close[1]);     Low[0] = min(Open[0],Close[1]);     Open[0] = Close[1];** 
+
+`  `**}** 
+
+`  `**if(High[0]-Low[0] >= BarRange)** 
+
+`    `**return 1;** 
+
+`  `**return 4;** 
+
+## } 
+
+## *// Renko Bars, variant 1*  
+
+## int bar(vars Open,vars High,vars Low,vars Close) { 
+
+`  `**Open[0] = roundto(Close[1],BarRange);** 
+
+`  `**if(Close[0]-Open[0] >= BarRange) {** 
+
+`    `**Close[0] = Open[0]+BarRange;** 
+
+`    `**High[0] = Close[0];** 
+
+`    `**Low[0] = Open[0];** 
+
+`    `**return 1;** 
+
+`  `**}** 
+
+`  `**if(Open[0]-Close[0] >= BarRange) {** 
+
+`    `**Close[0] = Open[0]-BarRange;** 
+
+`    `**High[0] = Open[0];** 
+
+`    `**Low[0] = Close[0];** 
+
+`    `**return 1;** 
+
+`  `**}** 
+
+`  `**return 4;** 
+
+## } 
+
+## *// Renko Bars, variant 2*  
+
+## int bar(vars Open, vars High, vars Low, vars Close) 
+
+## { 
+
+`  `**var OpenDiff = abs(Close[0]-Open[1]);** 
+
+`  `**var CloseDiff = abs(Close[0]-Close[1]);** 
+
+`  `**if(OpenDiff < CloseDiff) *// we have a valley or peak*      Open[0] = Open[1];** 
+
+`  `**else  *// we are moving with the trend*** 
+
+`     `**Open[0] = roundto(Close[1],BarRange);** 
+
+`  `**if(Close[0]-Open[0] >= BarRange) {  *// going up*** 
+
+`    `**Close[0] = Open[0]+BarRange;** 
+
+`    `**High[0] = Close[0];** 
+
+`    `**Low[0] = Open[0];** 
+
+`    `**return 1;** 
+
+`  `**}** 
+
+`  `**if(Open[0]-Close[0] >= BarRange) { *// going down*** 
+
+
+`    `**Close[0] = Open[0]-BarRange;     High[0] = Open[0];** 
+
+`    `**Low[0] = Close[0];** 
+
+`    `**return 1;** 
+
+`  `**}** 
+
+`  `**return 4;** 
+
+## } 
+
+## *// Mean Renko Bars* 
+
+## int bar(vars Open, vars High, vars Low, vars Close) { 
+
+`  `**Open[0] = 0.5\*(Close[1]+Open[1]);** 
+
+`  `**if(Close[0] <= Open[0] - BarRange) {** 
+
+`    `**Close[0] = Open[0] - BarRange;** 
+
+`    `**return 1;** 
+
+`  `**} else if(Close[0] >= Open[0] + BarRange) {** 
+
+`    `**Close[0] = Open[0] + BarRange;** 
+
+`    `**return 1;** 
+
+`  `**}** 
+
+`  `**return 4;** 
+
+## } 
+
+## *// Haiken Ashi Bars* 
+
+## int bar(vars Open,vars High,vars Low,vars Close) 
+
+## { 
+
+`  `**Close[0] = (Open[0]+High[0]+Low[0]+Close[0])/4;   Open[0] = (Open[1]+Close[1])/2;** 
+
+`  `**High[0] = max(High[0],max(Open[0],Close[0]));** 
+
+`  `**Low[0] = min(Low[0],min(Open[0],Close[0]));** 
+
+`  `**return 8;** 
+
+## } 
+
+## *// Point-and-Figure Bars* 
+
+## int bar(vars Open,vars High,vars Low,vars Close) 
+
+## { 
+
+`  `**static int direction = 0;** 
+
+`  `**if(direction == 1 && High[0]-Close[0] >= BarRange) {     Open[0] = round(Low[0],BarRange);** 
+
+`    `**Close[0] = round(High[0],BarRange);** 
+
+`    `**Low[0] = Open[0];** 
+
+`    `**High[0] = Close[0];** 
+
+`    `**direction = 0;** 
+
+`    `**return 1;** 
+
+`  `**}** 
+
+`  `**if(direction == 0 && Close[0]-Low[0] >= BarRange) {     Open[0] = round(High[0],BarRange);** 
+
+`    `**Close[0] = round(Low[0],BarRange);     High[0] = Open[0];** 
+
+`    `**Low[0] = Close[0];** 
+
+`    `**direction = 1;** 
+
+`    `**return 1;** 
+
+`  `**}** 
+
+`  `**return 4;** 
+
+## } 
+
+## series(*var Value*, *int Length*): vars 
+
+Creates a time series of the given **Length** with the given **Value**, and returns the pointer to the series. A series is a **var array** that contains the history of the variable. It is normally used by indicators in algorithmic trading. Series can 
+
+be **static or dynamic**. Dynamic series are automatically shifted at every time frame, so that every element corresponds to a certain **bar** or time frame; 
+
+the **[0]** element to the value at the current bar or time frame, the **[1]** element to the value from one bar or time frame ago, and so on. If a series is static by giving a negative **Length**, or if the **NOSHIFT** flag is set, the series is not shifted. ***Parameters:*** 
+
+## Valu Optional data value of the series. The series is initially filled with this value, otherwise w e 
+
+## Leng Optional number of elements of the series; must not change once set. When omitted or th  of LookBack. A negative number allocates a static series that can be shifted by script *Returns:* 
+
+Pointer to the **var** array (the **vars** type is just a **var\*** pointer). ***Usage:*** 
+
+## vars Prices = series(price()); defines a series with the length of 
+
+the **LookBack** period that contains the mean prices of the current asset 
+
+## ref(var Value, int Index): var 
+
+Convenience macro that generates a series and returns 
+
+the **Value** from **Index** time frames ago. All macros are defined in **variables.h**. 
+
+## SeriesLength 
+
+## int, r/o, containing the number of elements of the date series returned by the last series() call.
+
+## SeriesBuffer 
+
+## var\* pointer that can be set to a memory area, and will then be returned by the next series call. After a series call it is set to the returned pointer. This allows to use static or pre-filled buffers for a series. For an example, see Financial Hacker: Truncated Indicators. 
+
+## *Remarks:* 
+
+Series correspond to serial variables in EasyLanguage™. The **n**-th element of a series is accessed by adding a **[n]** to the series name, 
+
+where **n** is a positive integer number. For instance, **myseries[0]** is the most recent element, **myseries[1]** is the element of one time frame ago, and so on. **n** must be positive and smaller than the series length. 
+\***
+`   `For allocating and shifting series, the **series** function must be called **at any bar**. Therefore it should be called inside the **run** function or from a function that is called from the **run** function. 
+\***
+`   `An internal counter determines the pointer to be returned by 
+
+a **series()** call. For keeping the counter in sync, **series()** calls must 
+
+be **always in the same order**. Therefore they must not be skipped by **if** or other conditions that change from bar to bar (see example below). If the content of a series shall depend on **if** conditions, simply set the **[0]** element dependent on **if**. These restrictions also apply to all functions that internally create **series**, such as some **indicator** or **signal processing** functions.  
+\***
+`   `Since the **LookBack** value is normally only known after 
+
+the **INITRUN**, series are allocated in the **FIRSTRUN**. During 
+
+the **INITRUN** they are set to a temporary pointer and filled with the initial value. This **temporary content** is overwritten by the series allocation in the **FIRSTRUN**. Series are only valid during the session and released after the **EXITRUN**. 
+
+## Dynamic series are normally shifted by the series call at the end of any bar or time frame when the NOSHIFT flag is not set. The [0] element is then moved to the [1] element, the [1] element to the [2] element and so on. The current Value becomes the new [0] element. Due to this mechanism, the series contains its elements in reverse chronological order with the most recent element at the start. For synchronizing series to external events or to longer time frames, either set 
+
+the **TimeFrame** variable accordingly before the **series()** call, and set it back afterwards. Or use the **NOSHIFT** flag. The element **[n]** then corresponds to the **n**th event or time frame in the past. 
+
+## Static series (defined with a negative Length) are not automatically shifted, but can be shifted by script with the shift function. They can be used for storing arbitrary per-asset or per-algo variables, for excluding out-of-market time periods from indicators, or for shifting series by arriving price ticks in the tick function. Like any series, static series are allocated in the FIRSTRUN, so don't initialize them before as those values will be lost. Usage examples can be found in the SpecialBars script or in the SAR code in indicators.c. 
+
+For **offsetting a series into the past**, add an offset **+n**. This creates a pointer onto the **n**-th element of the series. For 
+
+instance, **(MySeries+1)** is **MySeries** at 1 bar offset into the past, excluding 
+
+the last element **MySeries[0]**. This allows to access series elements in different ways: for instance, **MySeries[3]** is the same 
+
+as **(MySeries+2)[1]** and the same as **(MySeries+3)[0]**. As the 
+
+offset **+n** lets the series begin at the **n**th element, it reduces the available length of the series by **n**. When calling an **indicator** with a series with an offset, make sure that **LookBack** is always higher than the required lookback period of the function plus the unstable period plus the highest possible offset of the series. 
+
+For **adding or subtracting two series**, create a series of the sum or difference of the recent elements, f.i. **vars Sums = series(Data1[0] + Data2[0]);**. 
+
+Some functions expect a single value, other functions expect a series as parameter. When a function expects a single value from a series, use the last element (**MySeries[0]**). When the function expects a whole series, use **MySeries** or **MySeries+n**. 
+
+If a series changes slowly, like an EMA, fill it initially with an 
+
+average **value**. This prevents **initialization effects** when an accumulative indicator needs many bars to 'creep' from 0 to its first value. 
+
+A value returned by a function can be **converted to a series** by using it as the first parameter to the series function. For 
+
+instance, **series(price())** is a series that contains 
+
+the **price** value; **series(SMA(series(priceClose()),30))** is a series containing the 30-bar Simple Moving Average of the **Close** value. 
+
+The **rev** function **reverses a series** so that the **[0]** element is the earliest. 
+
+The **length** parameter should not exceed the **LookBack** period, at least not when the series affects trading. Otherwise the script would trade differently in the fist time after starting.. 
+
+Every series requires memory and CPU resources. Therefore do not create more or longer series than needed. The longer a series, the more memory is required and the slower is script execution due to internal shifting the series on every time frame. 
+
+If you need to create extremely many series and get an **Error 041**, increase **TradesPerBar**. This affects not only the maximum number of trades, but also the maximum number of series. 
+
+For accessing the same series from several functions, declare a global **vars**, and set it with a **series** call in the **run** function. 
+
+## *Examples:* 
+
+## *// create a series with the high-low price differences* vars PriceRange = series(priceHigh()-priceLow()); 
+
+## *// compare the current range with the range from 3 bars ago* if(PriceRange[0] > PriceRange[3]) 
+
+`  `**...** 
+
+## *// calculate a 20-bar Simple Moving Average containing the price differences from 5 bars ago* 
+
+## var Average5 = SMA(PriceRange+5,20); 
+
+## *// wrong use of conditional series* if(priceClose() > Threshold) { 
+
+`  `**vars X = series(priceClose()); *// error message!*   vars Y = series(SMA(X,100)); *// error message!*   ...** 
+
+## } 
+
+## *// correct use of conditional series* vars X = series(), Y = series(); if(priceClose() > Threshold) { 
+
+`  `**X[0] = priceClose(); *// ok!*** 
+
+`  `**Y[0] = SMA(X,100);** 
+
+`  `**...** 
+
+## } 
+
+## *// using arrays of series* 
+
+## vars MySeriesArray[3]; *// declare an array of series*  
+
+## ... 
+
+## for(i=0; i<3; i++)  
+
+`  `**MySeriesArray[i] = series(); *// fill the array with series*  ...** 
+
+## (MySeriesArray[0])[0] = 123; *// access the first element of the first series. Mind the parentheses!* 
+
+## asset (string Name) : int 
+
+Selects an asset from the **asset list**, and loads its price history in the initial run from the broker or historical data. **Price** and trade functions, and all asset related variables (**Spread**, **Symbol**, **AssetVar** etc.) are automatically switched to the new asset. Sets **AssetPrev** to the previous asset name. Must be called in the first run (**INITRUN**) for any asset used of the script. 
+
+## *Parameters:* 
+
+## Na The name of the asset, as in the asset list or the [*Asset*] selector. An empty string "" or a me  a dummy asset with flat price history. Up to 15 characters, uppercase, with no blanks and n
+
+slash '/' and underline '\_'. 
+
+## *Returns:* 
+
+## 0 when the Name string is NULL or empty, or when the asset or its prices are not available; otherwise nonzero.*** 
+
+## *Usage:* 
+
+## asset("EUR/USD"); selects the EUR/USD pair. 
+
+## assetAdd (string Name) 
+
+## assetAdd (string Name, string Symbol) 
+
+## assetAdd (string Name, var Price, var Spread, var RollLong, var RollShort, var PipVal, var PipCost, var MarginCost, var Leverage, var LotAmount, var Commission, string Symbol) 
+
+Selects an asset and optionally updates its parameters in the **INITRUN**. If the asset was not yet in the **asset list**, it is added and also appears in the [***Asset***] scrollbox. Unlike **asset()**, the asset history is not yet loaded and the asset is not yet subscribed. For creating a dummy asset for test purposes, let **Name** begin with a **'#'** hash - this will generate artificial bars with a flat price history. Selecting an asset before loading its price history can be useful when asset specific parameters like **Centage** affect the subsequent history download or its **Symbol**, price source, or assigned account has to be set up by script. 
+
+## *Parameters:* 
+
+## Name  Name of the asset. A name beginning with '#' creates a dummy asset that will also appear 
+
+scrollbox. 
+
+## Symb Symbol of the asset, with optional source, in the format described under asset list. 
+
+## ol 
+
+## Price,  Optional asset parameters as described under asset list. When at 0, the parameter is not ... 
+
+## *Usage:* 
+
+## assetAdd("AAPL",150,0.01,0,0,0.01,0.01,0,2,1,0.02,"STOOQ:AAPL.US"); 
+
+## assetList (string Filename, *string Select*): int 
+
+Loads an alternative **asset list**, adds its assets to the [***Asset***] scrollbox, and selects an asset from the new list. Any asset used in the script must be either in that list, or added by script with **assetAdd**. The asset list must be loaded in the first run (**INITRUN**) of the script.before its assets can be selected. If this function is not called, the default list of the currently selected **account** is used; if no such list exists, it's the **AssetsFix.csv** list with some Forex pairs and CFDs. 
+
+If **Select** is omitted or **0**, a default asset - usually the first asset in the list - is selected. 
+
+## *Parameters:* 
+
+## FileNa File name of the asset list, f.i. "AssetsIB". The .csv extension and the path can be omitte me  the History folder. 
+
+## Select  Name of the asset to be selected in the scrollbox at first run, f.i. "EUR/USD". 0 for selecting
+
+## *Returns:* 
+
+Number of loaded assets, or **0** when no assets were loaded. The number of assets is also available through **NumAssetsListed**.*** 
+
+## *Usage:* 
+
+## assetList("StrategyFehler! Hyperlink-Referenz ungültig.);  assetSelect () 
+
+Sets the [***Asset***] scrollbox to the current asset. 
+
+## assetType (string Name) : int 
+
+Attempts to determine the type of an asset from its name. If the name begins and ends with the 3-letter abbreviation of a currency, it is identified as Forex; if it ends with a number, it is identified as an index. 
+
+## *Parameters:* 
+
+## Na Name of the me  asset *Returns:* 
+
+## 0 when the type can not be identified; otherwise FOREX (1) or INDEX (2). *Remarks:* 
+
+The place of an **asset** call (if any) in the script matters. All variables and flags that affect the creation of bars, such 
+
+as **BarPeriod**, **BarZone**, **LookBack**, **Detrend**, **StartDate**, **EndDate**, **TICK S**, **BarMode**, **UpdateDays**, **AssetList**, **History** etc. **must be set** 
+
+## before calling asset(). Otherwise the simulation period is unknown at asset loading and either a default period is used, or the script will produce an Error 030 message. All parameters specific to an asset, such 
+
+as **Spread**, **Commission**, etc., as well as all functions that use asset parameters or prices, such as **price()**, **optimize()**, **advise()**, etc. **must be used after** calling **asset()**. 
+
+Calling **asset** by script is **not the same** as selecting the asset with the ***Asset*** scroll box. If the script contains no **asset** call, the scroll box asset is selected \_after\_ the **INITRUN**, and its name is appended to 
+
+the **training** files for being able to train different assets separately. 
+
+Call **asset(Asset)** for loading the asset selected by the Scrollbox already in the **INITRUN**. 
+
+In multi-asset scripts the **order of asset() calls matters**. Bars are created from the historical ticks of the first asset. Gaps in the price history of the first asset are therefore reflected in the price data of all further assets. When **BR\_FLAT** is not set, price histories have normally gaps during weekends, holidays, or outside market hours. Therefore select first 
+
+the asset with the most complete price history (for instance, a currency pair that is traded 24 hours). When a subsequent asset has a gap where the first asset has none, the gap is filled from the price data of previous bar. This produces a different price curve and can cause indicators to behave differently in multi-asset portfolios, dependent on asset order. Otherwise use **BR\_FLAT** or don't combine assets with different market hours. 
+
+Every **asset** call switches the **asset parameters**, **asset** 
+
+## variables, trade statistics and OptimalF factors to the values of the selected asset. At begin of the simulation, asset parameters are loaded from the asset list. If the asset is not found in the list, an error message will be displayed and defaults are substituted for the asset parameters. 
+
+If an **asset** call fails, the failed asset is not selected and **0** is returned. Check the return value to make sure that only valid and available assets are traded. 
+
+Any asset can have up to **3 different broker symbols** and 3 different sources for trading, for retrieving live prices, and for downloading historical prices. The symbols can be given in the **Symbol** field in 
+
+the **asset list**, or by script in 
+
+the **SymbolTrade**, **SymbolLive**, **SymbolHist** parameters. The current asset name is stored in the **Asset** string. 
+
+The **Assets** array contains the names of all available assets. 
+
+For **selecting all assets** of the **asset list** in a **loop**, 
+
+use **while(asset(loop(Assets)))**. For enumerating assets 
+
+without **loop** call, use **for(used\_assets)** or **for(listed\_assets)**. 
+
+The trading time zone of an asset can be set up 
+
+with **AssetMarketZone** and **AssetFrameZone**. Trading can be restricted to market times with the **BR\_LEISURE** flag. 
+
+## Artificial assets can be created by combining the prices from a 'basket' of several real assets (see example). 
+
+When the asset name is an empty string or begins with a hash - 
+
+like **asset("")** or **asset("#USD")** - a **dummy asset** is created with default parameters and flat price history (usually with all prices at 50). This is useful when a real asset is not needed, like for testing filters or indicators with artificial price curves. The price history can be modified 
+
+with **priceSet** or **priceQuote**. For viewing the price curve of a dummy asset, use **assetAdd()** for adding it to the scrollbox. 
+
+When loading price data, the prices are checked for plausibility dependent on the **Outlier** parameter. Invalid prices, such as extreme outliers, are automatically corrected or removed. Setting **Detrend = NOPRICE;** before calling **asset()** prevents that asset and price data is checked and outliers are removed. 
+
+If only a single asset is selected in the script, the [***Asset***] scrollbox is automatically set to that asset. If multiple assets are selected, the [***Asset***] scrollbox is unchanged and determines the price in the [***Status***] window 
+
+and the price curve in the resulting chart. 
+
+For **adding new assets** to the available asset set, see the description under **Asset List**. 
+
+Assets must be subscribed before their prices are available. 
+
+The **asset** function subscribes the asset automatically, but some brokers have a limit to the number of subscribed assets. Some platforms, for instance **MT4**, need a long time after subscribing an asset before prices are available. 
+
+Any asset allocates computer memory (see also **memory**). This is normally uncritical in training or live trading, which is restricted to single assets and short lookback periods. But it can become critical in high resolution backtests with large portfolios. The **memory requirement** per asset in bytes can be estimated with the formula **Years / BarPeriod \* 15 MB**, where **Years** is the number of backtest years (use **1** for live trading). The **LEAN** and **LEANER** flags reduce the memory requirement by about 50%, the **TICKS** flag increases it by 32 bytes per historical price 
+
+quote. **plot** commands allocate 8..24 bytes per bar and asset. When the total memory requirement for backtesting large time periods exceeds ~3 GB, use **Zorro64** with a **C++ script** for the backtest. Alternatively, split the portfolio in separate smaller sub-portfolios, or split the time period in separate shorter tests.  
+
+## *Examples:* 
+
+## *// trade multiple strategies and assets in a single script* function run() 
+
+## { 
+
+`  `**BarPeriod = 240;** 
+
+`  `**StartDate = 2010;** 
+
+`  `**set(TICKS); *// set relevant variables and flags before calling asset()*** 
+
+## *// call different strategy functions with different assets*   asset("EUR/USD"); 
+
+`  `**tradeLowpass();** 
+
+`  `**tradeFisher();** 
+
+`  `**asset("GBP/USD");   tradeAverage();** 
+
+`  `**asset("SPX500");** 
+
+`  `**tradeBollinger();**   
+
+## } 
+
+## *// set all asset symbols to a new source* if(Init) { 
+
+`  `**assetList("MyAssetList.csv");** 
+
+`  `**for(listed\_assets)** 
+
+`    `**assetAdd(Asset,strf("MyNewSource:%s",SymbolLive)); }** 
+
+## *// Basket trading - generate a snythetic asset "USD"  // combined from the USD value of EUR, GBP, and AUD* var priceUSD() 
+
+## { 
+
+`  `**var p = 0;** 
+
+`  `**asset("GBP/USD"); p += price();** 
+
+`  `**asset("AUD/USD"); p += price();** 
+
+`  `**asset("EUR/USD"); p += price();** 
+
+`  `**return p;** 
+
+## } 
+
+## *// basket trade function with stop limit* 
+
+## int tradeUSD(var StopUSD) 
+
+## { 
+
+`  `**if((TradeIsLong && priceUSD() <= StopUSD)**  
+
+`    `**or (TradeIsShort && priceUSD() >= StopUSD))        return 1;   *// exit the trade*** 
+
+`  `**else return 0;  *// continue the trade*** 
+
+## } 
+
+## *// open a trade with the synthetic asset and a stop loss*   void enterLongUSD(var StopDistUSD) 
+
+## { 
+
+`  `**var StopUSD = priceUSD()-StopDistUSD;** 
+
+`  `**asset("GBP/USD"); enterLong(tradeUSD,StopUSD);** 
+
+`  `**asset("AUD/USD"); enterLong(tradeUSD,StopUSD);** 
+
+`  `**asset("EUR/USD"); enterLong(tradeUSD,StopUSD);** 
+
+## } 
+
+## void enterShortUSD(var StopDistUSD) 
+
+## { 
+
+`  `**var StopUSD = priceUSD()+StopDistUSD;** 
+
+`  `**asset("GBP/USD"); enterShort(tradeUSD,StopUSD);   asset("AUD/USD"); enterShort(tradeUSD,StopUSD);   asset("EUR/USD"); enterShort(tradeUSD,StopUSD); }** 
+
+## *// plot a price curve of the synthetic asset* 
+
+## *// (the plot command is linked to the last used asset - // so "EUR/USD" must be selected in the scrollbox)* function run()  
+
+## { 
+
+`  `**set(PLOTNOW);** 
+
+`  `**plot("USD",priceUSD(),0,RED); }** 
+
+## assetHistory(string Name, int Mode): int 
+
+Loads price history either from the currently selected broker or data feed, or from a specified online price source in CSV or JSON format. Stores the data in a dataset or in a **.t6** or **.t1** file in the **History** folder. Online price sources can be user defined; some popular sources such as Quandl, Stooq etc. are predefined. ***Parameters:*** 
+
+## Na Asset symbol or code specifying the price source, or the asset name from the asset list, or me  symbol. 
+
+## Mo 0 - download tick (T1) data from the selected broker (Zorro S required). 1 - download on de  brokers, plus Bittrex, CryptoCompare).. 2 - download hourly (H1) data (Bittrex, CryptoCom
+
+(D1) data (all online sources, and IB). **4** - download data in **LookBackResolution** (all brok nothing, but get the data from **History\history.csv** (for test purposes).  **+FROM\_SOURC** user defined online source (see **assetSource**; **Zorro S** required). **+FROM\_GOOGLE** - from **Google Finance** (currently unavailable). **+FROM\_QUANDL** - download daily (D1) d **S** and Quandl key required). **+FROM\_AV** - download daily (D1) data from **AlphaVantage** download daily (D1) data from **Stooq**. **+FROM\_EOD** - download daily (D1) data from **E** download daily (D1) data from **Yahoo Finance.** **+FROM\_IEX** - download daily (D1) data fr **Cloud**. **+FROM\_BITTREX** - download M1, H1, or D1 data from **Bittrex** (**Zorro S** require download M1, H1, or D1 data from **CryptoCompare** (**Zorro S** required).  (If no online sou downloaded from the selected broker).  **+UNADJUSTED** - download unadjusted prices remarks below). **+OVERRIDE** - download price data even when history is up to date, i.e. period. **+IMMEDIATE** - download at least one tick of recent price data; for getting a live pr source. **+VOLATILE** - store the data in a temporary **dataset** whose handle is returned (o sources). **+FOR\_ASSET** - store the file under the name of the current asset selected w
+
+## *Returns:* 
+
+## 0 when nothing was downloaded due to an error or because the data was up to date. Otherwise a nonzero value or the dataset handle. 
+
+## assetSource(string Filename, string URL, string Header, string Body, string Format) 
+
+Sets up all parameters of a price source website or REST API for a subsequent **assetHistory(...,FROM\_SOURCE**) call. See examples. ***Parameters:*** 
+
+## Filena Name of the file for storing or appending the downloaded data, or 0 for using the default s me 
+
+## URL  Target URL for the data request, including request parameters. 
+
+## Header  Request header, or 0 if no header is required. Some online sources requre an API key or ac Body  Request body for a HTTP POST request, or 0 for a HTTP GET request. 
+
+## Format  Format string for converting the received data, as described under dataParse. If the format 
+
+format is assumed, otherwise CSV format. If 0 or empty, the data is not converted, but stor under **history.csv** or **history.json**. 
+
+## *Remarks:* 
+
+Price history is stored in the **History** folder 
+
+under **Name** plus **.t6** extension for D1 data, or **Name** plus **.t1** for T1 data. The file name can be modified with the **History** string. T1 or M1 data downloaded from a broker is split into separate years, EOD data or data from an online source is stored in a single file. The Quandl database name, an appended **".US"** by Stooq, and **'/'**, **'.'**, or **':'** characters are automatically stripped from the historical data file names. If the name is otherwise different to the asset name, use **file\_copy** to copy the downloaded file to the correct asset name 
+
+(f.i. **file\_copy("History\\ICE.t6","History\\LONDONICE.t6")**. 
+
+Price history is only downloaded in the **INITRUN** or in 
+
+the **main** function, and only when existing price history is not **already up to date**. For this the most recent online price is compared with the history file date, and if the difference is less than half the data resolution, no new history is downloaded. If **FOR\_ASSET** is set, **UpdateDays** are also considered. For downloading data after the **INITRUN** and regardless of existing history, set the **OVERRIDE** flag. 
+
+If the same price history is downloaded **multiple times**, for instance by several different scripts, make sure that the begin of already existing data matches the longest needed data period. Newly downloaded data is only merged to the end of existing history, but not to the begin. 
+
+The **raw data** from online sources (Google, Quandl, etc) is stored in **History\history.csv** or **History\history.json**. If the price source does not deliver price data, but some error message instead, a **"invalid response"** error is displayed. The error message can then be read from the downloaded raw file. The **assetHistory** function will attempt twice to download the data before giving up. 
+
+If a **download failed** for some reason, delete the resulting partial history file (if any). Otherwise subsequent downloads might attempt to append to it or assume that the data is up to date. Usual reasons for failed downloads from online sources are wrong symbols or exceeding a quoata limit. The reason can be normally found in the 
+
+downloaded **history.csv** or **history.json** file, which contains the response 
+
+from the online source. 
+
+When downloading data from a broker, the asset is subscribed automatically. The recent values of the asset's **Spread**, **PipCost**, etc. are updated to the **Assets.csv** file even if no price history is downloaded. This way new assets can be added and available assets can be set up to their current parameter values for further simulations. 
+
+Price history from brokers is downloaded either for the number of recent years given by **NumYears**, or for the time period given 
+
+by **StartDate** and **EndDate** plus optionally a **LookBack** year. 
+
+If **FOR\_ASSET** is set, the start and end dates are kept exactly, otherwise the download period is from Jan 1 to Dec 31 (or the current date) of the given years. If **NumYears** is set to **-1**, no data is downloaded, 
+
+but **Log\Assets.csv** is still updated. Price history from online sources is downloaded for a fixed number of years up to the current day, depending on the source. 
+
+Price data from a broker or from online sources with limited history (**FROM\_IEX**, **FROM\_CRYPTOC**, **FROM\_SOURCE**) is **appended at the begin** of an existing data file. Price data from other sources is not appended, but **replaces** the previous file unless it's already up to date. Make sure that the time resolution of the downloaded prices matches the resolution of the historical data files. Normally the resolution is 1 tick for .t1 or .t2 files, 1 minute for .t6 files with year number, or 1 day for .t6 files without year number. 
+
+For **backtesting price history**, **BarPeriod** must be at or above the price history resolution. Set it to **1440** for testing D1 price data. For testing only parts of a multi-year **.t6** file, use an 8-digit **StartDate** or **EndDate**. 
+
+Price history from online sources is **temporarily stored** in a dataset of T6 or T2 records with handle **H\_HISTORY**. It can be used to evaluate the data without loading the history file. 
+
+Check the correct spelling of the asset name or code. Spelling often differs slightly, f.i. the same stock can be named **BRK.B**, **BRK\_B**, **BRK-B**, or **BRK-B.US** dependent on the website or price source. 
+
+## Outliers in the price history are automatically fixed on download dependent on the Outlier variable. The first detected outlier will 
+
+trigger **Warning 035**. Some high volatility assets, such as cryptocurrencies or penny stocks, could require a higher outlier tolerance when downloading prices. Candles with duplicate time stamps are automatically removed on downloading **.t6** files. 
+
+A price history file with length **0** is skipped in the backtest and prevents downloading prices for that particular year. This way, by storing an empty file, price data that is unavailable or of bad quality can be excluded from download and backtests. 
+
+For T1 data, the price server of the broker must support quote-based price data; this is the case for FXCM, but not for Oanda, IB, or MT4/MT5 brokers. Dependent on the price server speed, downloading T1 prices can take a long time, such as a whole day for one year of price quotes. If 
+
+the **LEAN** flag is not set, ask and bid prices are stored in the **.t1** file, otherwise only ask prices.  
+
+## Adjusted prices can be split-adjusted, dividend-adjusted, or both. For short-term trading backtests is split-adjustment the best choice, for long-term trading dividend- and split-adjustment. Since dividend adjustment has little effect on short-term backtests, you normally use dividend- and split-adjusted prices for all backtests. 
+
+Comments about some predefined data sources (all trademarks are property of their owners): 
+
+## Google prices are adjusted for splits only, unadjusted prices are not available. Google download is known to fail on certain assets for no apparent reason, even though they can be downloaded manually. The service was recently not available. 
+
+## Yahoo data is split and dividend adjusted; UNADJUSTED is supported. Yahoo EOD data was reported to contain 2 entries on dividend payment days, one with the current and one with previous day's data. Yahoo data of some European assets could be of poor quality; check the resulting price curve if in doubt. 
+
+## AlphaVantage data loads relatively slow when there is much traffic. The data has good quality. UNADJUSTED is supported. The AV API key must be present under "AVApiKey = ..." in Zorro.ini. Free data is limited to 5 requests per minute and 500 requests per day. 
+
+## Stooq requires a country identifier appended to stock or ETF names. If it is missing, ".US" is automatically appended. The data loads fast and is of good quality. UNADJUSTED is supported. There is a limit to the number of downloads per day, identified through the IP address. 
+
+## EOD requires a country identifier appended to stock or ETF names. If it is missing, ".US" is automatically appended. The free subscription only supports one year data and only 20 requests per day. Prices are split and dividend adjusted, UNADJUSTED is supported. The key token must be entered under "EODKey = 
+
+## ...."  in Zorro.ini. Zorro users get a discount on the all-in-one data package when they order on this link. 
+
+## Quandl data from 
+
+the **WIKI** (stocks), **CHRIS/CME** and **CHRIS/ICE** (futures), **BITFINEX**  and **GDAX** (Bitcoin and other cryptocurrencies) EOD databases are supported. Databases may be discontinued, so check it before on the Quandl website. Quandl databases in different formats can be downloaded with the **dataDownload** function. Quandl data loads fast and has usually good quality. The Quandl key must be present under **"QuandlKey = ..."** in **Zorro.ini** and the asset's database code (f.i. **"WIKI/AAPL"** or **"BITFINEX/ETHBTC"**) must be passed 
+
+to **Name**. 
+
+## IEX provides EOD data for US equities. UNADJUSTED is supported; otherwise data is split- and dividend-adjusted. The IEX API token must be present under "IEXlKey = ..." in Zorro.ini. 
+
+## Bittrex provides recent price history for a large number of        cryptocurrencies. Format: BTC-ETH returns ETH prices in BTC. The history length is normally several years for D1 data, several months for H1 data, and several days for M1 data. It is recommended to        insert a 4 seconds delay between subsequent loadHistory calls. 
+
+## CryptoCompare provides recent price history for almost all existing cryptocurrencies. Format: ETH/BTC returns ETH prices in BTC. The history length is up to 3 years for D1 data, 1 year for H1 data, and 1 month for M1 data. Since digital currencies are not traded at a central exchange, prices from different sources can be different. 
+
+## MT4/MT5 servers usually have no long price history, so the command will print an error message or only partially download the history. 
+
+## IB market data must be subscribed before it can be downloading. For downloading stock M1 data, send 
+
+a **SET\_PRICETYPE,2** command for switching to the last traded price, because ask/bid prices are sometimes in poor quality. 
+
+## FCXM servers provide tick price history from 2002 for currencies, and from 2008 for index CFDs. 
+
+Free historical data is also available on the Zorro download page. History in M1 resolution and options EOD data for US stocks can be purchased from oP group. 
+
+Some data sources, such as Quandl, AlphaVantage, EOD, provide also earnings reports and other fundamental data in JSON format. It can be retrieved with **http\_transfer** and parsed 
+
+with **strstr** and **strvar** commands. 
+
+## *Example:* 
+
+## *// Update M1 price history of all assets from selected broker* function main() 
+
+## { 
+
+`  `**NumYears = 2;** 
+
+`  `**while(loop(Assets))** 
+
+`    `**assetHistory(Loop1,1);** 
+
+## } 
+
+## *// Download D1 prices from Quandl* string Name; 
+
+## while(Name = loop("AAPL","MSFT","GOOGL")) 
+
+`  `**assetHistory(strf("WIKI/%s",Name),FROM\_QUANDL);** 
+
+## *// Download and plot Bitcoin prices from Bitfinex* function run() 
+
+## { 
+
+`  `**BarPeriod = 1440;** 
+
+`  `**assetHistory("BITFINEX/BTCUSD",FROM\_QUANDL);** 
+
+`  `**assetAdd("BTCUSD");** 
+
+`  `**asset("BTCUSD");** 
+
+`  `**set(PLOTNOW);** 
+
+## } 
+
+## *// Download unadjusted SPY data and store it in "SPYuna.t6"* History = "\*una.t6"; assetHistory("SPY",FROM\_STOOQ|UNADJUSTED); 
+
+## *// Download AAPL prices from Stooq, using assetSource* assetSource("AAPL.t6", "https://stooq.pl/q/d/l/?s=AAPL.US&d1=20000101&d2=20201024& i=d", 
+
+## 0,0,"+%Y-%m-%d,f3,f1,f2,f4,f6"); assetHistory(0,FROM\_SOURCE); 
+
+## *// Download Bitcoin OHLC prices from Coin.io* 
+
+## int Month, Year = 2019, MinutesPerMonth = 31\*1440; for(Month = 1; Month <= 12; Month++) { 
+
+`  `**string URL = strf("https://rest.coinapi.io/v1/ohlcv/BTC/USD/history?peri od\_id=1MIN&time\_start=%04d-%02d-01T00:00:00&limit=%d",** 
+
+`    `**Year,Month,MinutesPerMonth);** 
+
+`  `**string Name = strf("BTCUSD\_%04d.t6",Year);** 
+
+`  `**assetSource(Name,URL,** 
+
+`    `**"X-CoinAPI-Key: my-coin-api-key",0,** 
+
+## "[,time\_period\_end,%Y-%m-%dT%H:%M:%SZ,price\_high,price\_low, price\_open,price\_close,,volume\_traded"); 
+
+`  `**assetHistory(0,FROM\_SOURCE);** 
+
+## } 
+
+## *// Download Bitcoin BBO ticks from Kraken via Coin.io* var From = dmy(20190101), To = dmy(20200101); 
+
+## for(; From < To; From += 1.) { 
+
+`  `**string Start = strdate("%Y-%m-%dT00:00:00",From),     End = strdate("%Y-%m-%dT00:00:00",From+1.);** 
+
+`  `**assetSource("BTCUSD\_2019.t2",** 
+
+## strf("https://rest.coinapi.io/v1/quotes/KRAKEN\_SPOT\_BTC\_USD /history?time\_start=%s&time\_end=%s&limit=100000", 
+
+`      `**Start,End),** 
+
+`    `**"X-CoinAPI-Key: my-coin-api-key",0,** 
+
+## "[,time\_exchange,%Y-%m-%dT%H:%M:%SZ,ask\_price,ask\_size,bid\_ price,bid\_size"); 
+
+`  `**assetHistory(0,FROM\_SOURCE);** 

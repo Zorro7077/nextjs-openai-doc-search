@@ -1,0 +1,163 @@
+# ﻿Training variables 
+
+## TrainMode 
+
+Training method; affects the way how parameters, factors, rules, or machine learning models are generated in the training process. The following flags can be set:*** 
+
+## *Flags:* 
+
+## ASCENT  Ascent parameter optimization and parameter chart export. Evaluates the effec
+
+separately. Starts with the first parameter and applies the results of already optimiz the rest. Seeks for 'plateaus' in the parameter space, while ignoring single peaks for a robust strategy, except in special cases with highly irregular parameter spac parameters. 
+
+## BRUTE  Brute force parameter optimization and parameter spreadheet export (Zorro S requ
+
+combinations, exports them to a **\*par.csv**  file in the **Log** folder, and selects the not a single peak. Can take a long time when many parameters are optimized or steps. Useful when parameters affect each other in complex ways, or when it is ne any parameter combination. Brute force optimization tends to overfit the strategy walk-forward optimization is mandatory. 
+
+## GENETIC  Genetic parameter optimization (Zorro S required). A population of parameter co
+
+best solution in an iterative process. In each iteration, the best combinations are 
+
+parameters are then pair-wise recombined and randomly mutated to form a new g
+
+when a large number of parameters - 5 or more per component - must be optimized
+
+other in complex ways. It will likely overfit the strategy, so out-of-sample or walk- **TRADES**  Use trade sizes by **Lots**, **Margin**, etc. Large trades get then more weight in the o
+
+special cases when the trade volume matters, f.i. for optimizing the money manag
+
+calculate their capital distribution by script. Otherwise trade sizes are ignored in th
+
+trades equal weights. 
+
+## PHANTOM  Exclude phantom trades. Otherwise phantom trades are treated as normal trade PEAK  Optimize toward the highest single peak in the parameter space, rather than tow
+
+generate unstable strategies and is for special purposes only. For instance when but a set of different algorithms or different assets. 
+
+## ALLCYCLE Generate individual OptimalF factor files for all WFO cycles, instead of a single fil S  produces low-quality factors due to less trades, but prevents backtest bias. 
+
+## NumParameters 
+
+Number of parameters to **optimize** for the current asset/algo component that was selected in a **loop** (**int,** read/only, valid after the first **INITRUN**).
+
+## ParCycle 
+
+Current parameter or current generation, runs from **1** to **NumParameters** in Ascent mode, or from **1** to **Generations** in Genetic mode (**int,** read/only, valid after the first **INITRUN**).
+
+## StepCycle 
+
+Number of the optimize step, starting with **1** (**int,** read/only, valid after the 
+
+first **INITRUN**). The number of step cycles depends on the number of steps in a parameter range and of the population in a genetic optimization. Counts up after any step until the required number is reached or **StepNext** is set to 0. 
+
+## StepNext 
+
+Set this to **0** for early aborting the optimization (**int**).
+
+## NumTrainCycles 
+
+Number of training cycles (**int**, default = **1**) for special purposes, such as training a combination of interdependent rules and parameters in a given order 
+
+(see **Training**). In any cycle, set either **RULES**, or **PARAMETERS**, or both, dependent on training method. Not to be confused with **WFO** 
+
+## cycles or Generations.
+
+## TrainCycle 
+
+The number of the current training cycle from **1** to **NumTrainCycles**, or **0** in [***Test***] or [***Trade***] mode (**int,** read/only). The training mode of the current cycle can be determined with the **PARCYCLE**, **RULCYCLE**, **FACCYLE** flags.
+
+## LogTrainRun 
+
+Set this to a identifier number for logging a particular training run. The identifier is a 5-digit number in the format **WFSPO**, where **W** = WFO cycle, **F** = first loop iteration, **S** = second loop iteration, **P** = parameter number, and **O** = optimize step. At **11111** the very first training run is logged. 
+
+## Population 
+
+Maximum population size for the genetic algorithm (**int,** default = 50). Any parameter combination is an individual of the population. The population size reduces automatically when the algorithm converges and only the fittest individuals and the mutants remain.
+
+## Generations 
+
+Maximum number of generations for the genetic algorithm (**int,** default = 50). Evolution terminates when this number is reached or when the overall fitness does not increase for 10 generations.
+
+## MutationRate 
+
+Average number of mutants in any generation, in percent (**int,** default = 5%). More mutants can find more and better parameter combinations, but let the algorithm converge slower.
+
+## CrossoverRate 
+
+Average number of parameter recombinations in any generation, in percent (**int,** default = 80%). 
+
+## BestResult 
+
+Highest **objective** return value so far (**var**, starting with **0**).
+
+## Parameters 
+
+Pointer to a list of **PARAMETER** structs for the current asset/algo component. The **Min, Max,** and **Step** elements are set up in the list after the first **INITRUN** in [***Train***] mode. The **PARAMETER** struct is defined in **trading.h**.*** 
+
+## *Remarks:* 
+
+## TrainMode must be set up before the first optimize call. 
+
+Training methods for machine learning or rules generating are set up with the **advise** function. 
+
+Alternative optimization algorithms from external libraries or individual optimization targets can be set up with 
+
+the **parameters** and **objective** functions. 
+
+## Parameter charts are only produced by Ascent optimization 
+
+when **LOGFILE** is set. It is recommended to do first an Ascent training for determining the parameter dependence of a strategy. Afterwards the final optimization can done with a different algorithm if requried. 
+
+## Parameter spreadsheets are exported by Brute 
+
+## Force optimization. They can be used for generating 2-d parameter heatmaps or 3-d parameter surfaces with Excel or other programs. 
+
+Percent steps (4th parameter of the **optimize** function) are replaced by 10 equal steps for brute force and genetic optimization. 
+
+In genetic optimization, parameter combinations that were already evaluated in the previous generation are not evaluated again and are skipped in the log. This lets the algorithm run faster with higher generations. 
+
+Genetic optimization is also possible with the free Zorro version using the **Z Optimizer tool** from the Download page. 
+
+When parameters are trained several times by 
+
+using **NumTrainCycles**, each time the start values are taken from the 
+
+last **optimization** cycle in **Ascent** mode. This sometimes improves the result, but requires a longer time for the training process and increases the likeliness of **overfitting**. To prevent overfitting, use not more than 2 subsequent parameter training cycles. 
+
+## *Example:* setf(TrainMode,TRADES+PEAK); 
+
+## PlotMode 
+
+Determines what's plotted at the end of a test or when clicking [***Result***]. Use **setf** and **resf** for setting and resetting the flags.*** 
+
+## *Flags:* 
+
+## PL\_LONG  - begin the chart already with the LookBack period. Otherwise the 
+
+chart begins a few bars before the test or trade period. 
+
+## PL\_ALL  - plot all asset specific curves, regardless of the selected asset (except for price curve and trades). 
+
+## PL\_ALLTRADES - plot all trades, regardless of the selected asset. 
+
+## PL\_FINE - plot equity and price curves in higher resolution. 
+
+## PL\_DIFF - plot the equity/balance difference to the initial value, rather than the total value. For better visibility of small equity changes when Capital is invested. PL\_FILE - export the chart to a .png image, rather than opening the chart viewer. The file name is composed from the script name, an optional asset name, and the LogNumber. 
+
+## PL\_TITLE - print the chart title in the upper right area of the chart. PL\_BENCHMARK - plot the equity as a line, instead of a bar graph, for comparing equity curves with benchmarks. 
+
+## PL\_DARK - use a dark theme with a black background for the chart. 
+
+## *Type:* 
+
+## int *Example:* 
+
+## function run() 
+
+## { 
+
+`  `**...** 
+
+`  `**setf(PlotMode,PL\_ALL|PL\_FINE);   ...** 
+
+## } 

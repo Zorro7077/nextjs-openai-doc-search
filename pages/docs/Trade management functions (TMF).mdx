@@ -1,0 +1,47 @@
+# ﻿Trade management functions (TMF) 
+
+Trade **enter** commands can receive the name of a trade management function (**TMF**) as the first argument: **enterLong(MyTMF, ...);**. Alternatively, a user function named **manage** can be defined as a global TMF for all entered trades: 
+
+## int manage() 
+
+A TMF is a function for micro managing the trade. It is triggered for any open or pending trade at any price tick or price change of the traded asset. In most cases it's used for modifying entry, stop, or profit limits in a special way, thus overriding the standard trailing methods. Since a TMF runs at every **tick**, it has access to the most recent price quote. When the market is closed and no price ticks are received, TMFs are not executed. 
+
+TMFs are also executed at special events in the lifetime of a trade: Right before entering or exiting due to an **Entry**, **Stop**, or **TakeProfit** limit, and right after being closed. Which event it is can be checked in the TMF with the boolean expressions **TradeIsEntry**, **TradeIsStop**, **TradeIsProfit**, **TradeIsClosed** (descri bed below). 
+
+If the TMF is passed to an **enter** command, it can receive up to 8 
+
+additional **var** parameters following the function name: **enterLong(MyTMF, parameter1, parameter2...)**. They must also appear in the function's parameter list and keep their values during the lifetime of the trade. The alternative 
+
+global **manage** function has no parameters. 
+
+A TMF has the return type **int** and should normally return **0**; other return values have a special meaning: 
+
+## *TMF return values* 
+
+## 0  Check the trade's Entry, Stop, TakeProfit, and Trail parameters, and exit or enter accordingl
+
+## 1  If the trade is open or pending, exit or cancel it now. If the exit order was unfilled due to an Order
+
+the given **OrderDelay**. 
+
+## 2  If the trade is pending, enter it now. If the entry order was unfilled due to an OrderLimit, rep
+
+given **OrderDelay**. 
+
+## 4  Don't use Entry, Stop, or TakeProfit for automatically entering or exiting. Exit or enter only 
+
+## 8  Execute the TMF at the next bar right before the run call, instead of at the next incoming tick.
+
+## 1 Execute the TMF only at the following events: right before entering due to Entry, right before e
+
+## 6  to Stop or TakeProfit, and right after the trade was closed. 
+
+The return values can be combined by addition. For instance, **return 28**  (28 = 
+
+4+8+16) executes the TMF only at the next bar or when **Entry**, **Stop**, 
+
+or **TakeProfit** was hit, and does not automatically enter or exit in that 
+
+case.***     When using a TMF, make sure the function has a **return** statement 
+
+with the correct value! 

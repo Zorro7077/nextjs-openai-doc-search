@@ -1,0 +1,31 @@
+# ﻿Manipulating datasets 
+
+## dataMerge (int Handle1, int Handle2): int 
+
+Merges dataset **Handle2** into dataset **Handle1**. Both datasets must be sorted in descending time stamp order, and the first dataset must begin with an earlier timestamp than the second. When timestamps overlap, the content from the second dataset replaces content from the first. This function can be used to stitch datasets together. Returns the total number of records, or **0** when the datasets could not be merged.
+
+## dataAppend (int Handle1, int Handle2, *int Start, int Num*): int 
+
+Appends dataset **Handle2** partially or completely at the end of the 
+
+dataset **Handle1**. The **Handle1** dataset must be either empty or have the same number of columns as **Handle2**. The number of rows may be 
+
+different. **Num** records from **Handle2** are stored, beginning with the record **Start**. If both parameters are omitted or zero, the whole dataset is appended. Returns the total number of records, or **0** when the datasets could not be appended.
+
+## dataAppendRow (int Handle, int Fields): void\* 
+
+Appends a new record at the end of the given dataset, and returns a temporary pointer to the begin of the new record. If the dataset didn't exist, it is created with the given number of fields. The returned pointer remains valid until the 
+
+next **dataAppendRow** call. Use **dataRow** (see below) for converting the pointer to a record number. 
+
+## dataDelete (int Handle, int Record1, int Record2): int 
+
+Deletes all records from **Record1** up to **Record2** from the dataset. Returns its new number of records.
+
+## dataClip (int Handle, int Records): int 
+
+Truncates the dataset to the given number of records.
+
+## dataSort (int Handle) 
+
+Sorts the dataset with the given **Handle** in descending time stamp order. Returns the number of records. 

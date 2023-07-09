@@ -1,0 +1,41 @@
+# ﻿R Bridge 
+
+The R bridge connects Zorro scripts and algorithmic trading systems to 
+
+the **R** environment. It allows R computations and access to R packages in your C or C++ based script. 
+
+R is an interactive script language for data analysis and charting, developed in 1996 by Ross Ihaka and Robert Gentleman of Oakland University as successor to the S language. The latter was developed by John M. Chambers and his colleagues in the Bell Labs company in 1976. Today, R is still being improved by the R Development Core Team including John Chambers. Although R is an interpreted language and thus slow compared to 'real' programming languages such as C, it has many advantages: 
+
+It is the global standard for statistical research, data analysis, and machine learning algorithms. 
+
+It is interactive and easy to use once you're familiar with its command syntax. R functions are short and effective. 
+
+It is 'Zorro-like' - it has a minimalistic user interface and can be easily automatized for experiments and research tasks. 
+
+It has ready-to-use extensions - "packages" - for all imaginable mathematical and statistical tasks, including support vector machines, genetic optimization, several kinds of neural networks, and deep learning algorithms. Meanwhile there are more than 4000 R packages. 
+
+It is continuously developed and supported by the global scientific community. The time between a research publication and its implementation in a R package is usually very short. In average, 15 new R packages come out every day. 
+
+It is free. As Linus Torvalds said: "Software is like sex - it's better when it's free". 
+
+For any imaginable algorithm there's normally already one or several R packages available. This makes R an excellent tool for financial research or analyzing financial time series, using the newest published methods. However, R is not a 'clean' programming language such as C - it is full of traps to the beginner, so using it effectively needs some experience. It's also not suited for trading (although some packages provide rudimentary backtest, optimization, and even broker connection functions!). The solution to this is the **R bridge** that allows including R computations in a Zorro strategy and using their results for trade signals. The lite-C script can start R sessions, send price data or indicator values to it, and call training and predicting functions from R machine learning packages. The bridge uses the **R.dll** by Bernd Kreuss. Its original distribution with source code is contained in the **Zorro\Source** folder. The code that accesses the DLL is located in the **r.h** header file. 
+
+Many problems can be solved in lite-C as well as in R, but R often has already a dedicated command implemented for that. For instance, downloading and converting historical price data from an online source requires about 10 code lines in lite-C (**here**), but often only a single line in R (**read.csv("http://ichart.finance.yahoo.com/table.csv?...")**). 
+
+## *Installation and test* 
+
+Install R from **http://cran.r-project.org**.   
+
+Open **ZorroFix.ini** and make sure that the entry **RTermPath** contains the correct path to the R 
+
+terminal **RTerm.exe**.   
+
+Start Zorro and select the script **RTest**. Click [***Test***] for 
+
+running **RTest**. If everything went well, you should see a result in your 
+
+Zorro window, like this:            
+
+For using the R bridge in your scripts, include the **r.h** header at the begin of the **.c** or **.cpp** script. You need the 32 bit Zorro for running it - Zorro64 has no R bridge (yet). 
+
+A thorough intro to using R with Zorro can be found on **RobotWealth**.

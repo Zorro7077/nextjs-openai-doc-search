@@ -1,0 +1,361 @@
+# ﻿User interface panels 
+
+For setting up strategy parameters, triggering actions, or displaying something, the following elements are available: 
+
+The **sliders** for entering or displaying numerical values, 
+
+the [***Result***] button that can be redefined by script, 
+
+the [***Action***] scrollbox for displaying or selecting items or triggering script functions, 
+
+and a **control panel** with user-defined buttons, switches, displays, entry fields, and spreadsheet lists (**Zorro S** or executable strategies only). 
+
+The control panel can be created by script or with Excel™. The panel is a rectangular grid of multi-purpose cells, similar to a spreadsheet. Every cell can display text, numbers, or a color, and can serve as a numeric or text input field or as a push, toggle, radio, or spin button. With this concept, even complex control functions for commercial strategies can be realized in a simple way. Such a control panel does not look particularly pretty, but it's functional: 
+
+A panel can have a virtually unlimited number of rows and columns. If there are more than fit on the screen, the panel can be scrolled with scrollbars on the right and bottom side. Header rows or columns can be defined that stay fixed when the rest of the panel scrolls. This way, individual asset parameters can be set up or  displayed  for  multi-asset  strategies.  An  example  of  a  scrolling  panel  with thousands of rows can be found in the **History.c** script. 
+
+The following functions can be used for defining and handling a control panel or for populating the [***Action***] scrollbox: 
+
+## panel (int rows, int columns, int color, int size) 
+
+Opens an empty control panel with the given number of **rows** and **columns**, background **color**, and horizontal cell **size** in pixels. If a control panel was already open, it is replaced by the new one. The panel is opened next to the Zorro window, and can be freely moved by dragging it with the mouse. If the number of rows or columns exceed the screen size, scrollbars are added to the panel. **panel(0,0,0)** removes the panel.
+
+## panel (string filename, int color, int size) 
+
+As above, but loads a control panel from a **.csv** spreadsheet file. Every cell of the panel is set up from the corresponding spreadsheet cell. The cells in the file are separated with  ***;***  or  ***,***  delimiters. Every row must end with a new line character. The following control characters in the cell content have a special meaning:  ***!...***  - cell is a button;  ***#...***  - cell can be edited;  ***@***  - merge the cell with the next 
+
+not-empty cell to the left. The default colors are grey for text cells, red for numbers, white for editable cells, and blue for buttons; they can be changed with the **ColorPanel** variables. 
+
+`  `CSV delimiters and control characters must otherwise not appear in cell content. For still displaying them, the cell content can be set with **panelSet()** after loading the panel. Examples of spreadsheet-generated panels can be found in the **Strategy** folder.
+
+## panelSet (int row, int col, string text, *int color, int style, int type*) 
+
+Set properties or update content of an individual cell. 
+
+## row - row number starting with 0, or -1 for the [*Result*] button, or -2 for the [*Action*] scrollbox. 
+
+## col - column number starting with 0, or line number in the [*Action*] scrollbox.  text - content to appear in the cell, button, or scrollbox line, or 0 for not changing the content. Numbers can be converted to text with strf. 
+
+## color - background color of the cell, or 0 for not changing the color. 
+
+## style - 1 normal text, 2 highlighted text, 3 greyed-out 
+
+text, **+4** right-aligned, **+8** left-aligned, **+12** centered, **+16** bold, or **0** for not changing the style. 
+
+## type - 1 normal cell, 2 editable cell, 4 button, 0 for not changing the type. 
+
+If **row** is **-2** and **type** is nonzero, the **text** is selected in the [***Action***] scrollbox. 
+
+Default colors are stored in **ColorPanel[n]**, where **n = 0** for text 
+
+background, **1** for number background, **2** for an editable field, **3** for a button, **4** for highlighted text, **5** for greyed out text. 
+
+## panelGet (int row, int col): string 
+
+Returns a temporary string with the current content of the cell. Numbers can be converted from the returned string with **sscanf**, **atof**, or **atoi**. 
+
+## panelMerge(int Row, int Col, int NumRows, int NumCols) 
+
+Merges the given area of the panel to a single cell, with the content of the first cell. **Row** / **Col** is the upper left corner and **NumRows** / **NumCols** the size.
+
+## panelFix(int NumRows, int NumCols) 
+
+Gives the number of header rows and columns that stay fixed on a scrolling panel. Header cells cannot be merged. 
+
+## panelSave (string Filename) 
+
+Saves the panel content in **.csv** format to the given **FileName**, or to **"Data\\*.pan"** when the name is empty or zero.
+
+## panelLoad (string Filename) 
+
+Loads the saved panel content in **.csv** format from the given **FileName**, or 
+
+from **"Data\\*.pan"** when the name is empty or zero. Only editable or button cells are affected. 
+
+## click(int Row, int Col) 
+
+User-supplied function that is triggered by the following GUI actions: 
+
+- mouse click on a button cell, 
+- entering a number or editing a cell, 
+- clicking the [***Result***] button (**Row** = **-1**), 
+- selecting a previously set action from the [***Action***] scrollbox (**Row = -2**). 
+- selecting an asset with the [***Asset***] scrollbox (**Row** = **-3**; asset name 
+
+in **AssetBox**). 
+
+Dependent on the desired behavior of the button, the function can then change the cell color or content through **panelSet**, and/or save the panel content 
+
+with **panelSave()**.*** 
+
+## *Remarks:* 
+
+Control panels can only be created with **Zorro S**, but can be included in executable strategies (**.x** files) and can then also be used with the free Zorro version. 
+
+Even without a panel, the [***Result***] button and the [***Asset***] and [***Action***] scrollboxes can trigger the **click** function. If this is unwanted, filter out clicks with negative row values. 
+
+Text on the panel caption bar can be displayed 
+
+with **print(TO\_PANEL,...)**. 
+
+The panel stays open after the end of the strategy unless it is explicitely removed either with **panel(0,0,0,0)**, or by clicking [***Edit***], or by selecting a new script. As long as it is open, it can still be edited and can even trigger functions when clicked on. For preventing that functions are triggered when the script is not running, check the **RUNNING** flag. For keeping the previous panel content when the strategy is restarted, 
+
+call **panel()** or **panelLoad()** only when both the **INITRUN** and 
+
+the **CHANGED** flags are set. 
+\***
+`   `The **click** function is a separate process and not in sync with with the **run** or **tick** functions. Therefore, do not change the asset, send broker commands, or modify global variables directly in the **click** function, because this can interfere with other functions and with the rest of your script. Always use **call***(1,....)* for critical operations inside a **click** function. See example below. 
+
+The [***Action***] scrollbox keeps its state after the end of the strategy unless it is explicitely removed at the end with **panel(0,0,0,0)**. By clicking [***Edit***] or by selecting a new script, the scrollbox is reset to the default actions. The selection state of the scrollbox can be saved in 
+
+an **AlgoVar** and restored at the start of the strategy; for this use 
+
+the **panelSet** function with the **type** parameter at **1** for the selected item. ***Examples: (see also Download.c, History.c, PanelTest.c)*** 
+
+## *// click function example* 
+
+## function click(int row,int col) 
+
+## { 
+
+`  `**if(!is(RUNNING)) return; *// prevent clicks after the end of the script*** 
+
+`  `**if(row < 0) return; *// prevent clicks by result button or scroll box*** 
+
+`  `**sound("click.wav");** 
+
+`  `**string Text = panelGet(row,col);** 
+
+`  `**if(Text == "Buy") *// toggle button between "Buy" and "Sell"*     panelSet(row,col,"Sell",0,0,0);** 
+
+`  `**else if(Text == "Sell")** 
+
+`    `**panelSet(row,col,"Buy",0,0,0);** 
+
+`  `**else if(Text == "Close All")  *// push button to close all trades*** 
+
+`    `**call(1,closeAllTrades,0,0);** 
+
+`  `**else if(Text == "Enter Trade")  *// push button to enter position*** 
+
+`    `**call(1,enterMyTrade,0,0);** 
+
+`  `**else if(Text == "Cancel")  *// back to last saved state*** 
+
+`    `**panelLoad("Data\\mypanel.csv");** 
+
+`  `**panelSave("Data\\mypanel.csv");**   
+
+## } 
+
+## *// Entering a code number* 
+
+## int Code = 0; 
+
+## void click(int row,int col) { 
+
+`  `**sound("click.wav");** 
+
+`  `**Code = atoi(panelGet(0,0)); }** 
+
+## void enterNumber() 
+
+## { 
+
+`  `**Code = 0;** 
+
+`  `**panel(1,4,GREY,30);** 
+
+`  `**print(TO\_PANEL,"Enter your code number");   panelSet(0,0,"",0,1,2);** 
+
+`  `**panelMerge(0,0,1,3);** 
+
+`  `**panelSet(0,3,"Ok",ColorPanel[3],1,4);** 
+
+`  `**while(!Code) wait(0);** 
+
+`  `**panel(0,0,0);** 
+
+`  `**printf("\nCode: %i",Code);** 
+
+## } 
+
+## *// Start a program via Action scrollbox* 
+
+## void click(int row,int col) 
+
+## { 
+
+`  `**if(row == -2 && col == 0) *// first action line*     exec("Editor","Strategy\\Z.ini",0);** 
+
+## } 
+
+## function run() 
+
+## { 
+
+`  `**panelSet(-2,0,"Edit Z9.ini",0,0,0);   ...** 
+
+## } 
+
+## printf (string format, ...) 
+
+Prints text and variables in a log file and the message window in [***Test***] and [***Trade***] modes. This is a standard C function. It allows to display messages and variables. 
+
+## print (int to, string format, ...) 
+
+Similar to **printf**, but prints text and variables to a target channel given by 
+
+the **to** parameter, such as the log file, a .csv spreadsheet file, the HTML status page, or the performance report.
+
+## msg (string format, ...): int 
+
+Displays text and variables in a modal or nonmodal message box with [***Yes***] and [***No***] buttons, and waits for the user to click one of the buttons. Format strings beginning with '#' open a nonmodal box.*** 
+
+## *Returns* 
+
+## 0 when [*No*] was clicked, 1 when [*Yes*] was clicked. *Parameters:* 
+
+## to  TO\_WINDOW - print to the message window and the log file (default for printf). TO\_LOG
+
+the log file, in [***Trade***] and in **STEPWISE** mode also to the message window. **TO\_FILE** mode to the log file. **TO\_ANY** - print in all modes to the message window and log file 
+
+(= **TO\_WINDOW+TRAINMODE**). **TO\_DIAG** - print to the **diag.txt** file (see **Verbose**). Not are not yet open in the **INITRUN**. **TO\_ALERT** - print to an alert box and stop black box
+
+is set for **Verbose**. **TO\_OUT** - print to a file with the script name and extension **".out"** print to a file with the script name and extension **".csv"** in the **Data** folder, for exporting dat first line of the CSV file; for writing a header before writing the data.. **TO\_REPORT** - print i the **performance report**, for displaying additional performance parameters. **TO\_HTM**
+
+in **STEPWISE** mode to the HTML file that displays the live trading status. HMTL format cod text. **TO\_TITLE** - print to the title bar. **TO\_INFO** - print to the info field. **print(TO\_INFO, 0)** or simulation state in the info field. **TO\_PANEL** - print to the caption bar of the current print to the caption bar and - if **PL\_TITLE** is set - to the title of the current **chart**. **+TRA** mode. 
+
+## form C-style format string, containing arbitrary text with placeholders for subsequent variables (se at  placeholders begin with a percent sign '%' and define the format of the displayed number. 
+
+a **var** with a dollar symbol and 2 decimals; **"%i"** prints an **int**; **"%+4.1f"** prints a **var** with +/ decimal. For printing **float** variables, use the **%f** placeholder and typecast them to **(var)**
+
+## ...  Expressions or variables, one for each placeholder in the format text. *Remarks:* 
+\***
+`   `Since the above functions accept any number and type of parameters, **variable types are not checked** and not automatically converted. A wrong variable type in a **printf** call will produce wrong output 
+
+- not only of the variable, but also of all subsequent variables - and can even cause a program crash. So make sure that variables match 
+
+the **format** string precisely. If you print a predefined variable, use the correct placeholder for **var**, **float**, **int**,** or **string**. 
+
+For **printing float variables**, typecast them to **(var)** or **(double)**, like 
+
+this: **printf("Profit: $%.2f",(var)TradeProfit)**. The **printf** function will not automatically promote a **float** to a **double**. 
+
+For printing a **percent sign** in the text, use **"%%"**; for a **backslash**, use **"\\"**. A short list of C-style format strings can be found under **format codes**, a more detailed description in any C/C++ book. 
+
+For printing on a **new line** in the log or message window, begin the text with the linefeed symbol **"\n"**. Otherwise **printf** appends the text to the end of the current line. For printing on a new line in a HTML file, begin the text with the tag **"<br>"**. 
+
+For deleting the current line in the message window and replacing it with new content, begin the text with the carriage-return symbol **"\r"**. This way running counters or similar effects can be realized. 
+
+The **maximum text size** depends on the print channel. For the message window it's about 2000 characters, for a file 20000 characters. Longer texts are clipped. 
+
+For printing into a string, use the **sprintf** or **strf** functions. For printing into a file, use the **file\_append** function. 
+
+For printing with **printf** **only to the log file** and not to the window, add a **"#"** at the begin of the text (**printf("#\n...",...);**). In [***Trade***] mode log messages are also printed to the window. 
+
+For temporarily suppressing all **printf** messages, set **Verbose |=** 
+
+## SILENT. 
+
+For opening a nonmodal message box with the **msg** function, add a **"#"** at the begin of the text (**msg("#...",...);**). A nonmodal message box has an [***Ok***] and a [***Cancel***] button and does not wait for the user to click a button; the script just continues. When the user later clicks [***Ok***], 
+
+the **AFFIRMED** flag is set (see example). An empty message (**msg("#");**) lets the nonmodal box disappear. 
+
+For refreshing the GUI so that printed messages are updated in the window, use the **wait** function. 
+
+For **debugging** purposes, the **watch** function is often more convenient than the **printf** function. It allows breakpoints, needs no format string, and prevents errors by printing wrong variable types. 
+
+## *Examples:* 
+
+## *// printf example* 
+
+## var vPrice = 123.456; 
+
+## float fDiscount = 1.5; 
+
+## int nNumber = 77; 
+
+## ... 
+
+## printf("\nPrice %.3f for %d items, total %.3f, discount %.1f%%", 
+
+`  `**vPrice, nNumber, nNumber\*vPrice, (var)fDiscount);** 
+
+## *// HTML status message example* 
+
+## if(ATR(30) < Threshold) 
+
+`  `**print(TO\_HTML,"<br>Low volatility - ATR30 = %.3f",ATR(30)); *// nonmodal box example*** 
+
+## function run() 
+
+## { 
+
+`  `**if(is(INITRUN))** 
+
+`    `**msg("#Nonmodal message box.\nClick [Ok] to exit script!");   if(is(AFFIRMED))** 
+
+`    `**quit("Ok!");** 
+
+`  `**Sleep(10);** 
+
+## } 
+
+## *// CSV file output example* 
+
+## function run() 
+
+## { 
+
+`  `**LookBack = 100;** 
+
+`  `**asset(Asset);** 
+
+`  `**print(TO\_CSVHDR,"Date,Price,SMA,EMA\n");** 
+
+`  `**print(TO\_CSV,"%s,%.4f,%.4f,%.4f\n",** 
+
+`    `**strdate(YMDHMS,0),** 
+
+`    `**priceC(),** 
+
+`    `**SMA(seriesC(),50),** 
+
+`    `**EMA(seriesC(),50));** 
+
+## } 
+
+## progress (int n1, int n2): int 
+
+Displays a red/green progress bar during a [***Test***] run. Prevents unresponsiveness during long computations or external function calls.*** 
+
+## *Parameters:* 
+
+## n Length of the first part of the progress bar in percent. Green when > 0, red when < 0. 
+
+## 1 
+
+## n Length of the second part of the progress bar in percent; green when > 0, red when < 0, 0 for a n 2  color. 
+
+## *Returns:* 
+
+0 when the [***Stop***] key was hit, nonzero otherwise. ***Remarks:*** 
+
+If **n1** and **n2** are 0, the progress indicator displays the default bar with the current win/loss situation. If no **run** function is defined, it prints every 30 seconds a dot in the message window for indicating progress. 
+
+## *Example:* 
+
+## if(!progress(0,0)) return; 
+
+## sound(string name) 
+
+Plays a **.wav** sound file. ***Parameters:*** 
+
+## na Name of the sound file, f.i. "test.wav". If the file is not found in the Zorro folder, a standard me  played. 
+
+## *Remarks:* 
+
+Sounds are not played when **Mute** is set. 
+
+## *Example:* sound("win.wav"); 

@@ -1,0 +1,25 @@
+# ﻿Debugging a strategy 
+
+You can replay or single step through a strategy for examining the trade behavior in detail. Use the [***Asset***] scrollbox to select the asset to be observed, then click [***Step***] or [***Replay***] for stepping through the backtest or replaying it in reduced speed. [***Step***] moves one bar forward, [***Skip***] moves to the next bar at which a trade opens or closes. The two buttons also appear on the Zorro main window. 
+
+Debugging opens the chart window at the current position, and another window with a list of open trades: 
+
+The trade list has the same format as on the **live status page**. 
+
+The stepwise change of variables and indicators can be visualized either with 
+
+a **watch** statement, or by **plotting** them in the chart. For debugging single loops or function calls, place **watch ("!...", ...)** statements inside. [***Step***] will then not proceed to the next bar, but to the next **watch** statement. Stepwise debugging normally begins at the end of the **LookBack** period. For beginning at a certain date or bar number, call **watch** dependent on a condition, f.i. **if(date() >= 20150401) watch("!...", ...);**. Set the **STEPWISE** flag for starting the backtest already in debugging mode. 
+
+For suggestions about **writing clean code** and dealing with bugs and errors in your script, read **troubleshooting**. 
+
+For testing the behavior of a strategy under **simulated market conditions**, such as extreme drops, use an artificial price curve 
+
+(see **SHAPE)**. 
+
+For quickly testing the **robustness** of your strategy, run it with a detrended or inverted price curve (see **Detrend**). 
+
+For testing the live trading behavior at a **certain date** or in **'fast forward'** mode, use **DayOffset**. 
+
+## *See also:* 
+
+## Testing, Colors, plot, watch, Troubleshooting, Performance Report

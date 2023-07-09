@@ -1,0 +1,489 @@
+# ﻿Option Combos 
+
+The functions below can be used for handling combinations of **options**, such as Spreads, Straddles, Strangles, Condors, Butterflies, etc. Option combos are mainly used for limiting risk. For an introduction to options trading, see **Financial Hacker**. The image below shows the profit or loss of an Iron Condor combo dependent of the underlying price, at expiration (blue) and halfway to expiration (red).  
+
+` `Iron Condor payoff diagram (**Payoff.c**) 
+
+## combo (CONTRACT\* C1, int N1, CONTRACT\* C2, int N2, CONTRACT\* C3, int N3, CONTRACT\* C4, int N4): int 
+
+Combines 2, 3, or 4 option contracts **C1..C4** to a combo. The number and trade direction of contracts are given by **N1..N4**; use negative numbers for selling and positive numbers for buying, f.i. **-2** for short selling two 
+
+contracts. **C3**/**N3** and **C4**/**N4** can be **0** for combos with only 2 or 3 legs. Returns the number of combo legs, i.e. the number of different contracts of the combo. If all numbers **N** are **0**, or if any **CONTRACT\*** pointer is zero while its associated number **N** is nonzero, the combo is disabled and the function returns **0**. Source code in **contract.c**.
+
+## comboAdd (CONTRACT\* C, int N): int 
+
+Adds a copy of the option contract **C** to the current combo. Amount and trade direction of the contract is given by **N**; use a negative number for selling and a positive number for buying. Returns the number of the current combo leg. If **C** is 0, the function deletes all contracts from the combo and returns 0.
+
+## comboLegs (): int 
+
+Returns the number of legs of the current combo that was defined before with **combo()** or **comboAdd()** calls.
+
+## comboContract (int Leg): CONTRACT\* 
+
+Pointer to the **CONTRACT** struct of the combo leg with the given number (1..4). Macro defined in **contract.c**.  
+
+## comboLeg (int Leg): int 
+
+Selects the contract of the combo leg with the given number (1..4), and returns the number assigned to that contract as defined in the **combo()** function. The number is negative for selling and positive for buying, so it can be directly used for the **Lots** parameter passed to **enterLong**. 
+
+## comboStrike (int Leg): var 
+
+Returns the strike value of the given combo **Leg** (1..4). Source code 
+
+in **contract.c**.
+
+## comboProfit (var Price, int Sign): var 
+
+Returns the profit or loss of the current bought (**Sign == 1**) or sold (**Sign == -1**) combo when expiring at the given **Price**. **Type**, **fAsk**, and **fBid** of all contracts of the combo must be set, so **contractPrice** should have been called before; the other contract parameters don't matter. Multiplier and transaction costs are not included. Source code in **contract.c**.
+
+## comboRisk (int Sign): var 
+
+Returns the maximum possible loss of the current bought (**Sign == 1**) or sold (**Sign == -1**) combo. For combos with unlimited loss, returns the loss when the price drops to zero or ends up at twice the strike, whichever is 
+
+worse. **Type**, **fAsk**, **fBid**, and **fStrike** of all contracts of the combo must be set, so **contractPrice** must have been called before; the other contract parameters don't matter. Multiplier and transaction costs are not included. Source code 
+
+in **contract.c**.
+
+## comboPremium (int Sign): var 
+
+Returns the premium of the current bought (**Sign == 1**) or sold (**Sign == -1**) combo, also referred to as the combo's ask and bid price. Positive premium is earned, negative premium is paid. If the combo consists of long and short positions, its ask price can be lower than its bid price. **fAsk** and **fBid** of all contracts of the combo must be set, so **contractPrice** should have been called before; the other contract parameters don't matter. Multiplier and Transaction costs are not included. Source code in **contract.c**.
+
+## comboType (): int 
+
+Returns the combo type: **1** for a single put, **2** for a single call, **6** for a call spread, **7** for a strangle (call and put), **8** for a put spread, **13** for a call butterfly (3 calls), **14** for a put butterfly (3 puts), and **20** for a 4-contract combo such as a condor (2 calls and 2 puts). Source code in **contract.c**.
+
+## comboMargin (int Sign, int AssetType): var 
+
+Calculates the margin cost of the current bought (**Sign == 1**) or sold (**Sign == -1**) combo with the given **AssetType**.** Uses the margin formula on the Interactive Broker's **US Options Margin Requirements** page. Supports single calls and puts, call spread, put spread, strangle (call and put), Butterfly with 3 calls, Butterfly with 3 puts, and Condor (2 calls and 2 puts). Source code in **contract.c**. 
+
+## *Parameters:* 
+
+## C1..C4  CONTRACT\* pointer for leg 1..4, or 0 when the leg is not used in the combo. N1..N4  Number of contracts for leg 1..4, negative for selling and positive for buying contract
+
+the combo. 
+
+## Leg  Number of the combo leg, 1..4, starting with 1 for the first contract. 
+
+## Sign  Position sign, -1 for short and 1 for long. 
+
+## AssetTy 1 for a currency, 2 for an index, 3 for stocks and ETFs. The margin for futures must be indi pe 
+
+## comboPrint (int To) 
+
+Prints the parameters of the current combo contracts to the destination **To**, as in **print(To,...)**.  
+
+## plotCombo (var HistVol, var Min, var Max, int Days, int Modus) 
+
+Plots the **payoff diagram** of the current combo with volatility **HistVol** from 
+
+price **Min** to price **Max**. **Modus 0** initializes the plot and plots a zero line, **Modus 1** plots the diagram at expiration, **Modus 2** at the given **Days** into the lifetime 
+
+(**R** and **RQuantLib** required), and **Modus 3** plots the Delta. Type, strike, ask, bid, and expiry in days must be set in all contracts of the combo. Two different expiration periods are supported. Source code in **contract.c**; usage example 
+
+in **PayOff.c**. 
+
+## *Remarks:* 
+
+## contract.c must be included for all above functions. 
+
+Combo trades should be opened or closed in the order of legs,           starting with leg 1. They are then automatically combined to a combo order which is sent to the broker with the last leg. Many brokers offer **reduced      margin and commission** on combos. The combo order internally uses       the **SET\_COMBO\_LEG** command, which must be supported by the broker plugin. Otherwise the combo is split in separate contract orders. Make sure that all legs of the combo are entered together; "pending legs" won't work. 
+
+## Order limits are normally interpreted by the broker as a price limit of the whole combo. The Stop variable affects individual legs; closing the whole combo at a certain loss must be handled by script. 
+
+Combos orders **can take several minutes** for being executed, even at market. For this reason it is recommended to use **GTC** orders and/or to increase the wait time with the **SET\_WAIT** command. 
+
+If a combo order is not opened by the broker, the **enter** call with the last leg will fail. In that case cancel the preceding legs with 
+
+the **cancelTrade** function. 
+
+The elements of the current combo can be accessed through 
+
+the **ThisCombo** pointer, defined in **trading.h**. 
+
+The current combo remains valid until the 
+
+next **combo()** or **contractUpdate()** call. 
+
+Use the **algo** function for getting separate combo-specific statistics. For determining the current profit/loss of a combo position, use a **trade loop** and sum up all **TradeProfit** of the same **TradeAlgo**. Trades of the same combo are listed in sequence in the trade loop. 
+
+The script **Payoff.c** contains definitions of often used combos, such as **spread**, **strangle**, **butterfly**, **condor**. You can enter an individual combo for plotting its profit/loss curve. 
+
+For brokers with a different combo margin structure, 
+
+the **comboMargin** function can be copied from **contract.c** into the strategy script and accordingly modified. 
+
+## *Example (see also Workshop 8 and Payoff.c):* 
+
+## if(combo( 
+
+`  `**contract(CALL,Days,Strike),1,    contract(PUT,Days,Strike),1,   0,0,0,0)) *// Strangle combo*** 
+
+## { 
+
+`   `**enterLong(comboLeg(1));** 
+
+`   `**enterLong(comboLeg(2));** 
+
+## } 
+
+## enterLong (*int Lots, var Entry, var Stop, var TakeProfit, var Trail, var TrailSlope, var TrailLock, var TrailStep*): TRADE\* 
+
+## enterShort (*int Lots, var Entry, var Stop, var TakeProfit, var Trail, var TrailSlope, var TrailLock, var TrailStep*): TRADE\* 
+
+Enters a long or short trade with optional parameters. Entry and exit conditions are handled by Zorro.
+
+## enterLong (*function, var V0, ... var V7*): TRADE\* enterShort (*function, var V0, ... var V7*): TRADE\* 
+
+Enters a long or short script-managed trade with optional user-defined parameters. Entry and exit conditions are handled by a user-provided algorithm in the given trade management function (**TMF**) dependent on the 
+
+variables **v0** .. **v7**.
+
+## enterTrade (TRADE\*): TRADE\* 
+
+Enters an open, pending, or closed trade from a **TRADE** struct. Inserts the trade only in the internal trade list; does not send any order to the broker. The asset name can be given through **TradeStr[0]** resp. the **Skill** element of 
+
+the **TRADE** struct; if it is not set, the current asset is used. The position size (**nLots**) and the **TR\_SHORT** and **TR\_OPEN** flags must be set in 
+
+the **TRADE** struct; other elements are optional. The algo identifier of the trade is set to the current **algo**. This function can be used for running backtests from a list of trades (see **Simulate** script) or for reading positions from the broker API and converting them to trades.  
+
+## *Parameters:* 
+
+## Lots  Optional number of lots when nonzero; overrides the global Lots, Amount, Margin
+
+number reverses the trade direction: **enterLong** then opens a short trade and **enterShort Entry**  Optional entry stop when > 0, entry limit when < 0 (overrides the global **Entry**). 
+
+## Stop  Optional stop loss when nonzero (overrides the global Stop). 
+
+## TakePro Optional profit target when nonzero (overrides the global TakeProfit). 
+
+## fit 
+
+## Trail  Optional trail limit when nonzero (overrides the global Trail). 
+
+## TrailSlo Optional trailing speed when nonzero (overrides the global TrailSlope). 
+
+## pe 
+
+## TrailLoc Optional profit lock percentage when nonzero (overrides the global TrailLock). 
+
+## k 
+
+## TrailSte Optional autotrailing step width when nonzero (overrides the global TrailStep). 
+
+## p 
+
+## function  Optional pointer of an int function for micro-managing the trade (see TMF). 
+
+## V0 ... V7  Up to 8 optional numerical variables as further arguments to the TMF. 
+
+## *Returns:* 
+
+## TRADE\* - a pointer to the created trade struct (see include\trading.h for the definition of the TRADE struct), or 0 when no trade could be entered because the trade volume was zero, trading was disabled (f.i. weekend, time frame, or lookback period), or the trade was rejected by the broker. For pending trades a nonzero pointer is always returned.*** 
+
+## *Remarks:* 
+
+In the backtest, the result of entering a trade can be either 
+
+a **pending** trade, an **opened** trade, or a **skipped** trade. If no **Entry** limit is given, trades are opened at the current price or at the next open price, dependent on **Fill** mode. If a trade is pending, Zorro continues to attempt opening the trade within the time period given by **EntryTime**. 
+
+In live trading, **order filling** depends on the broker API and the market situation. Normally the order is cancelled when not filled within a wait time given by **SET\_WAIT** (default: about 30-60 seconds dependent on broker API). This behavior can be changed with 
+
+the **SET\_ORDERTYPE** command. Partial fills are allowed for IOC ("immediate-or-cancel") or GTC ("good-till-cancelled") orders. A GTC order stays active in the background until it is either complete, or is cancelled by expiration or by an **exit** command. 
+
+The **fill price** - the price at which the trade is entered - normally differs to the current ask or bid price. The difference is the **slippage**. It can be simulated in the backtest with the **Slippage** variable. If you disagree to a fill price in live trading, you can file a complaint with your broker. Alternatively, use limit orders instead of market orders. Some broker plugins, f.i. the IB plugin, support limit orders. They are normally guaranteed to be filled at the price set up through the **OrderLimit** variable. 
+
+When function parameters are **0** or omitted in the parameter 
+
+list, **global trade parameters** are used. When no trade management function and only global parameters are used, the parentheses can be empty. 
+
+If a **contract** is selected and the **Multiplier** is set, the function opens an **option or future position** instead of a position of the underlying. 
+
+Trades are automatically **skipped** during **weekends** or outside market hours, during the **LookBack** period, in the inactive period 
+
+of **SKIP** or **DataSplit**, or when the current bar is not the end of 
+
+a **TimeFrame**. For trading inside a time frame, set **TimeFrame = 1**, enter the trade, then set **TimeFrame** back to its previous value. 
+
+Trades are also **not opened** when **Lots** is **0**, or **Margin** or **Risk** are too low, or the **MaxLong** / **MaxShort** limits are reached in [***Test***] and [***Trade***] mode, or when the **Algo** name ends with **":L"** for short trades or with **":S"** for long trades. However reverse positions are then still closed and the stop limits, profit targets, and life times of open trades with the same asset and algo are **updated** to the current values. This way, already open trades behave as if they were just opened by the recent signal. If this mechanism is not desired, limit the number of trades with 
+
+negative **MaxLong** / **MaxShort** limits. 
+
+If a trade is **rejected by the broker**, the reason by the broker API - such as **"Outside market hours"** - is normally printed to the log. When trading with the **MT4/5 bridge**, the reason can be seen in the MT4/5 Experts Log. The number of rejected orders is stored in 
+
+the **NumRejected** variable. There can be many reasons for the broker API to reject a trade, for instance not enough capital on the account, not enough free margin, a wrong asset name, a closed or illiquid market, an asset that cannot be shorted, or a stop loss that is too tight, too far, or not an integer multiple of a pip. Zorro will not attempt to open the trade again unless either enforced by script, or when it's a **pool trade**. Pool trades will be rebalanced at any bar until they match the virtual trades. 
+
+A returned nonzero **TRADE\*** pointer means that the trade is             processed, but is no guarantee that the position is really opened - it could still be pending or is rejected later by the broker. This is indicated by flags in the **TRADE** struct. The returned **TRADE\*** pointer can be assigned 
+
+to **ThisTrade** (f.i. **ThisTrade = enterLong();**). If **ThisTrade** is nonzero, all its trade variables - for instance, **TradeIsOpen** - are available for checking the state of the trade. 
+
+A **trade management function** (**TMF**) is automatically called every tick - i.e. whenever the price changes - with the the optional variables 
+
+(**V0** .. **V7**) as arguments. It can evaluate the current price and other **trade variables** for managing the position or adjusting stop and profit limits. Note that **V0** .. **V7** are for numbers only; they internally stored as **float** variables 
+
+with 32-bit precision. 
+
+Open, pending, and closed trades can be **enumerated** with 
+
+the **for(open\_trades)** and **for(all\_trades)** macros. 
+
+Every trade is linked to an **algorithm identifier** that can be set up through the **Algo** string. Identifiers are useful when the script trades with several different algorithms; they are then used for selecting **strategy parameters** or **capital allocation factors** belonging to a certain trade algorithm, or to exit or identifiy particular trades. The **performance** 
+
+## report lists strategy results separated by their algorithm identifiers. 
+
+Entry and exit conditions can be either set individually per trade, or set up globally through the **Entry**, **Stop**, **TakeProfit**, and **Trail** variables for all subsequent trades. If the stop loss is too close, too far, to or on the wrong side of the price, the trade can be rejected by the broker. Make sure that the stop loss has sufficient distance to the current price (**priceClose()**). A timed exit can be set up with **LifeTime**. 
+
+If **TICKS** is not set and the price hits the entry limit, the profit target, and/or the stop loss in the same bar, the simulation assumes a pessimistic outcome. The limits are evaluated in the order entry - stop - profit target. 
+
+If **TICKS** is set, the price curve inside the bar is evaluated for determining which limit is met first. 
+
+Opening a trade automatically closes opposite trades 
+
+when **Hedge** is **0** or **1** (i.e. **enterLong** can automatically close short positions and **enterShort** can automatically close long positions). If the trade was not opened because the **Entry** limit was not met 
+
+within **EntryTime**, opposite trades are not closed; if the trade was not opened because **Lots** is **0** or **Margin** or **Risk** are too low, opposite trades 
+
+are still closed. 
+
+The **trade size** is determined by the **Margin**, **Risk**, **Amount**, 
+
+or **Lots** variables. 
+
+The **TR\_PHANTOM** flag causes the trade to be executed in           "phantom mode". **Phantom trades** are not sent to the broker and do not contribute to the **Total** statistics, but their projected wins and losses         contribute to the **Short** and **Long** statistics. This can be used to filter       trades based on the current win/loss situation ("equity curve trading"). 
+
+If an **order** function is defined in the script, it is called with **1** for the first argument and the **TRADE\*** pointer for the second argument at the moment when the buy order is sent to the broker. This function can f.i. open a message box for manually entering the trade, or control another broker's user interface. 
+
+When **converting** scripts from other trading software, keep in mind that other trading programs use sometimes different names for trade functions. For instance, TradeStation® uses "Sell Short" for entering a short position and "Buy To Cover" for exiting a short position. 
+
+In [***Trade***] mode, all open trades are stored in a **.trd** file in 
+
+the **Data** folder. The stored trades are automatically continued when the 
+
+strategy is started again, for instance after a computer crash. ***Example 1: Simple SMA crossing*** 
+
+## function run() 
+
+## { 
+
+`  `**vars Price = series(priceClose());** 
+
+`  `**vars SMA100 = series(SMA(Price,100));   vars SMA30 = series(SMA(Price,30));** 
+
+`  `**if(crossOver(SMA30,SMA100))** 
+
+`    `**enterLong();** 
+
+`  `**else if(crossUnder(SMA30,SMA100))     enterShort();** 
+
+## } 
+
+## *Example 2: Grid trading script* 
+
+## *// helper function for finding trades at a grid line* bool noTradeAt(var Price,var Grid,bool IsShort)  
+
+## { 
+
+`  `**for(open\_trades)** 
+
+`    `**if((TradeIsShort == IsShort)** 
+
+`      `**and between(TradeEntryLimit,Price-Grid/2,Price+Grid/2))         return false; *// trade found*** 
+
+`  `**return true; *// no open/pending trade at that price* }** 
+
+## function run()  
+
+## { 
+
+`  `**BarPeriod = 1440;** 
+
+`  `**Hedge = 2;**  
+
+`  `**EntryTime = ExitTime = 500;**   
+
+`  `**var Price;** 
+
+`  `**var Grid = 100\*PIP; *// grid spacing*** 
+
+`  `**var Current = priceClose();** 
+
+## *// place pending trades at 5 grid lines above and below the current price* 
+
+`  `**for(Price = 0; Price < Current+5\*Grid; Price += Grid) {** 
+
+`    `**if(Price < Current-5\*Grid)** 
+
+`      `**continue;** 
+
+`    `**if(Price < Current and noTradeAt(Price,Grid,true))** 
+
+`      `**enterShort(0,Price,0,Grid);**       
+
+`    `**else if(Price > Current and noTradeAt(Price,Grid,false))       enterLong(0,Price,0,Grid);** 
+
+`  `**}** 
+
+## } 
+
+## *Example 3: Using a trade management function* 
+
+## *// TMF that adjusts the stop in a special way*  
+
+## int TrailingStop() 
+
+## { 
+
+## *// adjust the stop only when the trade is in profit* 
+
+`  `**if(TradeProfit > 0)** 
+
+## *// place the stop at the lowest bottom of the previous 3 candles*     TradeStopLimit = max(TradeStopLimit,LL(3)); 
+
+## *// plot a line to make the stop limit visible in the chart*   plot("Stop",TradeStopLimit,MINV,BLACK); 
+
+## *// return 0 for checking the limits* 
+
+`  `**return 0;** 
+
+## } 
+
+## *// using the trade function* 
+
+## function run() 
+
+## { 
+
+`  `**...** 
+
+`  `**Lots = 1;** 
+
+`  `**Stop = 10\*PIP;** 
+
+`  `**Algo = "SIG";** 
+
+`  `**if(crossOver(MySignal,MyThreshold))     enterLong(TrailingStop);** 
+
+`  `**...** 
+
+## } 
+
+## *See also:* 
+
+## exitLong(*string Filter, var Price, int Lots*) exitShort(*string Filter, var Price, int Lots*) 
+
+Exits all long or all short trades that match the given filter condition (see below), at market or at a given price limit, until the given number of lots is closed.
+
+## exitTrade(TRADE\,* *var Price, int Lots*): int** 
+
+Exits a particular trade completely or partially at market or at a given price limit. Returns 0 when the order failed, otherwise nonzero.
+
+## cancelTrade(int Id) cancelTrade(TRADE\*) 
+
+Cancels an open trade with a particular identifier or **TRADE\*** pointer without sending a close order to the broker and without modifying the statistics or the balance. If the trade was still open on the broker side, it will become orphaned and is not anymore under Zorro control. Use this function for removing an externally closed position that was not transmitted to Zorro, for instance 
+
+on **NFA** compliant accounts. ***Parameters:*** 
+
+## Filter  0 or "" for closing all trades with the current algo/asset component (default). 
+
+An **algo name** for closing all trades with the given algo and the current asset. 
+
+An **asset name** for closing all trades with the given asset and the current algo. 
+
+## "c" for closing all call trades with the current component. 
+
+## "p" for closing all put trades with the current component. 
+
+## "cp" for closing all contract trades with the current component. 
+
+## "u" for closing all underlying trades with the current component. 
+
+## "\*" for closing all trades with the current asset. 
+
+## "\*\*" for closing all trades. 
+
+## TRAD A pointer to the trade to be closed, or ThisTrade for closing the current trade in a trade enu E\* 
+
+## Price  Optional price or distance to current price for selling the position, or 0 (default) for selling at
+
+price distance constitutes an exit stop, a negative price is an exit limit (similar to **Entry** when the asset price is at or worse than the given price, like a stop loss; an exit limit closes t price is at or better than the given price, like a profit target. 
+
+## Lots  Optional number of lots to be closed, or 0 (default) for closing all open lots. Partially closin
+
+some brokers. 
+
+## Id  Identifier of the trade to be cancelled. Either the full number as assigned by the broker
+
+the Zorro window. 
+
+## *Remarks:* 
+
+Optional parameters can be omitted. F.i. **exitLong()** exits all long positions with the current asset and algo at market. 
+
+If an **exit stop** or **exit limit** is given, the position is closed as soon as the target price is reached, no matter how long it takes. An exit stop overrides a more distant **stop loss**, an exit limit overrides a previous **profit target**. The **exitLong/Short** function can thus be used to tighten the stop loss or to change the profit target of open trades (see example). 
+
+Before closing a trade, check the **business hours** of the broker. Not all assets can be traded 24 hours per day. Trading is normally disabled during **weekends**, during the **LookBack** period, or in the inactive periods of **TimeFrame**, **SKIP**, or **DataSplit**. 
+
+If the market was closed when exiting a trade in [***Test***] or [***Train***] mode, the trade will be closed when the market opens again. 
+
+If the close **order is rejected** by the broker in [***Trade***] mode, the reason - such as **"Outside market hours"** - is printed to the log and the message window. With the **MT4/5 bridge** the reason can be seen in the MT4/5 Experts Log. The number of rejected orders is stored in the **NumRejected** variable. There can be several reasons for the broker API to refuse closing a trade, for instance NFA compliance, FIFO compliance, a wrong asset name, an invalid trade size, a closed market, or no liquidity. Check the requirements of your account and set the **NFA** flag and **Hedge** mode accordingly.   Zorro will **repeat** a rejected close order in increasing time intervals until it is eventually executed (except 
+
+for **options** or when **OrderLimit** is used). If the position can not be closed after 4 working days, Zorro will assume that is was already externally closed and remove the trade from its internal list. If the market is not open due to holidays or weekend, a message **"Can't exit at weekends"** is printed and the position is closed as soon as the market opens again. 
+
+Some cryptocurrency brokers deduct their commission from an open position, and subsequently reject the close order due to **insufficient funds**. In that case make sure to have a small additional amount on the account for covering the commissions. 
+
+When no **price** was given, pending positions - positions either immediately entered before, or positions with an **entry** stop or limit - are also closed. 
+
+The price at which the trade is closed in the backtest can be affected with the **Fill** variable. 
+
+If an **order** function is defined in the script, it is called with **2** for the first argument and the **TRADE\*** pointer for the second argument at the moment when the sell order is sent to the broker. This function can f.i. open a message box for manually exiting the trade, or control another broker's user interface. 
+
+## *Example:* 
+
+## exitShort(0,1.234); *// exits all short trades with the current Algo/Asset as soon as the price is at or above 1.234 (exit stop).* 
+
+## tradeUpdate(TRADE\*, int NewLots, var NewStop, var NewTP, int NewLifeTime) 
+
+Resizes or updates parameters of a particular open or pending trade.
+
+## tradeUpdatePool() 
+
+Updates pool trades to the current open virtual trades in **virtual hedging** mode. Automatically performed after any trade with **Hedge** = **4**, or once per bar 
+
+with **Hedge** = **5**. Must be called by script with **Hedge = 6**.*** 
+
+## *Parameters:* 
+
+## TRADE\*  Pointer to the trade to be updated, or 0 to update pool trades to the current open NewLots  New number of lots, or 0 for not resizing. For reducing the trade size, partial closin
+
+broker; for increasing the trade size, **virtual hedging** must be enabled. **NewStop**  New stop loss limit, or **0** for no change. 
+
+## NewTP  New profit target, or 0 for no change. 
+
+## NewLifeTi New life time in number of bars, or 0 for no change. 
+
+## me 
+
+## *Returns:* 
+
+## 0 when the operation failed, otherwise nonzero.*** 
+
+## *Remarks:* 
+
+Only the positions of virtual trades can be increased. Pool trades take over the new size either at the next bar or when 
+
+calling **tradeUpdate()**. 
+
+## *Example:* 
+
+## function double\_all\_trades() 
+
+## { 
+
+`  `**if(Hedge < 4) return;** 
+
+`  `**for(open\_trades)**  
+
+`    `**if(TradeIsVirtual))** 
+
+`      `**tradeUpdate(ThisTrade,2\*TradeLots,0,0,0);   tradeUpdatePool(); *// adapt pool trades*** 
+
+## } 

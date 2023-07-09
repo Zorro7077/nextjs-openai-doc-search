@@ -1,0 +1,1737 @@
+# ﻿*Zorro 2.56 (June 2023)* 
+
+The **AssetPtr** and **AlgotPtr** definitions allow storing asset or algo specific pointers. 
+
+The IB plugin was adapted to the name change **DTB** -> **EUREX**. The **plot2** function plots curves in two colors. 
+
+New plugins: **Saxo Bank**, **XTB**. 
+
+The A2 and HU algos of **Z12** have been modified and improved. New function: **strcatf**. 
+
+Example script for generating a **multi-broker asset list**. 
+
+The **sync** function can synchronize prices or indicators to higher time frames. 
+
+## *Zorro 2.53 (January 2023)* 
+
+## strdate now supports milliseconds. 
+
+New helper functions: **cum**, **fix0**, **changed** 
+
+## assetHistory can now download data in arbitrary resolution. SeriesLength contains the number of elements of the current 
+
+series. 
+
+## AssetFirstBar contains the number of the first valid bar of the current asset. 
+
+## LogZone prints the log and chart in a particular time zone. PL\_DARK generates a chart with a dark background. 
+
+## AssetsFUT is a new asset list with 20 often traded futures. 
+
+Trade entry and exit prices are calculated in higher precision 
+
+with **special bars**. 
+
+The **Performance** script evaluates arbitrary values from 
+
+the **performance report**. 
+
+The IB plugin now supports the **DO\_CANCEL,0** command that cancels all open orders. 
+
+The IB plugin now supports the **BrokerTrade** function for determining the fill status of open orders. 
+
+The **sha / hmac** function makes crypto broker plugin development easier. 
+
+## http\_request supports different request types and replaces 
+
+the **http\_send** function. 
+
+The new **Bittrex plugin** now supports API version 3.0. A new Bittrex asset list was included. 
+
+The **brokerRequest** function allows a script to send arbitrary requests to a broker API. 
+
+New plugin: **Finvasia**. 
+
+Duplicate timestamps from t6 files are now filtered out 
+
+by **assetHistory**. 
+
+Dataset records can be removed with **dataDelete**. 
+
+The new **import** page helps with data conversion. 
+
+A new article on **Financial Hacker** helps with plugin development. 
+
+## BR\_LOCAL does not anymore automatically alter BarZone. Set it by script (BarZone = AssetMarketZone) if needed. 
+
+## *Zorro 2.50 (August 2022)* 
+
+## strdate now supports a time zone. 
+
+## exec got a flag for hiding the program window. 
+
+## C++ scripts now start directly, like .c scripts (Zorro S and Visual Studio required). 
+
+The **VCPP** flag uses the VC++ compiler, rather than the lite-C compiler, for compiling rules. 
+
+The **quit** function can now restart the script. 
+
+## LookBackNeeded is set to the maximum needed lookback period. 
+
+Some adaptions to **zorro.h** and **functions.h** for 64-bit compatibility. 
+
+A new **64 bit Zorro version** has been included. It uses **VC++** for compiling scripts. 
+
+64 bit versions of the **MT4 bridge** and the **Offline** plugin have been added. 
+
+The charting library was updated. The **dataChart** function now supports heatmaps. 
+
+The **outlier correction** was modified for producing less artifacts with cryptos. 
+
+The **Python bridge** now supports string variables. 
+
+The **Python bridge** now loads the Python DLL at script start and supports any Python version from 3.6 or above. 
+
+## file\_select now supports a file save dialog. 
+
+The **STRAIGHT** flag allows running ta-lib functions in their original 
+
+mode. 
+
+## Hedge mode 6 allows trade synchronization by script. *Zorro 2.48 (May 2022)* 
+
+## MatchIndex finds the data closest to a reference in a series. 
+
+The time zone and market hours of an asset can now be set up in the Market field of the **asset list**. 
+
+New variables for easy handling asset specific market 
+
+hours: **AssetMarketZone**, **AssetMarketStart**, **AssetMarketEnd**. 
+
+Market hours for index CFDs have been added to the Oanda asset lists. 
+
+## PriceOffset allows handling negative prices by shifting them to the positive scale. 
+
+## Notepad++ has been updated to version 8.2. 
+
+The **SET\_FUNCTIONS** broker command allows Zorro functions to be called from a plugin. 
+
+## Penalty adds a fixed spread-like offset to trade fill prices for special purposes. 
+
+## AssetPrev stores the main asset inside enumeration loops. PL\_HLOC enforces HLOC bars on the chart. 
+
+The **IB plugin** now supports the **GET\_FILL** command for returning the current fill amount of open GTC orders. 
+
+The **at** function can trigger events at a certain local time of day. Asset updates can be temporarily suspended with 
+
+the **NOPRICE** flag. 
+
+Swaps can be continuously accumulated with the **SOFTSWAP** flag. The time for asset updates can be measured with 
+
+the **UpdateTime** variable. 
+
+A name beginning with **'#'** in **asset** calls creates a dummy asset with flat history. 
+
+The **Z3** cluster strategy missed the performance criteria and was removed from the **Z systems**. 
+
+New functions: **barssince**, **valuewhen** with code in **indicators.c**. 
+
+New **ref()** macro for more convenient script conversion from other platforms. 
+
+## dataCompress got a Resolution parameter for compressing datasets even further. 
+
+A plugin for the **FTX exchange** has been developed by a Zorro user. 
+
+The **plotBuyHold** function compares the strategy returns with a buy-and-hold benchmark. 
+
+The **Yahoo** data feed has be re-activated. 
+
+New data feed: **EODHistoricalData**, with subscription discount for Zorro users. 
+
+New scripts: **MRC** and **WFOProfile**. 
+
+The chart title can now be changed with **print(TO\_CHART,...)**. **plotGraph** now supports scatter plots and spline lines. 
+
+## BR\_ASSET was replaced by BR\_NOSHIFT and BR\_LOCAL. *Zorro 2.44 (December 2021)* 
+
+New flag **PIPRETURN** for exporting volume-independent profit 
+
+curves. 
+
+New plugins: **Coinbase Pro**, **TradeStation** 
+
+## NumOutliers counts the outliers in the data. 
+
+## fmod returns the fractional remainder of a division. SET\_VOLTYPE,7 returns the open interest (if available from the 
+
+broker). 
+
+## LookBackResolution sets the resolution of the live lookback history. . 
+
+If a lookback bar ends after the session start time, it is now continued into the live period. 
+
+Script, asset, and action boxes can now be scaled with the application window. 
+
+## tradeUpdate scales or modifies an open trade. 
+
+The default estimate of **trades per bar** was slightly reduced for saving memory. 
+
+## TMF functions now also run on incoming ticks when the trade is still pending (bugfix). 
+
+The **BuyHold** script can be used for comparing a system with a SPY buy-and-hold strategy. 
+
+Loading history with no year number can be enforced with 
+
+the **History** string. 
+
+New **PlotMode** flag: **PL\_TITLE** 
+
+The Oanda asset lists have been modified for 0.1 CFD lot size. 
+
+The **ExpiryTime** default was changed to 23:00 UTC for avoiding option expiration during market hours. 
+
+## *Zorro 2.40 (August 2021)* 
+
+New text style flag **+16** for bold text on **panel cells**. 
+
+## PriceJump can now also detect stock merges. 
+
+The **Russell2000** asset list was included. 
+
+## GET\_DATA was implemented in the IEX plugin. 
+
+New broker commands: **SET\_SERVER**, **SET\_CCY** 
+
+## SET\_SERVER was implemented in the Binance plugin.  
+
+New plugins: **Kraken**, **Deribit**, **Binance Futures**. 
+
+## Leverage can now be set individually per trade when the API supports the SET\_LEVERAGE command.  
+
+The **tock** function is now executed after **tick**, thus ensuring that all recent ticks had been processed at **tock** time. 
+
+## file\_copy now accepts a folder as destination. 
+
+The **CSVfromHistory** script converts .t6 to .csv files. 
+
+The IB **TWS/Gateway** socket port number can now be set up in 
+
+the **Server** field of the account list. 
+
+New **Coinbase** plugin by a Zorro user. 
+
+The current script folder is returned by **report(26)**. 
+
+If the strategy folder was **redefined**, the **#include "..."** statement now reads files from the new folder. 
+
+The structure of an unknown dataset can be determined 
+
+with **dataSize**. 
+
+## dataParseString converts a JSON string to a dataset. 
+
+## mtu converts Unix time to the DATE format. 
+
+## matSaveCSV saves a matrix to a CSV file. 
+
+## Brute Force, Genetic, and External optimizations now export results to CSV and generate 2D contour charts.. 
+
+## dataChart generates a 2D countour chart from a dataset. 
+
+## dataCol retrieves data arrays or series from a dataset. 
+
+Order book data (**.t2** files) can now also be used for the price history with **History = "\*.t2"**. 
+
+## TickTime now also affects backtests in TICKS mode, and can be 
+
+used to reduce the memory footprint. 
+
+New broker command: **GET\_HEARTBEAT**. 
+
+New script **Reality.c** as a template for reality checks. 
+
+## BarPeriod can now be set up by script to weekly bars. 
+
+Partial closing is now also supported in **Fill** mode 3. 
+
+The **contractUpdate** function now sorts contract chains automatically by expiration and strike. 
+
+We found that scripts often use the **loop** function unnecessarily, and thus added **of** as an alternative. 
+
+The **NOFACTORS** flag prevents OptimalF calculation, which can take a long time when trade numbers are huge. 
+
+## FAST backtest mode was abandoned, since standard backtests are almost as fast as fast backtests. 
+
+The backtest profit by linear regression of the equity curve can be retrieved with **ReturnLR**. 
+
+## *Zorro 2.35 (February 2021)* 
+
+The account limit of the free Zorro version was raised from $7000 to 
+
+$15,000. 
+
+External optimization algorithms can be used with 
+
+the **parameters** function (Zorro S required). 
+
+Prices of open option trades are not anymore updated outside market hours when **BR\_SLEEP** is set.. 
+
+Zorro's exit code can be set with the **ExitCode** variable. 
+
+The backtest speed was increased due to changes to the print function and the memory management. 
+
+The **seriesO/H/L/C** functions can be used as prices series parameters to indicators or functions. 
+
+Multicore training now supports the **StrategyFolder** (was only partially implemented in the previous version). 
+
+The **assign** function converts portfolio weights to asset amounts. The **report** function can now return a list of all open trades. 
+
+Open trades can be loaded from the broker account with 
+
+the **brokerTrades** function. 
+
+The **GET\_TRADES** and **DO\_CANCEL** commands were implemented in the **IB plugin**. 
+
+Graphics by **plotGraph** don't affect the chart scale anymore. **Coinigy** now supports **GTC orders** and 
+
+the **GET\_DATA** and **DO\_CANCEL** commands. 
+
+## assetHistory can now load data from arbitrary sources and supports .t2 order book data (Zorro S required). 
+
+Setting **StopFactor** at **1** causes stops to be managed by the broker 
+
+only. 
+
+Shifting dynamic **series** can be controlled with the **NOSHIFT** flag. New plugins by users: **Alpaca**, **TD Ameritrade**, and **Binance** 
+
+## Futures. 
+
+New plugins for Zorro S: **DTN IQFeed** and **Tradier**. 
+
+The **assetHistory** function now loads split and dividend adjusted data from **IEX**. 
+
+## BR\_SLEEP is now unaffected by BR\_LEISURE. 
+
+The **MT4 bridge** now supports the **GET\_POSITION** command. Re-install the bridge for using this command. 
+
+The Binance plugin now returns the **TradeVal** of all open positions on account requests. 
+
+## GET\_AVGENTRY was implemented in the IB plugin. 
+
+The new **ZStatus** script displays the live status of multiple accounts (Zorro S required). 
+
+## *Zorro 2.30 (August 2020)* 
+
+The **IB API** can now return prices in fast mode (price type = 8) in less than 1 ms, dependent on setup and location. 
+
+Charts can now be generated and updated in real time with 
+
+the **plotChart** function. 
+
+A price history folder can now be set up with the **History** string. 
+
+## Historical D1 data from IB now contains only regular trading hours. 
+
+The **Offline** plugin can be used in [***Trade***] mode with no broker connection. 
+
+The **PayOff** script is now interactive. Strike distance and expiry can be set with sliders. 
+
+The **comboProfit** function returns the profit or loss of the current combo at a given expiration price. 
+
+The **SLIDERS** flag detects slider movement. 
+
+Bar start/end times in live trading are now synchronized to an integer multiple of the bar period. 
+
+The **tdm** function counted also partial trading days, such as UTC Sunday 22:00. For avoiding confusion, now only 'real' workdays are counted. 
+
+The chart caption can be changed with the **print** function. 
+
+The **IB plugin** was modified for supporting European options on the ICEEU exchange. 
+
+The **TR\_AON** flag enforces all-or-nothing order mode. 
+
+Arbitrary content can be passed via **command line** with 
+
+the **-u** option. 
+
+## contractUpdate now automatically sets the Multiplier when it was at 0. 
+
+The **error** function can be used to sound alerts, send emails, or stop Zorro on warnings or errors. 
+
+Series can be replaced with external buffers with 
+
+the **SeriesBuffer** pointer. 
+
+Trades from a template can be entered with **enterTrade**. 
+
+The **Simulate** script backtests a trade list. 
+
+For suppressing particular error messages, 
+
+call **ignore(ErrorNumber)**. 
+
+Spearman **correlation** with arbritrary functions. 
+
+New **Ehlers indicators**: **CTI, CCYI, CCYIR, CCYIState**. 
+
+## SMAP calculates the mean of positive values. 
+
+## NOWATCH switches off all watch statements. 
+
+## plotContract and plotCombo plots payoff diagrams of the given option or combo. 
+
+The **break\_assets**, **break\_algos** statements abort asset or algo enumeration loops. 
+
+The average profit per trade, instead of per year, is now displayed after a backtest. 
+
+## MarginCost in the asset list can now be negative for a percentage. Options multipliers can be given in LotAmount. 
+
+## assetSelect() selects the current asset in the scrollbox. 
+
+## *Zorro 2.25 (March 2020)* 
+
+Optimized parameters can be generated by script by setting 
+
+the **optimize** range to zero. 
+
+## OptimalF factors of profitable components are now rounded up to at least 0.001. 
+
+A script for converting CSV to .t8 options history was added to 
+
+the **repository**. 
+
+The **OVERRIDE** flag now also works for broker price sources. 
+
+Two new indicators were added: **LSMA** and **QLSMA**. 
+
+Memory consumption by **PRELOAD** was reduced. 
+
+The last **WFO cycle** is now extended to ensure that it includes the end date. 
+
+## HistoryScript = "History" in zorro.ini opens the History script when clicking on a t1, t2, t6, or t8 file (Zorro S). 
+
+The **peak**, **valley**, and **cross** functions now return the bar offset of the last event. 
+
+The **slope** and **line** functions can be used to connect points on the price curve. 
+
+More traditional 
+
+indicators: **Pivot**, **Support**, **Resistance**, **Divergence**. 
+
+More traditional candle patterns: **CDLEngulfing0**, **CDLOutside**. The **BUSY** flag indicates whether the broker API can be accessed. **PlotLabels** determines the x axis label distance on histograms. Text can now be plotted to the chart with **plotText**. 
+
+Price curves can now also be **randomized** with 
+
+the **BOOTSTRAP** and **RANDOMWALK** methods. 
+
+The **SHAPE** flag allows manipulating price curves in arbitrary ways for test purposes. 
+
+Use the **call** scheduler for running functions at particular events. The **debugger** now displays a list of open trades. 
+
+Options expiration time of day can now be set with **ExpiryTime**. New time series functions: **SemiMoment**, **Sharpe**, **Sortino**. 
+
+The **Sortino ratio** was added to the **performance report**. 
+
+The **knapsack** function can be used to manage a stock portfolio with small capital. 
+
+The **ScholzBrake** and **LossGlobal** variables can step around the new German trader tax. 
+
+The Scholz tax is now included in the **performance report**. 
+
+The C functions **strcpy\_s**, **sprintf\_s**, **strcat\_s**, **memcpy\_s** have been added to **stdio.h**. 
+
+New functions for 
+
+options: **contractMargin**, **comboMargin**, **comboType**. 
+
+## OBV has been added to the indicators. 
+
+The **invalid** function helps debugging arithmetic errors. 
+
+## GET\_CALLBACK sets a plugin supplied callback function. 
+
+Historical data from **CryptoCompare** is now automatically appended to existing data, if any. 
+
+## *Zorro 2.20 (November 2019)* 
+
+The **once** function registers the first time when a condition became 
+
+true. 
+
+The **erf** function returns the interval probability.  
+
+## SampleOffset can be used for per-cycle oversampling. 
+
+A **Detrend** example script was added to the **script repository**. The price range of randomized curves (**SHUFFLE** flag) can now be 
+
+limited. 
+
+A new **workshop 4a** about indicator development has been added. 
+
+Wrong **PIP**, **PIPCost**, or **LotAmount** parameters from the broker API can be fixed by **SET\_PATCH**. 
+
+## Zorro.ini entries are now available by 
+
+the **report** function. **report(1)** can now be called inside **evaluate**. 
+
+The **zalloc** function is useful for allocating temporary arrays. 
+
+## BR\_SLEEP or BR\_LOGOFF flags can now be set for the Z systems. 
+
+The question "Close open trades?" at session end can be skipped with the **AutoConfirm** setting. 
+
+Since **Oanda** now requires a unique size for stop loss orders, stops are now handled on the Zorro side. 
+
+Variables and functions that are long outdated or deprecated are now collected in **legacy.h**, which can be included when needed. 
+
+Outdated keywords moved 
+
+to **legacy.h**: **Slider1-3**, **CVolatility**, **loadHistory**, **DDScale**, **OptCycle**, **rev erseLong**, **reverseShort**. 
+
+The **AccountName** string contains the selected name from the [Account] scrollbox. 
+
+The **OptionsCalculator** script calculates the value and delta of call and put options. 
+
+The **advise** training speed has been improved for large training sets. 
+
+The **flag system** was changed to support more than 64 flags. All flags can now be set and read with the **set** and **is** functions. 
+
+The status flags **PARCYCLE**, **FACCYCLE**, **RULCYCLE** are renamed to avoid confusion with mode flags of the same name. 
+
+Internal structs have been changed in version 2.19.5. Compiled scripts must be re-compiled for the current version. 
+
+The command line and other system strings are now available through the **report** function. 
+
+The **SAV\_STATS** flag resumes **trade statistics** from the previous session. 
+
+An example for **integrating Zorro** in other software was included in the **Source** folder. 
+
+## *Zorro 2.15 (July 2019)* 
+
+## Init is an abbreviation for is(INITRUN). 
+
+The **-quiet** option suppresses the 3 seconds pause at the end of a 
+
+batch run. 
+
+An asset can be optionally preselected in the scrollbox with 
+
+the **assetList** function. 
+
+In the **TradeOptions script** now several combos can be selected. 
+
+The **getvar/putvar** functions can now store variables in the Windows registry. 
+
+The primary exchange for **IB asset symbols** can be appended to the exchange code. 
+
+The **strx** function can now replace text in strings of unlimited size. 
+
+Special order types, like "market on close" etc, are now supported by the **IB plugin**. 
+
+## NaN lines can now be filtered out by dataParse. 
+
+## M1 bitcoin history has been added to the download page. 
+
+A list of market holidays can be passed to the **Holidays** pointer. 
+
+The **PlotBorder** variable reserves space for the chart axis labels. 
+
+The **FXCM plugin** was updated to the most recent API version. You'll need to unpack additional DLLs. Win XP is not supported anymore by FXCM. 
+
+The **Weekend** variable has been replaced by **flags** that are more flexible to use. 
+
+New **FXCM accounts** are now rewarded with a **Zorro** 
+
+## S subscription. 
+
+A **DLL for integrating Zorro** in other platforms is available on request. 
+
+## Zorro instances can now start, stop, and communicate with each other. 
+
+## SET\_PRICETYPE,8 now loads option and futures prices faster from IB. 
+
+The **MT4/MT5 bridge** was changed in 2.14.6. Re-install the bridge and compile the Zorro EA. 
+
+CSV files by **print(TO\_CSV)** are now generated in the **Data** folder. **[New Script]** will now generate a basic strategy template. 
+
+## *Zorro 2.12 (May 2019)* 
+
+Genetic and brute force **training modes** are now available (Zorro S). 
+
+10 new scripts for various purposes have been added to the **script repository**. 
+
+The **RET** indicator is for quickly calculating momentum without a series. 
+
+The **SpecialBars** script illustrates the use of special bars for single-asset and multi-asset strategies. 
+
+The **sliders** can now display fractional values. 
+
+The ***Action*** scrollbox can now be selected **by script** and keeps the selection after the end of the strategy. 
+
+A new **Z13** options trading system was added to the Z systems 
+
+(Zorro S). 
+
+The number of concurrent broker connections was increased from 4 to 12. 
+
+The **PL\_BENCHMARK** flag plots the equity curve as a line. 
+
+## Virtual Hedging became a S feature and the interactive chart viewer became a free feature. 
+
+The **performance report** now contains a breakdown of annual and monthly returns. 
+
+The **InvestCalculator** script allows investing by the square root rule. The **SETFACTORS** flag allows factor calculation by script. 
+
+CSV files generated with the **SIGNALS** flag are now stored separately per asset. 
+
+The **Ulcer** and **R2** statistics parameters have been renamed 
+
+to **ReturnUlcer** and **ReturnR2**. 
+
+The **conv** function converts a float array to a var series. 
+
+The **R2** function returns the coefficient of determination of a series. **dataMerge** adds new data at the front of an existing dataset. Interest on margin loan can be set up with the **Interest** variable. The IEX exchange is now supported by **assetHistory** and with 
+
+the **IEX plugin**. 
+
+Price request can be switched off with 
+
+the **SET\_PRICETYPE** command. 
+
+The default **objective** function now rejects results with less than 5 
+
+trades. 
+
+## OptimalF factors are not displayed in the performance report when profit is reinvested. 
+
+## *Zorro 2.08 (April 2019)* 
+
+The new **Python Bridge** allows to run Python scripts and commands from Zorro. 
+
+A new **Regime** script was added to test indicator responses on market regime changes. 
+
+The **frameSync** function now synchronizes also 30-min and 4-hour timeframes. 
+
+Get info about trading events with the **email** function. 
+
+The **plotHistory** helper function allows easier producing histograms. The **comboAdd** function adds a contract to the current combo. **comboPremium** calculates the premium of a combo. 
+
+Stop orders can be added to IB trades with 
+
+the **SET\_ORDERTYPE** command. 
+
+## NumAssetsUsed counts the assets used in the script. 
+
+## Live is an abbreviation for is(TESTMODE). 
+
+The **contractSellUnderlying** function gets rid of the underlying of exercised contracts. 
+
+## BarMode > 4 now suspends broker API calls when logged out. 
+
+A new memory management reduces the memory footprint of portfolio systems by about 50%. 
+
+The **LEANER** flag reduces the memory footprint by further 50% when **TICKS** is not set. 
+
+Option premiums displayed in the log now include the ask-bid 
+
+spread. 
+
+The **Itor** variable counts asset and trade loops. 
+
+## Symbol strings can now contain '\*' for the asset name. 
+
+The IB API now supports **option combinations** and **GTC orders**. 
+
+## AlgoVar2 can now be saved with the SV\_ALGOVARS2 flag. 
+
+## Warning 054 will now be issued when asset parameters from the broker API are suspicious. 
+
+The **require** function can be used to start a script only with a certain software version. 
+
+## *Zorro 2.03 (February 2019)* 
+
+The **brokerAsset** and **brokerAccount** functions directly call the corresponding functions of the **broker API**. 
+
+The **Chart** script opens a .t1, .t6, or .t8 file and displays its content in a chart. 
+
+The **CryptoCompare** download function has been adapted to the new 2000 prices limit. 
+
+## Z9 now downloads UK ETFs from Stooq (Yahoo sometimes 
+
+delivered wrong prices for UK assets). 
+
+## assetHistory now uses the current asset history symbol when no name is given. 
+
+The **Centage** flags automatically convert live or historical prices given in cents, as for some agricultural futures and options. 
+
+A new [***Action***] scrollbox has been added. It can be set up 
+
+in **Zorro.ini** or in the **script** for running Zorro tasks, external programs, or script functions with a mouse click. 
+
+The **SET\_PATCH** command can now also override the broker API's leverage and margin cost parameters. 
+
+The **timeOffset** function now also supports bars in the future. 
+
+The **contractUpdate** function can now load chains from any historical data, using the **Now** variable. 
+
+The **.t8** format is now also accepted for historical price data (**History = ".t8"**). If the file contains different underlying prices for the same date, as for futures, their average is used. 
+
+For options on futures (FOPs) the trading class can now be encoded in the **IB symbol string**. 
+
+The exchange for the current options chain can now be retrieved or given with the **Exchange** variable. 
+
+The **ER** and **KAMA2** indicators have been added to the **indicators** 
+
+## list. 
+
+The maximum size of a contract chain has been increased to 20,000 contracts. 
+
+## MaxLong and MaxShort can be set to a negative number for preventing the updating of open trades. 
+
+The Zorro.exe can now be assigned to files 
+
+with **.t1**, **.t6**, **.t8** extension and automatically displays them in a chart. 
+
+A name can be passed via command line to the **Define** string. 
+
+## PlotHeight2 can be used for determining the proportions of additional charts in the interactive chart viewer. 
+
+The account is now stored per trade so that trades from multiple brokers or accounts can be resumed. 
+
+The **file\_appendFront** function now supports text strings. 
+
+Options can now be combined with the **combo** functions. 
+
+## Algo identifiers ending with ":L" or ":S" now automatically suppress trades in opposite direction. 
+
+The **VWAV** function calculates volume weighted average values. ***Zorro 1.96 (November 2018)*** 
+
+## Stop and Trail distances can now also be used for option contracts. 
+
+The interactive **Chart Viewer** allows zooming into chart details and replaying the backtest in single step and slow motion (Zorro S). 
+
+Level 2 data is now supported by the IB plugin with 
+
+the **GET\_BOOK** command. Market depth data must be subscribed and the 
+
+exchange must be coded in the asset symbol. 
+
+The **contract.c** include file is now  C++ compatible, which allows writing options trading systems with the **VC++ environment**. 
+
+A step by step instruction for **writing strategies with Visual** 
+
+## Studio was added to the manual (Zorro S). 
+
+The **contractRecord** function can store the current option or futures chain in a historical data file in **.t8** format. 
+
+The number of **AssetVars** has been increased to 16. The first 8 can be read from the asset list. 
+
+The background color of a **panel button** can now be changed in 
+
+the **click** function. 
+
+Automatic daylight saving can now be switched off by adding **UTC** to the time zone, f.i. **UTC+1** = Central European Winter Time and **UTC+2** = Central European Summer Time. 
+
+A new workshop for **options trading** was added to the tutorial. 
+
+A negative lot parameter to a **trade** function reverses the trade direction. This allows shorter code in some situations. 
+
+## *Zorro 1.88 (August 2018)* 
+
+The **sortRank** function can encode candle patterns for machine learning features. 
+
+The **file\_next** function can enumerate file names in a directory. 
+
+Multiple accounts are now supported by the **IB plugin**. The account can be set up in the **account list**. 
+
+Order flow can be analyzed with the **order book functions**. 
+
+Broker API requests can be limited with the **MaxRequests** variable. The limit is automatically set by broker plugins that support 
+
+the **GET\_MAXREQUESTS** command. 
+
+The **Mode** function returns the most frequent value of a data series. 
+
+The **Windows Handle** can be used for triggering events between Zorros or asynchronously receiving price quotes from **broker plugins**. 
+
+Option Delta can now be calculated with the **contractDelta** function. 
+
+With the **panelFix** function header rows or colums can be determined on a scrolling panel. 
+
+The default **BarOffset** for daily candles and D1 history is now set to 16:30 for preventing unwanted midnight bars. 
+
+The **modf** function splits a variable in a fractional and integer part. 
+
+## FROM\_YAHOO is back! At least for the moment, Yahoo™ data can be downloaded again, using a 'backdoor'. 
+
+The **dataParseJSON** function parses OHLC prices from a JSON file to a **.t6** dataset. 
+
+The **OrderDuration** variable limits the duration of a GTC order. 
+
+Williams' Market Sentiment Index has been added to the **indicator collection**. 
+
+## Commission is now stored per trade, which allows to set up 
+
+script-calculated commission amounts before entry or in a **TMF**. 
+
+Option trades displayed in the **chart** now begin with the strike price. 
+
+The **COT** functions can be used to evaluate the **Commitment Of Traders** report. 
+
+The **priceRecord** function can be used to update price history files while live trading. 
+
+Use **file\_appendfront** for appending data to the start of a file. 
+
+Different brokers and sources can now be used for trading, live prices, and historical prices through the **Symbol** syntax. 
+
+The **Z10 system** now automatically rebalances the cryptocurrency positions in trade mode. 
+
+The **Binance** and **Bitfinex** cryptocurrency exchanges are now directly supported. 
+
+## *Zorro 1.83 (May 2018)* 
+
+Stock splits are now detected and can be evaluated with 
+
+the **PriceJump** variable. 
+
+The **sortData / sortIdx** functions can now also sort in descending order. 
+
+The **FXCM** plugin now also downloads bid prices in **.t1** files. 
+
+The **marketVal** function now supports bid-ask spread from bid prices 
+
+in **.t1** files. 
+
+Closed trades can be enumerated with **for(closed\_trades)**. 
+
+The **contractCPD** function can be used for predicting the underlying price from option prices. 
+
+For finding a particular value in a time series, use 
+
+the **findIdx** function. 
+
+The **suspended** function returns the current trading permission. 
+
+Changed margin costs of open positions are now considered in the backtest. 
+
+On no-leverage accounts, the ROI (return on investment) is displayed at the end. 
+
+The **contractNext** function allows to enumerate contracts by their strike value. 
+
+## ConnorsRSI and SMA-based RSI were added to the indicators. 
+
+The **NFA** flag does not prevent partially closing trades anymore. 
+
+The **filter** and **renorm** functions can be used for array filtering and normalization. 
+
+The **contractStrike** function calculates a strike price from Delta. 
+
+The **TradeIsMissed** status can be used for generating adaptive orders. The **TradeTest** script now supports adaptive entries and exits. 
+
+## BarMode flag 16 suppresses bars outside market hours. 
+
+Assets and algos can be enumerated 
+
+with **for(used\_assets)** / **for(all\_algos)**. 
+
+The **results** function can sum up the results of the last N trades by 
+
+several criteria. 
+
+Selecting an account from the **account list** now also changes the assets in the Asset scrollbox. 
+
+The **broker interface** now supports UUID strings to identify trades. 
+
+The **Bittrex** plugin is included in the beta version (Zorro S). 
+
+## Weekend = +16 now uses the bar time zone for allowing bar generation without setting AssetMarket. 
+
+## wdatef now supports Unix time stamps with the %t format code. 
+
+For quicker finding a function, a **list by category** was added to the manual. 
+
+## Detrend now supports RECIPROCAL mode for swapping currencies of a forex pair. 
+
+## marketVal and marketVol can now also be called in a TMF 
+
+or **tick** function. 
+
+The **dataFromQuandl** function now automatically adjusts timestamps by 16 hours. 
+
+Datasets can be truncated with **dataClip**. 
+
+A new **Z10** system with more than 1000% annual return was added to the **Z systems** (Zorro S). 
+
+The **Z3** system is now included in the free Zorro version. 
+
+Crypto history in day, hour, or minute resolution can be downloaded from **CryptoCompare** (Zorro S). 
+
+Selecting an asset with the scrollbox now triggers the **click** function. The selected asset can be evaluated with the **AssetBox** string. 
+
+The **sftoa** function can display prices with an adaptive number of digits. 
+
+The **Coinigy** plugin is included in the beta version (Zorro S). Coinigy allows algorithmic trading with many digital currency exchanges. 
+
+The new **History** script displays the content of **.t1**, **.t6**, or **.t8** files (Zorro S). 
+
+The [***Edit***] button now also opens the asset list after a test if the script used special assets. 
+
+Portfolio weights can be generated with the **distribute** function. ***Zorro 1.74 (January 2018)*** 
+
+## dataParse is now 2x faster, and supports larger text fields in the target dataset (1.70.2) and a start and end record (1.70.3). 
+
+The **ContractRow** variable allows easy expansion of option contracts with further fields in an extra dataset. 
+
+Colors can be made brighter or darker with **colorScale**. 
+
+A negative **Capital** amount allows backtests without margin call detection. 
+
+The **stridx** function can be used for indexing arrays or datasets with asset or algo names. 
+
+Up to 4 different brokers or price sources can now be simultaneously 
+
+connected by **asset/account list** entries (1.70.6, Zorro S required). 
+
+A page about **Broker Arbitrage** was added to the manual. 
+
+The **\_POS** macro helps finding the location of error messages in the script. 
+
+The **GET\_MAXTICKS** broker command allows downloading historical data in bigger chunks than 300 ticks (1.71.2). 
+
+Indicators can now be loaded from CSV time series with 
+
+the **dataFromCSV** function. 
+
+The **dnorm** function returns the probability of a variable in a Gaussian distribution. 
+
+The **strtr** function returns a string identifying a trade. 
+
+The currency symbol and number of decimals for account values can now be set up with the **account list** (1.71.9). 
+
+The fill status of a trade can now be returned with 
+
+the **BrokerTrade** function. The MTR4 bridge has been modified accordingly. 
+
+The **R Bridge** can now also be used with a **strategy DLL** (1.72.4). 
+
+The **PL\_ALLTRADES** flag plots trades of all assets in the same chart. 
+
+Downloading **Crypto Currencies** from Coinbase and Bitfinex is now supported through the Quandl Bridge (Zorro S required). 
+
+Limiting trades to local market hours can now be set up in 
+
+the **BarMode** variable. 
+
+Panel cells can be merged with **panelMerge**. 
+
+The stop distance of pool trades can be set with **StopPool**. 
+
+The **IB Bridge** now downloads prices in 1500-tick packets, which increased the download speed by up to 30%. 
+
+The **IB Bridge** now supports the **SET\_PRICETYPE** command with parameters 1 (quotes) and 2 (trades). 
+
+The **Download script** was pimped up. It is now easier to use and offers more features. 
+
+## Perceptrons with an analogue output can now be generated. 
+
+The start date of the **Z8 and Z9 systems** is now automatically adapted to the availability of historical data. 
+
+Unix time stamps in milliseconds are now supported 
+
+for **dataParse** (1.73.4). 
+
+Since Support got permanently complaints by former MTR4 users about the 'wrong lot size', position sizes can now be given as **Amount**, similar to MTR4 lots. 
+
+The **TrainMode** variable got a new flag to 
+
+generate **OptimalF** factors separately per WFO cycle. 
+
+Broker connections can now be set up per asset in the **asset list**, allowing simultaneous connection to several brokers (Zorro S). 
+
+## *Zorro 1.66 (September 2017)* 
+
+## Statistics data can now be evaluated at the end of the strategy. 
+
+The **dataSaveCSV** function can be used for saving datasets in arbitrary CSV formats. 
+
+The **PercentRank** function was added. 
+
+The "reverse" helper functions have been replaced by 
+
+the **MaxLong** / **MaxShort** variables. 
+
+Option history files in **.t8** format are now automatically loaded 
+
+by **contractUpdate**. 
+
+Commission is now automatically reduced by 50% on expired options. 
+
+A **cheat sheet** with often used codes was added to the manual. **TO\_ALERT** and **TO\_CSVHDR** modes have been added to 
+
+the **print** command. 
+
+The Zorro panel can now be resized, allowing more space for the message window. 
+
+The **-stay** command line option leaves the Zorro window open after running a script. 
+
+The **Cold Blood Index** has been implemented through 
+
+the **verify** function. It is now displayed every day in live trading by the Z systems. 
+
+Log files from strategy variants can be more conveniently compared by numbering them with **LogNumber**. 
+
+## Plot curves are now automatically exported to spreadsheets in the CSV format. 
+
+The **Margin** and **Risk** sliders of the **Z strategies** have been replaced by a **Capital** slider similar to Z8. 
+
+The **Z8** system got several improvements (heatmap display, sell priority, weight adaption). 
+
+A new system **Z9** was added to the Z systems, based on Antonacci's "Dual Momentum". 
+
+The **advise** function now accepts signals in an array with arbitrary length. 
+
+The generated perceptron, decision tree, and price pattern rules use now double precision variables. 
+
+Zorro now distinguishes rejected **Pool Trades** from externally closed Pool Trades. 
+
+The **Notepad++** editor was integrated in Zorro as a replacement of the SED editor. 
+
+## *Zorro 1.60 (July 2017)* 
+
+Price data can now also be **downloaded** from **Google Finance**, **AlphaVantage**, and **Stooq**. 
+
+The **IG** plugin by Daniel Lindberg has been added to the Plugins folder. 
+
+The **Payoff** script can be used for calculating profit diagrams of 
+
+option combinations. 
+
+The **assetList** function now also sets the Asset scrollbox to the selected asset list. 
+
+The **MTR5 platform** is now supported with the MTR5 bridge 1.15 The outlier detection can be adjusted with the **Outlier** variable. 
+
+The **Stoch** function now also supports variable time frames. 
+
+## StartDate = NOW can be used for strategies that do not run permanently, but are started periodically, f.i. for modifying a portfolio. 
+
+## AssetMarket can be used for skipping all bars outside market hours in local time. 
+
+Z8 was changed to trade not anymore at a fixed day of the month. The next trading day is now displayed in trade mode. 
+
+## *Zorro 1.58 (May 2017)* 
+
+If an asset is not available from the broker, it can be downloaded from Yahoo or Quandl by using special **Symbol** codes. 
+
+The **callback** function can be called from the **broker plugin**, allowing the script to react immediately on certain API events. 
+
+In **HFT mode**, high frequency trading systems can be simulated with pre-set lag. 
+
+Various plot flags can be set with the **PlotMode** variable. 
+
+A **StopFactor** can now be determined for the Z systems and allows disabling broker stops. 
+
+The **Oanda plugin** now also supports Oanda API V2.0. 
+
+Text can now be assigned to the [***Result***] button with **panelSet**. 
+
+The **IB plugin** now supports trade volume also in live data. 
+
+Seconds in **.csv files** and **wdatef** fields can now have decimals and are parsed with 1 microsecond resolution. 
+
+A new **lowpass** filter function was added that does not use a series. The Quandl **WIKI** database is now supported by **assetHistory**. 
+
+A user-developed **Dukascopy** plugin has been included. 
+
+## *Zorro 1.54 (February 2017)* 
+
+Functions for **loading arbitrary data**, such as option chains, futures, order book content etc. from CSV files have been implemented. 
+
+The **wdatef** function parses time/data parameters from formatted strings. 
+
+The **dataFromQuandl** function can access Quandl™ datasets for backtests as well as for live trading (**Zorro S** required). 
+
+Up to 8 additional asset specific values or strings can be stored in the **asset list**. 
+
+The **contract** functions are for trading and analyzing options and futures. 
+
+Real money accounts can now be connected in read-only mode with an **account list**. 
+
+The **EXTRADATA** flag of version 1.50 was replaced by 
+
+the **LEAN** flag that has the opposite meaning. Historical data is now stored in noncompressed format by default. 
+
+Option and future chains can be restricted to certain trading classes with the **SET\_CLASS** command. 
+
+The IB bridge now supports the **SET\_LIMIT** command for getting a better fill price. 
+
+The IB bridge now supports stock CFDs (type **STKCFD**). 
+
+Prices are now stored with 5 digits precision in the trade spreadsheet. 
+
+Option trades are now based on the real options ask price instead of the extrinsic price. 
+
+The **MinutesPerDay** variable prevents "Not Enough Bars" errors of assets that are only traded a few hours per day. 
+
+The **between** function now also works for cyclic ranges. 
+
+## PlotPeriod sets the update rate of the chart on the trade status page. 
+
+The **OrderLimit** variable allows sending limit orders for filling with best price within a time period. 
+
+The **season** indicator can be used to predict price movements based on seasonal strength. 
+
+## qnorm is the inverse of the cdf function. 
+
+Assets can now be excluded from Z3 and Z7 with the **Exclude** line in z.ini. 
+
+The equity or balance curve of a test run is now also exported in CSV format for further evaluation. 
+
+MTR4 bridge 1.13 now supports a **lock command** for preventing that trade parameters sent by different Zorro instances interfere with each other. 
+
+## *Zorro 1.50 (September 2016)* 
+
+Orders for binary options and other special order types can now be sent via MTR4 bridge with the **SET\_ORDERTEXT** command (V 1.47.1). 
+
+## Currency strength functions have been added for detecting currency trends that affect several markets (V 1.47.2). 
+
+Live trading results can be verified by **retesting** (V 1.47.2; **Zorro** 
+
+## S required). 
+
+Live trading systems can retrain automatically in predefined intervals with the **ReTrainDays** variable (V 1.47.2; **Zorro S** required). 
+
+The sliders can now be moved with **slider(num,pos)** commands (V 1.47.2). 
+
+The default data format was changed from **.bar** to **.t6** for including volume and other data streams in the price history (V 1.47.2). **.bar** data can still be used. 
+
+With the **marketVol** function, trade or tick volume of an asset can be 
+
+used in a trading algorithm (V 1.47.3; Zorro S only). 
+
+The **Fill** mode determines how orders are filled in the simulation (V 1.47.4). 
+
+Numbers can be passed to the **Command** variable via command line (V 1.47.4; **Zorro S** required). 
+
+The number of optimize steps per parameter was increased to 1000 (V 1.47.7). 
+
+Price ticks are now internally stored in a different format that used less memory for large high-resolution backtests. (V 1.47.7). 
+
+Disquieting broker messages - such as "An internal server error occurred, our engineers have been notified" - are now filtered out by the Oanda plugin (V 1.47.8). 
+
+Three **Volatility indicators** are now supported - Chaikin, Min/Max, and StdDev based volatilities (V1.50.2). 
+
+## *Zorro 1.46 (July 2016)* 
+
+The **assetAdd** function allows adding assets via script without editing the asset list. 
+
+The **assetList** function loads an asset list immediately. 
+
+Price history files can be shared among several Zorro installations when a **HistoryFolder** is set up in **Zorro.ini**. 
+
+With the **"\r"** character in a **print/printf** statement that jumps back to begin on the current line, a running counter or similar effects can be realized in the message window. 
+
+The **mouse** function can be used for automated clicking "Buy" and "Sell" buttons on a broker's web interface. 
+
+Individual asset lists for the **Z systems** can now be entered in 
+
+the **Z.ini** setup file. 
+
+A new free trading system **Z8** was added to the **Z systems**. 
+
+The **Oanda plugin** now supports sub-accounts. 
+
+The **LINE** flag in a **plot** command plots thick lines in the chart. 
+
+[***Change Folder***] in the Strategy scrollbox selects strategies from a different folder. 
+
+## *Zorro 1.44 (May 2016)* 
+
+The **Oanda** plugin allows direct trading with Oanda™. 
+
+Headers for authorization or other purposes can now be included in the **http\_send** function. 
+
+The **TradeTest** script opens a panel with buttons for manually trading, useful for testing broker plugins. 
+
+Files can now be selected in a dialog box with 
+
+the **file\_select** function. 
+
+Clicking on [***Result***] during test or trading triggers the **click** function. This can be used for performing a calculation or plotting an interim result. 
+
+The **IB bridge** was modified for downloading larger price history. 
+
+The **GET\_POSITION** command is now supported by the IB bridge. 
+
+The **BALANCED** flag produces a balanced samples distribution for all machine learning algorithms. 
+
+A set of **normalization functions** was added for better adapting indicators to machine learning algorithms. 
+
+The **SIGNALS** method exports samples for experimenting with them in R sessions. 
+
+A default **neural** function was included in the **r.h** header. The documentation now got a R example for a 'deep learning' strategy. 
+
+The **Covariance** between two series was added to the indicator library. 
+
+The **TRADESIZE** flag can be used for training strategies that rely on different trade sizes, f.i. Martingale systems. 
+
+The **28 Currencies history** was updated until the end of 2015. 
+
+## Day gives the current day number of the simulation. 
+
+Optimal capital allocation among portfolio components can be calculated with the **Markowitz efficient frontier**. 
+
+Symbols on a histogram or statistics chart can now have individual colors. 
+
+The **plotHeatmap** function can plot correlation heatmaps. 
+
+The **color** function can be used for plotting heatmaps or multiple color curves. 
+
+Date and time can be printed more easily with the **strdate** function. A set of **matrix functions** was added. 
+
+By default Zorro is now installed in the **User** folder instead of 
+
+the **Program Files** folder. 
+
+## *Zorro 1.42 (February 2016)* 
+
+The **STEPWISE** flag can be used for **debugging** trade behavior by single stepping through a test session. 
+
+Variables can be debugged with the **watch** function. 
+
+When a script crashes, the name of the faulty function is now displayed. 
+
+A negative **PlotBars** number zooms to the end of the chart. 
+
+The **MTR4 Bridge** can now draw horizontal lines and text in the MTR4 chart window. 
+
+The **MTR4 Bridge** latency time was reduced from ~100 ms to ~30 ms by optimizing the data transfer. 
+
+## Control panels can now be defined for entering and displaying strategy parameters. 
+
+The **Leverage** parameter was changed to reflect account leverage instead of buying power. 
+
+The location of the **.trd** files moved from the **Log** to the **Data** folder. 
+
+The last potentially orphaned trade is now displayed in the status page. 
+
+The **Shannon Entropy** was added to the indicators. 
+
+Price data of stocks and indices can now be downloaded from Yahoo with the **assetHistory** function. 
+
+The **Download** script is now controlled with a panel; editing the script is not necessary anymore. 
+
+Assets can now be tested even with no entry in the asset list. An error message will then be issued and default asset parameters will be used. 
+
+## Trade loops can now be executed from inside a TMF. 
+
+The **wdate** function returns the date and time of a bar in the Windows **DATE** format. 
+
+Trades can be simulated in an unrealistic **naive mode** for special purposes. 
+
+Individual text editors (such as Notepad++) and chart viewers can be used by editing the **Zorro.ini** file. 
+
+## *Zorro 1.40 (November 2015)* 
+
+Zorro can now trade with **Interactive Brokers** accounts through the 
+
+IB plugin. 
+
+Asset lists and account lists are now in **.csv** format for easier            editing. **Leverage** and **Symbol** have been added to the asset parameters. 
+
+Correlograms can now be plotted with the **profile** library. 
+
+Trade slippage, magic number, and other parameters can now be set up in the **MTR4 bridge** via **brokerCommand**. 
+
+The type of an asset can be determined with 
+
+the **assetType** function. 
+
+The **frameSync** function can be used to snychronize the time frame to full hours or days. 
+
+A fixed WFO test/training time can be set up with **WFOPeriod**. 
+
+## Curves stores balance or equity curves during the training process for further evaluation. 
+
+The **putvar/getvar** functions share variables globally among scripts. 
+
+The **lock** function can synchronize the behavior of multiple Zorros (Zorro S only). 
+
+The **sort** functions can now be used without data length limits. 
+
+The **randomize** function can shuffle a price or equity curve with or without replacement. 
+
+## Percentile calculates upper or lower percentiles of a data series. 
+
+## ProfitFactor calculates the profit factor of a balance or equity curve. 
+
+The **market** function can be used to limit trading to certain hours of the day. 
+
+The **plotData** function returns plot data arrays that can be used for further evaluation. 
+
+Plotting data is now pre-sampled, which makes plotting huge data sets - f.i. a backtest of several years based on minute or second bars - up 
+
+to 100 times faster than before. 
+
+The **BrokerAccount** function is now optional (account data is normally unavailable in a FIX API implementation). 
+
+The **Montecarlo** module has been integrated in Zorro, so an external plugin is not required anymore. 
+
+Periodic I/O tasks can be realized with the **tock** function. 
+
+The sample period of the **Spectrum** function can now be set up independently. 
+
+The **Z.ini** file can now be modified while trading, and is updated at the begin of the next bar. 
+
+The **Z7 system** got a modified and supposedly more robust algorithm. 
+
+## loop(Assets) loops over all assets from the asset list. 
+
+## *Zorro 1.34 (released August 2015)* 
+
+WFO training time can be minimized by using **several CPU** 
+
+## cores (Zorro S only). 
+
+The Zorro window can be started minimized with the **-h** command line option. 
+
+The **AssetZone** variable allows individual time zones for assets in a portfolio system. 
+
+The pattern analyzer behavior can be set up with 
+
+the **PatternCount** and **PatternRate** variables. 
+
+A negative **series** length can be used for generating static, non-shifting series. 
+
+The **ZigZag** indicator was added to the indicators list. 
+
+Machine learning models and script parameters can now be trained at the same time (see **Training**). In the previous version this was only possible for the integrated machine learning methods, but not for the general **NEURAL** method. 
+
+The **bar** function allows user-defined special bars such a Range Bars or Renko Bars. 
+
+Training parameters now really produces a HTML file with parameter histograms (in the previous version this was not yet fully included). 
+
+The **R lectures** by Harry Georgakopoulos have been included in the Zorro documentation. 
+
+Zorro will now detect margin calls when **Capital** is set. 
+
+The **seed** function can initiate a deterministic random number 
+
+sequence. 
+
+The **HH** and **LL** functions now also accept a bar offset. 
+
+The **Ichimoku** indicator was added to the collection. 
+
+The **TO\_CSV** print target prints into a CSV file. 
+
+The **strmid** function returns a substring from a string. 
+
+The asset list **AssetsCur.dta** contains all 28 major currency pairs. Price history of all 28 major currency pairs is available on the 
+
+download page. 
+
+The **Z2** system has been improved and got better exit algorithms and a new counter trend algo (A2). 
+
+The new **Z7** system, based on the machine learning algorithm from **Workshop 7**, was included. 
+
+## *Zorro 1.32 (released June 2015)* 
+
+The **R bridge** runs R functions from lite-C scripts and allows coding a trade strategy completely in R, using the newest and sexiest AI algorithms. 
+
+## Verbose = 30 now stops the blackbox recording at the first error. The strw function converts strings to wide character strings. 
+
+The **strf** function returns a formatted string. 
+
+The **strx** function replaces sub-strings in a string. 
+
+The **TO\_FILE** and **TO\_ANY** print target prints messages to the log file and window in all modes. 
+
+The **TICKS** mode was changed. Ticks are now executed in the order of their time stamp, not sorted by asset or trade as before. This makes testing slower, but removes the special restrictions for tick functions, TMFs, and virtual hedging. The old testing method can still be used by setting the **FAST** flag. 
+
+The **rev** function reverses a series so that it now starts with the oldest data. 
+
+The **SHUFFLE** flag randomizes a price curve and thus helps              determining if profit is caused by a real edge or by artifacts or randomness. 
+
+The **plotWFOCycle** and **plotWFOProfit** functions can be used for analyzing the profit curve over several WFO cycles. 
+
+The **BarZone** variable can be used to shift daily bars to a certain local time zone. 
+
+## Chaikin Volatility was added to the standard indicators. 
+
+The **BINARY** flag enables the simulation of binary trading. 
+
+## Training now plots all parameter charts in a HTML page, also for portfolios and WFO. 
+
+## *Zorro 1.30 (released April 2015)* 
+
+The **OptimalFRatio** variable modifies **OptimalF** factors for preventing large component margin differences in portfolio systems. 
+
+For scalping strategies, **bar periods** down to 100 ms are now         possible with Zorro S. The **BarPeriod** variable is now of type **var** instead of **int** (check possible compatibility issues, f.i. in print/printf statements). 
+
+Asset specific parameters can be stored in the **AssetVar** variables. 
+
+All **Z systems** can now be retrained with Zorro S by clicking the       [***Train***] button (even while trading). Price history of all assets from 2008     and above must be available in the **History** folder. The recent prices are updated and the parameters of the last WFO cycle are trained. Retraining the Z systems is normally not necessary, but was requested by many users. 
+
+Several small improvements have been implemented in the **Z systems**, among them different **OptimalF** factors for the backtest and for live trading, and a different profit lock method. 
+
+The **Z3 system** now also trades US indexes. 
+
+A chart with the current equity curve and other information is now included in the **trade status page**. 
+
+If the trade volume is controlled by setting both **Margin** and **Lots**, the **Lots** variable now determines the minimum number of lots per trade. Trades can be automatically skipped when Margin is below the minimum. 
+
+The **backtest** can now use T1 (tick based) historical price data. 
+
+The **assetHistory** function can now be used to produce T1 price history files. 
+
+The **seconds** function is now of type **var** instead of **int** (check possible compatibility issues, f.i. in print/printf statements). Its fractional part contains fractions of a second in milliseconds precision. 
+
+The user-supplied **tick** function can be used to evaluate incoming price quotes. 
+
+The **AutoCompile** flag determines whether scripts are always compiled, or only when they were modified. 
+
+## Plot names beginning with '#' won't appear in the chart legend. 
+
+The test performance can now be further evaluated with the user-supplied **evaluate** function. 
+
+The **UO** (Universal Oscillator) by John Ehlers was added to the indicator library. 
+
+The **Risk** column of the **status page** now displays the current risk of a trade instead of the initial risk. 
+
+## *Zorro 1.28 (February 2015)* 
+
+The **WebFolder** variable can now be set up globally for displaying live trade status on a web site. 
+
+The **strtext** function can be used to read strings from an **.ini** file. The **DPO** oscillator was added to the TA functions. 
+
+The **AGC** and **EMA** functions now also accept an alpha parameter instead of a time period. 
+
+Some Zorro properties - for instance, the automatic deleting of old log files - can now be set up in the **Zorro.ini** file. 
+
+The commission per asset can now be set up in 
+
+the **AssetsFix.csv** file and by script in the **Commission** variable. The simulation now simulates a spread/commission account, instead of a pure spread account. 
+
+In the SNB floor removal aftermath, many brokers reduced their maximum leverage from 400:1 or 200:1 to 100:1. The simulated default account (**AssetsFix.csv**) was also changed to 100:1 leverage, which 
+
+affects the profit of most systems. 
+
+The **Z4** and **Z5** systems are expired and have been removed from the strategy pool. 
+
+The **Z3 system** now also got an equity curve trading mechanism. The currently profitable and suspended components of 
+
+the **Z12** system are now displayed in a **asset/algo matrix** with green and red rectangles. 
+
+## *Zorro 1.26 (October 2014)* 
+
+The number of open lots per asset can be evaluated with 
+
+the **LotsPool** and **LotsPhantom** variables. 
+
+The Market Meanness Index (**MMI**) was added to the indicator library. 
+
+Haiken Ashi prices (**HA**) were added to the indicator library. 
+
+The Z systems have been improved and retrained. New algorithms have been added to the Z4 and Z5 systems for working with very low price volatility. 
+
+## *Zorro 1.24 (June 2014)* 
+
+The **AssetFrame** variable can be used to skip quoteless bars of assets in a portfolio system. 
+
+The **TradeCosts** script lists the relative trade costs of all main assets. 
+
+The **Script** scrollbox now 'remembers' the last selected script. 
+
+## Hedge mode 5 now minimizes the number of open trades by closing trades partially if required. 
+
+## exitLong/Short can now close trades partially. 
+
+The **MTR4 bridge** and the **FXCM plugin** have been adapted to partially closing trades. 
+
+## TrailSpeed raises the stop faster before breakeven, this way preventing that a winning trade turns back into a loser. 
+
+The **Hurst exponent** can determine trending state of a price curve. The **Alligator** indicator was added to the library. 
+
+The **predict** function can predict crossovers several bars before they happen. 
+
+The **Momentum** variable indicates the 'strength' of crossovers, peaks, or valleys. 
+
+The **saveStatus**/**loadStatus** functions can preserve variables, open trades, and slider positions when the system is stopped or restarted. 
+
+The **AlgoVar** variables are now automatically saved, thus keeping their content when a trading system is stopped or restarted. 
+
+Invalid **Margin** values are now indicated with an error message. 
+
+The **NFA** flag is now ignored in training mode. 
+
+While trading, Zorro now displays a detailed lists of open trades and performance statistics in a HTML file that is updated every minute. 
+
+## *Zorro 1.22 (April 2014)* 
+
+The **MTR4 bridge** was updated to version 1.3 that supports MTR4 version 600 and above. 
+
+The **Multisession plugin** allows to trade with multiple brokers, instances, and accounts even with the free Zorro version. 
+
+Placing the stop level at the wrong side of the price in a TMF is now automatically corrected. 
+
+The **ATR** function now adapts to the **TimeFrame**. 
+
+A new **Virtual Hedging** mode allows to combine trades opened on the same bar to a single net trade. 
+
+The **Keltner Channel** was added to the indicator library. 
+
+The **PlotDate** variable can be used to zoom the chart to a certain date. 
+
+The **print** function can print to various targets, f.i. to a message box or to the performance report. 
+
+Zorro now only logs in to the broker when in trade mode. In test or train mode, missing assets or price data will produce an error message. The **Download** script now needs trade mode for updating prices or asset data. 
+
+The **exec** function can be used to open an external program, document, URL, or batch file. 
+
+A **Monte Carlo plugin** is now available for a Monte Carlo analysis of strategy scripts and external trade lists. 
+
+The annual return is now calculated from the maximum margin instead of the average margin. This produces slightly more pessimistic returns. 
+
+The **R2** coefficient that measures equity curve linearity is now included in the **performance report**. 
+
+A small example script for converting **.csv** price history files to Zorro's **.bar** format was added (needs the **file\_write** function). 
+
+The **History** string can be used for selecting between different sets of historical data files. 
+
+The **file\_write** function can be used to store the content of a string, series, or array in a file. 
+
+The **NumInRange** function can be used to generate price distribution statistics while trading. 
+
+The **ShannonGain** indicator calculates the expected gain of the next bar period, based on Shannon probability. 
+
+A description of using NeuroShell™ and other DLL-based indicators for Zorro was added to the **conversion** chapter. 
+
+Trade management functions (**TMF**) can now be triggered by entry or exit limits, thus allowing for additional entry/exit conditions or trade chains. 
+
+## TickSmooth can remove outliers from incoming price ticks. 
+
+The **TickTime** variable can be used to save CPU resources by defining a minimum time between script executions. 
+
+The **plotProfit** functions plot the daily, weekly, monthly, or quarterly profit or loss in the price chart. 
+
+The **Z5 system** got a new algorithm for the "Stop" slider that re-enters trades closed due to the risk limit. This greatly improves the profit in situations when the risk limit is exceeded. 
+
+## *Zorro 1.20 (November 2013)* 
+
+The **PRELOAD** flag allows loading lookback price data from the price history on trade start. 
+
+The **DominantPhase** function can detect turning points of the dominant cycle in a price curve even before they happen. 
+
+The **account selection system** was implemented for multiple accounts and/or multiple MTR4 clients (Zorro S only). 
+
+A new FXCM plugin is available where the wrong trade profit issue is fixed, so the **SET\_PATCH** command is not required anymore. 
+
+Bar charts by **plotBar** are now automatically aligned so that the chart always starts with the first bar. 
+
+The **MTR4 bridge** now supports multiple MTR4 instances on the same PC (Zorro S only). To connect to a particular MTR4 account, either the account number can be manually entered in Zorro's [***User***] field, or 
+
+the **account selection system** can be used. 
+
+The **-d** command line option allows to pass a **#define** statement to the script (Zorro S only). This way many different tasks can be automatized with the same script. 
+
+The **ALLCYCLES** flag produces a portfolio analysis of all sample 
+
+cycles. 
+
+The **plot** command now supports plotting different symbols in the chart. 
+
+A price data gap check can be activated with the **GapDays** variable. 
+
+New indicators by John Ehlers (**HighPass2**, **StochEhlers**) have been converted to C by DdlV, together with an example script of a trade system. 
+
+A **Filter** script has been added for testing and displaying 
+
+Zorro's **spectral filter** functions. 
+
+The sine and square wave generators can now produce hyperbolic chirps for filter testing. 
+
+## Margin at 0 now prevents trades; previously 1 lot was opened, which was a common source of mistakes. 
+
+A backup of the **.trd** file is now stored at trade start. 
+
+Several different money management methods are now discussed at the end of **workshop 6**. 
+
+A **Gap** script was added as an example for a simple gap trading system. 
+
+The **Z5 system** was improved for adapting to periods of low 
+
+volatility. 
+
+The new **Z4 system** was especially designed for minimal budgets in the range of $100 .. $400. 
+
+## *Zorro 1.16 (September 2013)* 
+
+The **-quiet** command line flag suppresses message boxes. 
+
+## FTP and HTTP functions have been added for accessing the content of websites or sending emails or files to or from remote servers. 
+
+A new **Virtual Hedging** mode was implemented and replaces 
+
+the **HEDGING** flag. It can greatly reduce the market exposure and the trade duration, and improve profit due to smaller trade costs. 
+
+A drawdown chart was added to the **performance chart**. 
+
+Chart colors can be individually set up with the **color** variables. 
+
+The contribution weights of portfolio components are now listed in the **portfolio analysis**. 
+
+New trades can now be opened from inside a **TMF**. 
+
+The **Simulate** script simulates a trade system by importing trades from a .CSV file. 
+
+Entry and exit time of a trade are now stored with tick precision in the .CSV file (previously it was with bar precision only). 
+
+Some users had problems to set up a trading system on a VPS, so a **VPS installation service** was added to the download page. 
+
+The **Z5** system now uses virtual hedging. 
+
+## *Zorro 1.14 (August 2013)* 
+
+While trading, a click on [***Result***] prints a list of open trades with entry, current, and stop prices. 
+
+The **login** function can be used for temporarily logging out from the broker. 
+
+The **memory** function can be used for determining the current memory footprint of the script, and for finding memory leaks. 
+
+The **reverse** functions are convenient for limiting the number of trades. Their use is explained in **workshop 5**. 
+
+The **msg** function can now be used for modeless message boxes, useful for trade alerts without interrupting the script. 
+
+The stop loss distance is now displayed in the daily profit/loss reports with **Verbose** >= 2. 
+
+## OptimalF factors are now also calculated for long and short trades together. This gives a more precise result than averaging the long and short OptimalF factors. 
+
+A **seconds** function was added for evaluating intrabar time. 
+
+The **OrderDelay** variable can be used for improving profits by entering trades at the optimal moment. 
+
+A step by step description of adding new assets and downloading 
+
+price data was added to the manual. 
+
+The **Capital** variable allows to set up an initial capital and calculate the CAGR. 
+
+The **advise** function can now generate trading rules for multiple assets and algos. 
+
+The **BarPeriod** variable can now be set from an **optimize** call, except for WFO. 
+
+## TimeFrame can now generate individual time frames that are aligned to external events. 
+
+## assetHistory can now be used for updating or adding new assets without downloading historic price data. 
+
+The state of the input sliders are now stored together with the open trades, and restored when trading is resumed. 
+
+The state of the Account scrollbox is now preserved when Zorro is restarted. 
+
+The **BarMode** variable can now be set to **2** for preventing that bars end during the weekend. 
+
+The **Verbose** variable can now be used to set up message verbosity and diagnostics mode via script. It is also added to the **Z.ini** file for the included systems. 
+
+The **diag.txt** file is now separately stored for every strategy. 
+
+## *Zorro 1.12 (July 2013)* 
+
+Slippage is now recorded while live trading, and displayed in 
+
+the **performance report** in total and per trade. 
+
+An additional algorithm (VO) was added to the Z1 system, increasing the annual return to about 280% 
+
+After 6 months live test the **Z3** and **Z5** trade systems have been released. 
+
+C source generated by machine learning functions is now stored 
+
+in **.c** files instead of **.rul**. 
+
+The **plotMAEGraph** function can produce MAE distribution graphs and similar charts. 
+
+The **plotGraph** function draws lines and polygons in a chart. 
+
+The **DOT** type can be used for plotting a dotted curve. 
+
+The **Trail** distance can now be negative for raising the stop loss on any bar regardless if the trade is in profit or not. 
+
+Due to an internal loop optimization, trades are now entered faster, thus reducing slippage. 
+
+The **MUTE** flag prevents playing sounds (in the case that Zorro trades from your bedroom). 
+
+## NumTotalCycles can be used to repeat a full simulation cycle many times. 
+
+The **pattern analyzer** can now generate 'fuzzy patterns' with 
+
+the **FUZZY|PATTERN** method. 
+
+The **pattern analyzer** can now generate pattern finding functions in C that can be exported to other platforms. 
+
+The **equalF** and **eq** functions have been added to the **fuzzy** 
+
+## logic set. 
+
+## *Zorro 1.10 (May 2013)* 
+
+Zorro can now run as a MTR4 expert advisor using the **MTR4 Bridge**. 
+
+The **Spectrum** function can be used to find hidden cycles in a price curve. 
+
+A new **workshop** was added for trading with machine learning algorithms. 
+
+AI rules and strategy parameters can now be generated at the same time. 
+
+The **PATTERN** analyzer automatically finds profitable candle patterns for price action trading. 
+
+The **FrameOffset** variable allows to generate trade signals at        different times within the same time frame of a multi time frame strategy. 
+
+The **-diag** command line option can be used for finding the reason of a crash or similar problem that terminates the script. 
+
+## *Zorro 1.06 (March 2013)* 
+
+The **AVG** flag now allows to **plot** a value as an average curve over all oversampling cycles. 
+
+A **Laguerre** filter was added to the **filters**. 
+
+Comparing a function pointer with a **var** or **float** value - this can happen when forgetting the () of a function call - will now generate a compiler error. 
+
+The **info** and **progress** commands display text and color signals in Zorro's info window and progress bar. 
+
+Zorro can now be started from external programs with **command line options**. 
+
+## Seasonal analysis functions have been implemented. They are also be available as an add-on for Zorro 1.05. 
+
+The **Z12**, **Z12fx**, and **Z12nfa** combined strategies have been removed because they were found less profitable than trading Z1 and Z2 separately. Reason is an internal mechanism that evaluated open trade profits for trade decisions, which does not work well across opposite strategies such as the Z1 trend trading and the Z2 counter trend trading systems. 
+
+## *Zorro 1.05 (January 2013)* 
+
+The **Total down time** - the time spent below a preceding equity peak - is now displayed in the **performance report**. 
+
+The **timer** function can be used for precisely determining execution times. 
+
+Asymmetric slippage can be simulated by setting 
+
+the **Slippage** variable to a negative value. 
+
+## dayPivot calculates the pivot point of the previous day. 
+
+The stock exchange working hours for the **day** functions can be changed through the variables **StartMarket** and **EndMarket**. 
+
+The week start and end time can be changed through the 
+
+variables **StartWeek** and **EndWeek**. 
+
+The **DIAG** flag prints the execution time for opening and closing positions into the log file. 
+
+The **TICKS** flag now also handles entry limits with per-tick resolution. 
+
+## Trade functions can now also be used for individual entry limits. 
+
+Price history files are not anymore automatically downloaded at the begin of a new year - this confused beginners and was a bad idea anyway. Instead the **assetHistory** function was implemented. 
+
+A new broker plugin with the ForexConnect™ API interface has been implemented. It provides a more stable connection than the previously used Order2Go™ broker plugin. 
+
+Logging in to the broker with several Zorro instances on the same PC will now generate an error message. 
+
+The **Z1** / **Z2** system components are now optionally filtered with the results of an out-of-sample test with the real trading parameters. This reduces the backtest performance, but should improve the real trading performance.

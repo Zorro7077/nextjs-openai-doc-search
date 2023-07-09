@@ -1,0 +1,49 @@
+# ﻿Accessing data 
+
+## dataFind (int Handle, var Date): int 
+
+Returns the number of the first record at or before the 
+
+given **Date** in **wdate** format. Returns **-1** when no matching record was found or when no dataset with the given **Handle** exists. Returns the number of records when **Date** is **0**. The dataset must be in descending time stamp order. Decrease the returned record number to retreive records with later dates; increase it to get records with earlier dates or with the same date. Subtract an offset from **Date** for avoiding future peeking; f.i. for EOD datasets with timestamps from the begin and data from the end of the day, subtract 16 hours (**16./24**) to adjust the timestamps to 16:00 market close time.
+
+## dataRow (int Handle, void \*Record): int 
+
+Returns the row number of the record with the given pointer. Reverse function of **dataStr(Handle,Row,0)**.
+
+## dataSize (int Handle, int \*Rows, int \*Columns): int 
+
+Returns the number of elements in the given dataset, and set 
+
+the **Rows** and **Columns** pointers, when nonzero, to the number of records and fields. 
+
+## dataSet (int Handle, int Row, int Column, var Value) dataSet (int Handle, int Row, int Column, int Value) 
+
+Stores the **Value** in the floating point or integer field **Column** of the record **Row**. Can be used for modifying datasets f.i. for removing outliers or adding parameters. Since the target field format depends on whether **Value** is **int** or **var**, make sure to use the correct type, especially when entering constants, and typecast it with **(int)** or **(var)** if in doubt. When modifying the time stamp field of the record (**Column** = 0), make also sure to keep descending order of dates in the array.
+
+## dataVar (int Handle, int Row, int Column): var 
+
+Returns the value of the floating point field **Column** from the record **Row**. 
+
+If **Column** is 0, the time stamp of the record is returned in **wdate** format. 
+
+If **Row** is negative, the record is taken from the end of the dataset, i.e. **Row = -1** accesses the oldest record. If the dataset is empty or 
+
+if **Row** or **Column** exceed the number of records and fields, **0** is returned.
+
+## dataInt (int Handle, int Row, int Column): int 
+
+As before, but returns the value of the integer field **Column** from the record **Row**.
+
+## dataStr (int Handle, int Row, int Column): string 
+
+As before, but returns a pointer to the field **Column** from the record **Row**. It it's a 
+
+text field, the text string of up to 3, 7, or 11 characters is returned. If **Column** is **0**, it returns a pointer to the timestamp field, i.e. the start of the record. For getting a pointer to the first record of the dataset, call **dataStr(Handle,0,0)**. For modifying a text field in a dataset, return its **string** pointer and then modify the string.
+
+## dataCol (int Handle, var\* Data, int Column): int 
+
+Fills the **Data** array with all **float** or **double** elements from the given **Column**, and sets the **rMin** and **rMax** variables to their minimum and maximum. Returns the number of records. The **Data** array must have sufficient size. 
+
+## dataCopy (int Handle, var\* Data): int 
+
+Fills the **Data** array with the content of the dataset, while all **float** elements are converted to **double**. Sets the **rMin** and **rMax** variables to the minimum and maximum value. Returns the number of elements. The **Data** array must have sufficient size.  

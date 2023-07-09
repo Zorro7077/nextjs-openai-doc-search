@@ -1,0 +1,29 @@
+# ﻿Developing Algo Trading Systems in C++ 
+
+The Zorro platform accepts 4 types of algo trading scripts in the **Strategy** folder: lite-C code (**.c**), C++ code (**.cpp**), lite-C executables (**.x**), and DLLs 
+
+(**.dll**). **Zorro64** has no lite-C compiler and thus runs only **.cpp** and **.dll** scripts. Scripts of supported types appear in the [***Script***] scrollbox and run automatically when the [***Test***], [***Train***], or [***Trade***] button is clicked. **Zorro** 
+
+## S compiles .x and .dll files from c. and .cpp sources automatically. For compiling .cpp scripts it utilizes the Visual Studio™ C++ compiler. Theoretically other languages can also be implemented, such as C#, Java, Pascal, Delphi, or Basic, as long as they are able to generate a 32- or 64-bit Windows DLL. The included batch and header files in Source\VC++ can serve as templates for integrating other languages. 
+
+Using C++ as script language has many advantages. Additional development tools, such as the Visual Studio debugger and profiler, are available. External libraries, such as **Boost**, can be integrated without a wrapper. The 64-bit mode can access more memory for backtests. All lite-C functions and all system variables can still be used, but additionally you have C++ classes and templates at your disposal. Error handling is more strict and you'll get warnings about bad code style. The VC++ compiler is a bit slower than the lite-C on-the-fly compiler, but is only invoked when the script was changed. The resulting code runs equally fast or - in 64 bit mode - even faster. The only disadvantage is that you have to download and install **Microsoft Visual Studio™** 2017 or above. 
+
+The Visual Studio debugger can display local and global variables and can step into code without the need of **watch** statements (which won't display C++ variables anyway). It is better suited than lite-C for finding hidden bugs or crashes in the code. For finding bugs or flaws in the trading logic, the **Zorro visual debugger** is still the best way. it works with C and C++ projects as well. 
+
+## *Getting started with C++* 
+
+You can get the free **Visual Studio Community** 
+
+## Edition from https://visualstudio.microsoft.com/de/downloads. Install it with its C++ desktop applications enviroment. Locate its build path - that's the folder containing vcvars32.bat, for instance "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build" - and enter it in ZorroFix.ini. This enables Zorro S to directly compile and start C++ scripts. 
+
+Even though it lacks the direct start feature, you can use C++ also with the free Zorro version. Set up a DLL project as described below and use the Visual Studio IDE to compile your .cpp script to a DLL in the Strategy folder. DLLs are supported by the free version. Only for debugging it with Visual Studio you'll 
+
+really need Zorro S.   
+
+The VC++ compiler and linker options can be found 
+
+in **Source\VC++\compile.bat** and **compile64.bat**. They are set up for Visual Studio 2022, but should also work for 2017 and 2019. When you know what you're doing, you can edit the batch files and modify the compiler or linker options for enabling special code optimizations or linking additional libraries. If you are unfamiliar with the VC++ options, leave the files untouched. 
+
+The 32-bit Zorro version compiles 32-bit DLLs, Zorro64 compiles 64-bit DLLs. When you switch between 32 and 64 bit versions, delete the old **.dll** file and compile it again. Or use different names for 32 bit and 64 bit .cpp scripts. A 64 bit program cannot load a 32 bit DLL, and vice versa. 
+
+DLLs can be used not only for developing strategies, but also for extending the lite-C language with external packages (see **using DLLs**). The code syntax for strategies in C++ is similar to lite-C; the example file **MyStrategy+.cpp** contains C++ versions of some of the included scripts. 

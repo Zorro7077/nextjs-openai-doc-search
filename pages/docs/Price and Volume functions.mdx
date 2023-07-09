@@ -1,0 +1,237 @@
+# ﻿Price and Volume functions 
+
+## price(int offset) : var 
+
+Returns the **TWAP** (time-weighted average price) of the selected asset. TWAP is the mean of all price ticks of the bar or time frame with the given **offset**. For indicators the mean price is normally preferable to the close price, since it is less susceptible to random fluctuations and makes systems more robust and less dependent on the data feed.
+
+## priceO(int offset) : var 
+
+## priceC(int offset) : var 
+
+## priceH(int offset) : var priceL(int offset) : var 
+
+Returns the open, close, maximum and minimum price of the current asset and the bar or time frame with the given **offset**. **priceC(0)** returns the current price.
+
+## priceReal() : var 
+
+Returns the current real price when OHLC prices have been artificially calculated by **special bars**. The **TICKS** flag must be set.  
+
+## marketVal(int offset) : var 
+
+## marketVol(int offset) : var 
+
+Returns additional market data, such as spread, quote size, trade volume, accumulated volume, tick rate, or quote frequency - see remarks and examples below. The type of data returned depends in live trading on the **Broker API**, and in backtesting on the **fVal** and **fVol** fields in **.t6** historical data, or on the ask-bid difference and volume field in **.t1** or **.t2** data. Normally **marketVal** returns the average historical spread of the last bar period, and **marketVol** returns the average historical trade volume of the last bar period. For the total historical volume of a bar, multiply **marketVol()** with **BarPeriod** divided by the historical data resolution in minutes. The **market** functions require **Zorro S** and 
+
+no **LEAN** flag. 
+
+## *Parameters:* 
+
+## offs Bar or time frame number for which the prices are returned, relative to the current bar or et  bar or time frame. Negative offsets return prices of future bars or time frames when the PE
+
+give an error message. 
+
+## *Returns:* 
+
+Price or raw market data. 
+
+## seriesO(): vars 
+
+## seriesH(): vars seriesL(): vars seriesC(): vars 
+
+Returns pointers to a temporary open, high, low, and close price **series** of the current asset. Can be used as a price series parameter to any function or indicator, or for referencing a price **N** bars ago (example: **var PreviousClose = (seriesC())[1];** - mind the parentheses). Unlike real series, they don't consume memory and can be conditionally called. Temporary series do not 
+
+support **TimeFrame** and **special bars**, and keep their content only until the next **indicator** call. 
+
+## priceSet (int offset*,* var Open, var High, var Low, var Close) 
+
+Modifies the open, high, low, close, and mean price of the current asset at the given bar, for **dummy assets**, artificial price curves, displaying special candles, or using a different price source. Use **offset = -1** for modifying the prices of the next bar when trades should be entered at the modified prices. Does not affect intrabar prices in **TICKS** mode.
+
+## priceQuote (var Timestamp, var Quote) : int 
+
+Enters a new price quote of the current **asset** in the system; especially for **HFT simulation** or when prices are not available from the broker connection. Filters outliers and updates the current best ask (**AskPrice**) and best bid 
+
+(**AskPrice** - **Spread**). Increases **Bar** after every **BarPeriod** when no **run** function is used. Price quotes are also printed to the log when **Verbose** is at 3 or above, so be careful with **Verbose** for preventing awfully large log files.*** 
+
+## *Parameters:* 
+
+## offset  Optional bar number for which the prices are returned, in time frames before the cu
+
+the current bar is returned. Negative offsets return future prices when the **PEEK** flag is set error message. 
+
+## Timesta The exchange timestamp of the quote in DATE format. Quotes older than the prev
+
+## mp 
+
+## Quote  The price. Quote > 0 indicates an ask price, Quote < 0 a bid price. 
+
+## *Returns:* 
+
+1 if the price quote was accepted, 0 if an **Outlier** was detected or the timestamp was outdated. 
+
+## priceRecord () 
+
+Appends the current OHLC candle and the current spread and volume of the current asset to the begin of the price history in **.t1** or **.t6** format; only in [***Trade***] mode and after the **INITRUN**. This allows recording live prices for **re-training** or 
+
+other purposes. 
+
+## *Remarks:* 
+
+The **priceO**, **priceH**, **priceL**, **priceC** functions can be also used under the names **priceOpen**, **priceHigh**, **priceLow**, **priceClose**. 
+
+At the initial run of the strategy before an **asset** is selected, all **price functions return 0**. After switching to a different **asset**, the price and market functions automatically change to the prices and market data of that asset. In backtesting or training prices are affected by **Detrend** flags. 
+
+If not otherwise mentioned, all prices are **ask prices**. This way         stops, entry limits, or profit targets can be calculated without a distinction between long and short trades. Zorro automatically handles conversion     from Ask to Bid when entering or exiting trades, calculating trade profit, or setting limit levels. For getting the **bid price**, subtract **Spread**; for getting the **pip value** of a price, divide by **PIP**. The current bid/ask mean price 
+
+is **priceClose() - 0.5\*Spread**. More variants of prices - i.e. the Center Price, the Typical Price, the Haiken Ashi Price, the VWAP etc. - can be found on the **indicators** page. Live prices can be switched between different types (f.i. quotes and trades) with 
+
+the **SET\_PRICETYPE** command when supported by the broker. 
+
+For changing the price range of an asset, f.i. for shifting **negative prices** to the positive scale, use **PriceOffset**. 
+
+When connected to a broker or exchange, prices are updated at any incoming tick; when connected to an online **price source**, at any 
+
+bar. **Outliers and stock splits** are detected and can be evaluated with 
+
+the **PriceJump** variable. Outliers are removed, splits are logged. 
+
+If the **LEAN** flag is set and M1 historical data is used, open and close prices of a bar are not explicitely stored for preserving memory. They are derived from the mean prices of its first and last M1 tick. 
+
+If **LookBack** is not explicitely set, it is automatically expanded to the biggest **offset** value. If **offset** is higher than the current bar number (**Bar**), the price of the first bar is returned. 
+
+When using **multiple time frames** in the strategy 
+
+(**TimeFrame** variable), the **offset** parameter gives the number of time frames rather than the number of bars. The function **priceOpen** returns the price from the begin of the time frame, **priceClose** from its 
+
+end, **priceHigh, priceLow** the maximum and minimum price within the time frame, and **price** the current average of the time frame. Synchronizing time frames (**TimeFrame = 0**) to certain events or dates is not supported by price functions; use price **series** for that when required. 
+
+In live trading, **marketVal** and **marketVol** return spread and volume from the **broker API**, when available. If volume is not available, a proxy is returned, such as the tick frequency. The type of returned volume is described on the specific broker page (f.i. **IB**).Some broker APIs support 
+
+the **SET\_VOLTYPE** command for setting up the volume source between ask/bid or trade volumes. **Historical volume** is often the sum of quote sizes or trade volumes of the current minute or current day. **Live** 
+
+## volume is often the accumulated trade volume of the current day or trading session. The functions return the current value when Offset is 0, otherwise the average of the time frame. Depending on which sort of raw volume they return, it can be converted by script to the total volume per time frame. For instance, to convert accumulated volume to per-minute volume, subtract the volume from 1 bar ago from the current volume, and 
+
+divide by **BarPeriod.** See examples below.   In test and train 
+
+modes, **marketVol** returns the **fVol** element of **.t6** historical data, or otherwise 0. The **marketVal** function returns the **fVal** element of .t6 data, 
+
+and the ask-bid spread of .t1 or .t2 data, otherwise 0. 
+
+` `Depending on the broker, **live volume can be different to historical volume** where delayed transactions, busted trades, combos and unreportable trades are filtered out. Likewise, outliers are often filtered out of historical price data. Trade signals should therefore not rely on comparing live volume with historical volume or live volatility with historical volatility. 
+
+For **basket trading**, artificial assets can be created by combining the prices from several real assets. An example can be found under **Tips & Tricks**. 
+
+For evaluating live or historical **order book data** or BBO data, and for generating order flow profiles, use the **orderUpdate** function. 
+
+For calculating **VWAP prices** from a given time period, store prices and volumes in **series** and apply the **VWAV** function. 
+
+If the **PEEK** flag is set, price functions can **peek into the future** by using negative offsets. This is often used for training machine learning algorithms (see **advise**) with historical price data. If **PEEK** mode is not set, negative offsets will generate an error message. 
+
+In a **TMF** or **tick** function, **priceC(0)** returns the last price quote, updated every live or historical tick when new price data becomes available. **marketVal(0)** returns the last ask-bid spread 
+
+and **marketVol(0)** returns the last trade or quote volume if available. 
+
+If **.t1 data** contains both ask and bid quotes, **marketVal** returns the recent ask-bid spread. In **.t6 data** it returns the **fVal** value. The 
+
+command **if(Test)** **Spread = max(0,marketVal());** can be used for backtesting with variable spread when it is available in the historical .t1, .t2, or .t6 data. 
+
+An example of using the **priceQuote** function for simulating a HFT system can be found on **Financial Hacker**. 
+
+## *Examples:* 
+
+## BarPeriod = 60; *// set up 1 hour bars (60 minutes)* 
+
+## TimeFrame = 4; 
+
+## asset("EUR/USD"); 
+
+## vars EUR4Hs = series(price(0)); *// create a series of 4 hour EUR mean prices* 
+
+## ... 
+
+## TimeFrame = frameSync(24); 
+
+## asset("SPX500"); 
+
+## vars SPXDays = series(priceC(0));  *// create a series of daily S&P 500 close prices* 
+
+## TimeFrame = 1; 
+
+## ... 
+
+## *// plot a daily spread histogram* 
+
+## void run() 
+
+## { 
+
+`  `**BarPeriod = 10;** 
+
+`  `**PlotLabels = 4;** 
+
+`  `**plotBar("Spread",** 
+
+## (60\*hour(0)+minute(0))/BarPeriod,tod(0),marketVal(0),AVG,RE D); 
+
+## } 
+
+## *// print IB trade volume at any bar* 
+
+## *// consider different live and historical volumes* 
+
+## var volumeSum(var\* Buffer,var Volume,int NewFrame) 
+
+## { 
+
+## *// Buffer[0] = current volume, building up;* 
+
+## *// Buffer[1] = previous volume;*  
+
+`  `**if(NewFrame) {**  
+
+`    `**Buffer[1] = Buffer[0];** 
+
+`    `**Buffer[0] = 0;** 
+
+`  `**}** 
+
+`  `**return Buffer[0] += BarPeriod\*Volume; *// sum of 1-min volumes* }** 
+
+## var volumeDiff(var\* Buffer,var Volume,int NewFrame) 
+
+## { 
+
+## *// Buffer[2] = previous accumulated volume* 
+
+`  `**if(Buffer[2] == 0 || Buffer[2] > Volume)** 
+
+`    `**Buffer[2] = Volume;** 
+
+`  `**Buffer[0] = Volume-Buffer[2]; *// frame volume difference*   if(NewFrame) {** 
+
+`    `**Buffer[1] = Buffer[0];** 
+
+`    `**Buffer[2] = Volume;** 
+
+`  `**}** 
+
+`  `**return Buffer[0];  }** 
+
+## void run() 
+
+## { 
+
+`  `**BarPeriod = 1;   LookBack = 0;** 
+
+`  `**assetList("AssetsIB");** 
+
+`  `**brokerCommand(SET\_PRICETYPE,2); *// trade prices*   brokerCommand(SET\_VOLTYPE,4); *// trade volume*** 
+
+`  `**vars VBuffer = series(0,-3);** 
+
+`  `**if(Live) *// daily accumulated volume*     volumeDiff(VBuffer,marketVol(0),1);   else     *// average 1-min volume*** 
+
+`    `**volumeSum(VBuffer,marketVol(0),1);   var Volume = VBuffer[1];** 
+
+`  `**printf("# Vol %.0f",Volume);** 
+
+## } 

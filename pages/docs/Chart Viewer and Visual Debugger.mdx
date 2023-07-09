@@ -1,0 +1,73 @@
+# ﻿Chart Viewer and Visual Debugger 
+
+A click on the [***Result***] button after a test run opens the chart viewer and debugger. It allows to zoom and scroll from an overview of the whole simulation down to a single day or hour, and can replay or single step through the strategy for debugging purposes. Charts can be exported and stored as images, or already generated as images.. 
+
+The chart runs from the begin of the first test cycle (not identical to 
+
+the **StartDate**) to the end of the last test cycle. By default it displays equity and drawdown profiles (blue and red), the price curve (black), and the trades of the asset selected with the [***Asset***] scrollbox. For displaying a different asset, select it with the scrollbox and click [***Result***] again. 
+
+The chart uses the same **time zone** as the historical data, normally UTC. The left axis is the asset price, the right axis is the profit or loss in account currency units. Any axis runs from the minimum to the maximum value within the chart. Trade entry and exit points are connected with green or red lines for winning or losing trades. A falling green line or a rising red line indicates a short position. For option trades the lines connect the strike prices with underlying exit prices. 
+
+Equity and drawdown profiles are summed up from the whole portfolio and averaged over all **oversampling** cycles. If **Capital** is invested, it adds to the equity curve dependent on **PlotMode** settings. In **BALANCE** mode the blue profile displays the balance rather than the equity, in **PIPRETURN** mode it's the volume-independent profit in pips. The red "underwater profile" is normally 
+
+the **drawdown**, the equity distance from a preceding balance peak. 
+
+In **MAECAPITAL** mode it's the adverse excursion from a preceding equity peak and thus 'mirrors' the top of the equity curve. In **PL\_BENCHMARK** mode the equity curve is plotted as a blue line rather than bars, for comparison with buy-and-hold or market profit lines. Additional curves appear either on or below the main chart, depending on **plot** settings. 
+
+Candles are displayed when zooming in; otherwise the price curve is a black line. In the chart below, a short trade was opened on 16 at market open and closed intraday on Aug 8, probably by a trailing stop. A close at bar end by an exit command would have placed the end dot next to the close of the candle. 
+
+Chart elements can be switched off either with the buttons on the left side, or by setting their **Color** to 0.   
+
+## *Chart Buttons* 
+
+## *Date*  Jump to a particular date in the chart ![](Aspose.Words.d470f0cf-b4db-4f55-bd0b-16aa22d03a8c.001.png)
+
+## *Move*  Move mode. Drag the chart with the mouse. 
+
+## *Zoom*  Zoom mode. Click on a position in the chart for zooming in. *Total*  Zoom out to the total view. 
+
+## *Equity*  Toggle the equity and underwater curves. 
+
+## *Trades*  Toggle the trades. 
+
+## *Candle* Toggle the price curve. 
+
+## *s* 
+
+## *Export*  Export the current chart to a .png image. *Debugger Buttons* 
+
+## *Step*  Restart the script in single step mode. Step forward 1 bar. ![](Aspose.Words.d470f0cf-b4db-4f55-bd0b-16aa22d03a8c.002.png)
+
+## *Skip*  Restart the script in single step mode. Jump to the begin of the next trade. 
+
+## *Replay*  Replay the script, one bar per second. Gives some sort of live trading experience in fast
+
+The price curve with the displayed trades can be selected with the [***Assets***] scrollbox; afterwards click [***Result***] again for refreshing the chart. The equity or balance curve results from the sum of all trades of the portfolio. The underlying datasets of a chart can be **exported** and further evaluated with third party charting software, f.i. an **R data analysis** package. 
+
+In **PL\_FILE** mode, the chart is initally generated as a **.png** image in 
+
+the **Log** folder and displayed with the **ZView** image viewer. Elements can be removed from the chart image by setting their corresponding **Color** parameters to **0.** The size, scale, and resolution of the chart image can be set up with **plot parameters**. The number of bars per chart can be limited with 
+
+the **PlotBars** variable. 
+
+## *Remarks* 
+
+In [***Trade***] mode a chart image is part of the **.htm** status page. It can be displayed in a web browser and is updated after every **PlotPeriod** (default: 1 hour). It is not a live chart, but a snaphot of the last update point. 
+
+In [***Train***] mode parameter charts are exported to image files and displayed on the training result page. 
+
+The start point of a trade triggered at the end of a bar is displayed in the chart on the next bar, regardless of the selected **Fill** mode. 
+
+For bar charts the last position and zoom factor are preserved until the [***Edit***] button is clicked or a different script is selected. 
+
+On zooming horizontally, the vertical zoom is automatically adjusted so that it covers all plot elements inside the range. This can cause 'flat' candles when plot elements, f.i. by **plotGraph**, are far away from the price line. 
+
+Charts with many sub-charts (more than 15) can be difficult to view even with a large window size. If required, generate them as images 
+
+with **setf(PlotMode,PL\_FILE);** and display them in the **ZView** image viewer that is included in the Zorro distribution. 
+
+The text in the caption bar of the current chart can be changed 
+
+with **print(TO\_CHART,...)**. 
+
+For comparing charts or histograms of different strategy variants, export them as images and open them with **ZView** in horizontal split mode.

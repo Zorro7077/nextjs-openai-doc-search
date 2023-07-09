@@ -1,0 +1,349 @@
+# ﻿Predefined and user-supplied strings 
+
+## Script 
+
+Name of the script without the **".c"** extension. Can be changed for generating or loading parameters, rules, and factors from files with a different name, this way sharing training data with other scripts. Script names must not contain spaces or special characters.
+
+## Algo 
+
+The current algorithm identifier (read/only), set up by the **algo** function or a **TMF**. Algo identifiers should be short and must not contain spaces or special characters.
+
+## Asset 
+
+The current asset name (read/only), set up initially by the [***Asset***] scrollbox. Is automatically changed at runtime with the **asset** function, a **tick** function, 
+
+a **TMF** or a **trade loop**. 
+
+## AssetPrev 
+
+The name of the previously selected asset; in a **trade loop** the name of the asset that was selected before the loop.
+
+## Assets 
+
+A NULL-terminated **string** array containing the names of all available assets in the **asset list** (read/only). Can be used either as a **loop** parameter, or for enumerating assets, f.i. **for(N = 0; Assets[N]; N++)**. The asset names are valid after the first **asset** or **assetList** call. The number of assets in the list is returned by **assetList**.
+
+## AssetBox 
+
+The name of the currently visible asset in the [***Asset***] scrollbox (read/only). **Account** 
+
+The name selected with the [***Account***] scrollbox, f.i **"Demo**" or **"FXCM"**.
+
+## Factors 
+
+Name suffix and extension of the file containing the **OptimalF** factors; can be set for selecting between different sets of factors. If not set up otherwise, the file begins with the script name and ends with **".fac"**, f.i. **"Z12.fac"**. Set **Factors** f.i. to **"oos.fac"** for reading the factors from the file **"Z12oos.fac"**. 
+
+## History 
+
+User-supplied string with path, name suffix, and extension of the historical data files, for selecting between different sets and types (**.t1**, **.t2**, **.t6**, **.t8**) of price histories. If not set, **.t6** and the **HistoryFolder** path is assumed. A **'\*'** character at the begin of the name represents the asset name and an optional year 
+
+number, **'?'** represents the asset name with no year number. **History** must be set before the first **asset()** or **assetHistory()** call. Examples (for AAPL 2015): **History = "\*a.t6";** reads price history from **AAPL\_2015a.t6**;** if not found, 
+
+uses **AAPLa.t6**. 
+
+## History = "?.t6"; reads price history from AAPL.t6. 
+
+## History = "History\\Temp\\\*.t1"; reads tick data history 
+
+from **History\Temp\AAPL\_2015.t1**. 
+
+## History = "D:\\Data\\Options\\\*.t8"; reads price history from option chains 
+
+in **D:\Data\Options\AAPL.t8**.
+
+## Curves 
+
+User-supplied string with path, name, and extension of the file containing the exported equity or balance curves of all **optimize** parameter variants in [***Train***] mode (see **export**). Also used for storing the daily equity curve in [***Test***] mode. The **LOGFILE** flag must be set for exporting curves. If the file already exists, the curves are appended to the end. If **Curves** is not set, no curves are exported in [***Train***] mode, and in [***Test***] mode the equity/balance curve is exported to 
+
+a **\*.dbl** file in the **Log** folder.
+
+## SymbolTrade 
+
+The trading **symbol** of the current asset as set up in the **asset list**; or the asset name when the asset has no assigned trading symbol. Does not contain the optional broker or price source name. Can be modified with **strcpy**.
+
+## SourceTrade 
+
+The trading **account** assigned to the current asset as set up in the **asset list**; for instance an **account name** in a multi-broker strategy, or an empty strig for trading with the currently selected account. Can be modified with **strcpy**.
+
+## SymbolLive SourceLive 
+
+## SymbolHist SourceHist 
+
+The symbols and price sources of the current asset for live and historical prices. Can be modified with **strcpy**.
+
+## ZorroFolder 
+
+The folder in which Zorro was installed, with trailing backslash, f.i. **"C:\Program Files\Zorro\"** (read/only). This is not necessarily the root folder of the data files - see the remarks about **UAC**.
+
+## WebFolder 
+
+The folder for the HTML page that displays the trade status. If not set up otherwise, the HTML documents are generated in the **Log** folder. Can be set up in the **Zorro.ini** file.*** 
+
+## *Type:* 
+
+## string *Remarks:* 
+
+Make sure not to assign temporary strings to the above string constants. Temporary strings will lose their content after the next command. For making them permanent, copy them to a static **char** array of sufficient size. 
+
+Make very sure not to assign new content to read/only strings. This will not only not work, it can even cause subsequent errors when system strings are overwritten. 
+
+More strings, performance data and trade lists, broker/account info, and file contents are available through the **report** function. 
+
+## *Examples:* 
+
+## Script = "MyScriptV2"; *// store and load parameters under "MyScriptV2.par"* 
+
+## History = "\*s1.t6";    *// read historical data from f.i. "EURUSD\_2013s1.t6"* 
+
+## History = "?.t6";    *// enforce historical data with no year number, f.i. "EURUSD.t6"* 
+
+## WebFolder = "C:\\inetpub\\vhosts\\httpdocs\\trading";  *// VPS web folder* assetAdd(Asset,strf("%s:%s",NewSource,SymbolLive)); *// change source of current asset* 
+
+## ExitCode 
+
+The exit code of the Zorro application. It not set, Zorro terminates with exit code 0. 
+
+## *Type:* 
+
+## int *Remarks:* 
+
+For checking the exitcode in a Windows batch file or Cmd shell, use the **%ERRORLEVEL%** variable and make sure to start the application with **start /wait** (see example). 
+
+## *Example* 
+
+## *Script Test.c:* 
+
+## void main() { ExitCode = 777; } 
+
+## *Cmd Shell:* 
+
+## start /wait Zorro -run Test echo %ERRORLEVEL% 
+
+## HWnd 
+
+The window handle of the Zorro window. ***Type:*** 
+
+## int *Remarks:* 
+
+The window handle can be used by another application or process for triggering events or sending messages to a Zorro window. The message **WM\_APP+1** triggers a price quote request, **WM\_APP+2** triggers a script-supplied **callback** function, and **WM\_APP+3** triggers a plugin-supplied callback function set by the **GET\_CALLBACK** command. 
+
+The window handle is automatically sent to broker plugins with 
+
+the **SET\_HWND** command. 
+
+Window handles of other applications can be found with 
+
+the **FindWindow** function (see example). 
+
+## *Example (run 2 Zorros with this script):* 
+
+## #include <windows.h> #include <default.c> 
+
+## long Handle1 = 0; 
+
+## int click() 
+
+## { 
+
+`  `**if(Handle1)** 
+
+`    `**PostMessage(Handle1,WM\_APP+2,0,0); *// WM\_APP+2 = trigger callback function*** 
+
+`  `**else** 
+
+`    `**PostMessage(FindWindow(0,"Msg Test 2"),WM\_APP+2,0,0);** 
+
+## } 
+
+## void callback(void \*Message) 
+
+## { 
+
+`   `**printf("\nMessage received!"); }** 
+
+## void main() 
+
+## { 
+
+## *// use [Result] button for senging* 
+
+`  `**panelSet(-1,0,"Send",0,0,0);** 
+
+`  `**Handle1 = FindWindow(0,"Msg Test 1");   if(1Handle1)** 
+
+`    `**print(TO\_TITLE,"Msg Test 1");   else** 
+
+`    `**print(TO\_TITLE,"Msg Test 2");   while(wait(1));** 
+
+## } 
+
+## BarPeriod 
+
+The duration of one bar in minutes (default = **60**). The minimum bar period is one second (**1./60**) for normal scripts, and 1 ms (**0.001/60**) for **HFT simulation**. 
+
+Use **1440** for daily and **10080** for weekly bar periods. The bar period is the basic time frame in the script. It determines the width of a candle in the chart, and the frequency of the **run** function that is called after every bar. If not explicitly set up in the script, it can be determined with the [***Period***] slider. User-defined bars (see **bar** function) have no fixed bar period; in that case **BarPeriod** should be set to the average duration of a bar. 
+
+## *Type:* 
+
+## var
+
+## BarOffset 
+
+Bar start/end time offset in minutes; **0** or a positive number smaller 
+
+than **BarPeriod** (default = **940** with daily bars, otherwise **0**). Bars and frames normally start at a date/time boundary; f.i. 60-minute bars start at every full hour, and daily bars normally start at UTC midnight when **BarOffset** is **0**. For daily bars, use **BarOffset** shift the bar begin to the desired trading time of the day; the **940** default sets it to 15:40 in the bar **time zone**. **BarOffset** is also automatically set by **NumSampleCycles** for dividing a bar into equal time intervals and decreasing the offset by one interval per cycle; on the last 
+
+cycle, **BarOffset** is 0.  
+
+## TimeFrame 
+
+Time frame in bars (default = **1**) used for all 
+
+subsequent **price**, **time**, **series**, **advise**, and **trade** calls. This variable can be set within a strategy for using multiple time frames, for skipping bars, for synchronizing time frames to external events, or for for emulating special bars such as Range or Renko Bars. For instance, with a bar period of 5 minutes (**BarPeriod = 5**) and a time frame of 12 bars (**TimeFrame = 12**), series and trade signals use a one hour time frame (5\*12 = 60 minutes). 
+
+`  `For **synchronizing time frames** to a certain event, time, or date, skip the bars inbetween by setting **TimeFrame** to **0**. Count the skipped bars, and 
+
+set **TimeFrame** to the negative number of skipped bars when the event happens. The time frame synchronizing mechanism only affects the shifting of **series**; price and other functions are unaffected. See remarks and example; see 
+
+also **frameSync** and **AssetFrame**.
+
+## FrameOffset 
+
+Time frame offset in bars (default = **0** = no offset) used for all 
+
+subsequent **price**, **time**, **series**, and **trade** calls; must be smaller 
+
+than **TimeFrame**. When fixed time frames are used, this variable determines the bar number within a time frame when series are shifted and trades are executed. This variable allows to generate trade signals at different times dependent on the asset.*** 
+
+## *Type:* 
+
+## int *Remarks:* 
+
+Use the **bar** function for **special bars** that are not bound to a certain 
+
+bar period. 
+
+## BarPeriod can be set by script from one second (1./60) to one week (7\*24\*60 = 10080). Bar periods above 1 are rounded to a multiple of minutes. The [*Period*] slider moves in fixed steps corresponding to the standard bar periods of trading platforms; directly setting BarPeriod places the slider at the position closest to the BarPeriod value. If BarPeriod is set directly in the script, the slider is locked. 
+
+In [***Test***] mode, bar generation is based on the **UTC time stamps of ticks** in the historical price data. All ticks that fall in the bar period contribute to the bar. For instance, a 10-minute bar ending at 12:00 contains all ticks with timestamps from 11:50:00.000 until 11:59:59.999. If the tick covers several prices, its time stamp should be from its close price. If historical time stamps are from the open or the middle price instead, you can use the **TickFix** variable for adjusting them. In [***Trade***] mode, bar generation is based on UTC time from the PC clock, not on the broker's server time for avoiding sync problems by connection interruptions and Internet lag. 
+
+On **short bar periods** it is recommended to set the **TICKS** flag and use high resolution **.t1 price data**. It's mandatory on bar periods of less than a minute. For this, set **History** to **".t1"** and **BarPeriod** to the number of seconds divided by 60, f.i. **BarPeriod = 5./60.** for 5 seconds. Mind the decimal; **5/60** would be considered an **int** and thus evaluate to **0**. For extremely short bar periods, make sure that **TickTime** is always less than a bar period. 
+
+For bar periods **longer than a week**, set **BarPeriod = 1440** and 
+
+use **TimeFrame** for setting up monthly or quarterly time periods.  
+
+## BarPeriod and BarOffset affect the sampling of price 
+
+## data. Therefore they must be set in the first run before selecting the asset, must not change afterwards, and must not be 
+
+optimized. **TimeFrame** and **FrameOffset** can be set anytime and can be optimized without restrictions. 
+
+Historical price data should have sufficient resolution so that 
+
+any **BarPeriod** contains at least one historical tick during market hours. 
+
+If **BarOffset** is nonzero, historical and lookback data need accordingly higher resolution. For instance, with a daily bar period price data should have at least 10-minutes resolution when **BarOffset** is set so that bars end at 15:40.  
+
+If **BarOffset** is **0**, bars begin and end at day/hour boundaries. For preventing that daily bars would begin and end at 00:00 midnight (and thus reflect the prices from the previous, not from the current 
+
+day), **BarOffset** has a default value of **940** (equivalent to 15:40) on daily and weekly bars. Alternatively, set **BarOffset** to the time when you want the script to trade; for example, **BarOffset = 60\*9+30;** for trading at market open at 9:30. Witb the default bar offset, weekly bars end on Friday 15:40. 
+
+All time zone settings assume UTC time for price history. If price history is in local time and the time of day is relevant for the system, either convert the timestamps to UTC or use **BarZone**. 
+
+## *TimeFrame vs. BarPeriod:* 
+
+## TimeFrame is not the same as BarPeriod. The differences are listed below. If multiple time frames or time offsets are not required, set the time frame with BarPeriod only. This uses the lowest possible number of bars and results in the highest speed for testing and training.  
+
+## Barperiod determines the bar chart and the frequency of 
+
+the **run** function, while **TimeFrame** affects the **price** functions, the shifting of **series**, and the bars at which **advise** and **trade** calls are executed. 
+
+Commands to enter or exit trades in the **run** function are only executed when the **TimeFrame** has ended at the current bar. But trade entry, stop, or profit targets are observed at any bar period. 
+
+The **run** function itself is executed at any bar period, but 
+
+the **frame** function can be used for restricting code execution to the end of the current time frame. 
+
+## TimeFrame is normally not synchronized to day/hour boundaries, while BarPeriod is. For synchronizing time frames to days or hours, use the frameSync() function. For aligning daily time frames to a certain market hour in a certain time zone, use the AssetFrame variable. 
+
+## TimeFrame has no effect on variables in bar period units, 
+
+f.i. **LookBack**, **UnstablePeriod**, **LifeTime**, or **WaitTime**. For extending those time periods, multiply the variable value with the number of bars per 
+
+time frame. 
+
+## TimeFrame does not affect indicators that do not use a Data series, but directly the current asset price series. This is mentioned in the description of the indicator. 
+
+Recursive indicators from the TA-Lib such 
+
+as **EMA** or **ATR** require **UnstablePeriod** to be adapted to their maximum time frame.  
+
+## *Examples:* 
+
+## #define H24 (1440/BarPeriod) 
+
+## #define H4 (240/BarPeriod) 
+
+## #define H1 (60/BarPeriod) 
+
+## ...  
+
+## BarPeriod = 60; *// 1 hour (60 minutes) bars* ... 
+
+## *// create a 4-hour price series ///////////////////////////////////* TimeFrame = H4; 
+
+## vars PriceH4 = series(price()); 
+
+## *// create a 24-hour price series /////////////////////////////////* TimeFrame = H24; 
+
+## vars PriceH24 = series(price()); 
+
+## *// skip bars outside market hours* 
+
+## static int SkippedBars = 0; 
+
+## if(!market(ET,0)) { 
+
+`   `**TimeFrame = 0;** 
+
+`   `**SkippedBars--; *// count negative number of bars outside market hours*** 
+
+## } else if(TimeFrame == 0) { 
+
+`   `**TimeFrame = SkippedBars;** 
+
+`   `**SkippedBars = 0;** 
+
+## } else 
+
+`  `**TimeFrame = 1;** 
+
+## vars PriceInMarketHours = series(price()); 
+
+## *// create a daily price series (equivalent to AssetZone) ////////* 
+
+## static int BarsPerDay = 0; 
+
+## if(hour(0) < hour(1)) { *// day change*   
+
+`  `**TimeFrame = BarsPerDay; *// end the frame*** 
+
+`  `**BarsPerDay = 0;** 
+
+## } else { 
+
+`  `**TimeFrame = 0; *// inside the frame*** 
+
+`  `**BarsPerDay--;  *// count negative number of bars per day* }** 
+
+## vars PriceD1 = series(price()); 
+
+## *// alternative: a midnight-aligned price series using frameSync()* 
+
+## StartWeek = 10000; 
+
+## TimeFrame = frameSync(H24); vars PriceD1 = series(price()); 
+
+## *// back to 1-hour time frames* TimeFrame = 1; 
+
+## ... 

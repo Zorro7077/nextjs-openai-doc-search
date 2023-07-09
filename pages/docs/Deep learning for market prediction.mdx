@@ -1,0 +1,313 @@
+# ﻿Deep learning for market prediction 
+
+Machine learning algorithms are very effective for algo trading systems. They are used for market prediction with Zorro's **advise** functions. Due to their low signal-to-noise ratio and to ever-changing market conditions, analyzing price series is an ambitious task for machine learning. But since the price curves are not completely random, even relatively simple machine learning methods, such as in the **DeepLearn** script, can predict the next price movement with a better than 50% success rate. If the success rate is high enough to overcome transactions costs - for this we'll need to be in the 53%..56% area - we can expect a steadily rising profit curve. 
+
+Compared with other machine learning algorithms, such as Random Forests or Support Vector Machines, deep learning systems combine a high success rate with litle programming effort. A linear neural network with 8 inputs driven by indicators and 4 outputs for buying and selling has a structure like this: 
+
+Deep learning uses linear or special neural network structures (convolution layers, LSTM) with a large number of neurons and hidden layers. Some parameters common for most neural networks: 
+
+## Hidden layers of a linear network are usually defined with a vector. For instance, c(50,100,50) defines 3 hidden layers, the first with 50, second with 100, and third with 50 neurons. 
+
+The **Activation** function converts the sum of neuron input values to the neuron output. Most often used are a **Rectifier** (RELU = rectified linear unit) that has a linear slope from 0 to 1, **Sigmoid** that saturates to 0 or 
+
+1, **Tanh** that saturates to -1 or +1, or **SoftMax** that approximates the highest input. 
+
+An **Epoch** is a training iteration over the entire data set. Training will stop once the predefined number of epochs is reached. More epochs mean better prediction, but longer training. 
+
+The **Learning rate** controls the step size for the **gradient** 
+
+## descent algorithm used in training. A lower learning rate means finer steps and possibly more precise prediction, but longer training time. The Larning rate scale is a multiplication factor for changing the learning rate after each iteration. 
+
+## Momentum adds a fraction of the previous step to the current one. It prevents the gradient descent from getting stuck at a tiny local minimum or saddle point. 
+
+The **Batch size** is a number of random samples – a **mini batch** –      taken out of the data set for a single training run. Splitting the data into mini batches speeds up training since the weight gradient is then calculated from fewer samples. The higher the batch size, the better is the training, but the more time it will take. 
+
+## Dropout is a number of randomly selected neurons that are disabled during a mini batch. This way the net learns only with a part of its neurons, which can effectively reduce overfitting. 
+
+Here's a short description of installation and usage of four popular R based deep learning packages, each with an example of a (not really deep) linear neural net with one hidden layer. 
+
+## *Deepnet* 
+
+Deepnet is a lightweight and straightforward neural net library supporting a stacked autoencoder and a Boltzmann machine. Produces good results when the feature set is not too complex. The basic R script for using a deepnet 
+
+autoencoder in a Zorro strategy: **library('deepnet')** 
+
+## neural.train = function(model,XY) 
+
+## { 
+
+`  `**XY <- as.matrix(XY)** 
+
+`  `**X <- XY[,-ncol(XY)]** 
+
+`  `**Y <- XY[,ncol(XY)]** 
+
+`  `**Y <- ifelse(Y > 0,1,0)** 
+
+`  `**Models[[model]] <<- sae.dnn.train(X,Y,   hidden = c(30),** 
+
+`  `**learningrate = 0.5,** 
+
+`  `**momentum = 0.5,** 
+
+`  `**learningrate\_scale = 1.0,** 
+
+`  `**output = "sigm",** 
+
+`  `**sae\_output = "linear",** 
+
+`  `**numepochs = 100,** 
+
+`  `**batchsize = 100)** 
+
+## } 
+
+## neural.predict = function(model,X) 
+
+## { 
+
+`  `**if(is.vector(X)) X <- t(X)** 
+
+`  `**return(nn.predict(Models[[model]],X)) }** 
+
+## neural.save = function(name) { 
+
+`  `**save(Models,file=name)**  
+
+## } 
+
+## neural.init = function() 
+
+## { 
+
+`  `**set.seed(365)** 
+
+`  `**Models <<- vector("list") }** 
+
+## *H2O* 
+
+H2O is an open-source software package with the ability to run on distributed computer systems. Coded in Java, so the latest version of the JDK is required. Aside from deep autoencoders, many other machine learning algorithms are supported, such as random forests. Features can be preselected, and ensembles can be created. Disadvantage: While batch training is fast, predicting a single sample, as usually needed in a trading strategy, is relatively slow due to the server/client concept. Multiple core training won't work with H2O because any new client will connect to the running closter. The basic H2O R script for Zorro: 
+
+## library('h2o') 
+
+## neural.train = function(model,XY) 
+
+## { 
+
+`  `**XY <- as.h2o(XY)** 
+
+`  `**Models[[model]] <<- h2o.deeplearning(     -ncol(XY),ncol(XY),XY,** 
+
+`    `**hidden = c(30),**  
+
+`    `**seed = 365)** 
+
+## } 
+
+## neural.predict = function(model,X) 
+
+## { 
+
+`  `**if(is.vector(X))**  
+
+`    `**X <- as.h2o(as.data.frame(t(X)))   else**  
+
+`    `**X <- as.h2o(X)** 
+
+`  `**Y <- h2o.predict(Models[[model]],X)   return(as.vector(Y))** 
+
+## } 
+
+## neural.save = function(name) { 
+
+`  `**save(Models,file=name)**  
+
+## } 
+
+## neural.init = function() { 
+
+`  `**h2o.init()** 
+
+`  `**Models <<- vector("list") }** 
+
+## *Keras / Tensorflow* 
+
+Tensorflow is a neural network kit by Google. It supports CPU and GPU and comes with all needed modules for tensor arithmetics, activation and loss functions, covolution kernels, and backpropagation algorithms. So you can build your own neural net structure. Keras is a neural network shell that offers a simple interface for that, and is well described in a **book**. 
+
+Keras is available as a R library, but installing it with Tensorflow requires also a Python environment such as Anaconda. The step by step installation for the CPU version:  
+
+Download and install R 64 bit for Windows 
+
+from **cran.r-project.org/bin/windows/**.. 
+
+Edit **Zorro.ini** and enter the path to the R terminal on your PC, f.i. "**C:\Program Files\R\R-3.6.1\bin\x64\Rterm.exe**". 
+
+Download and 
+
+install **RTools** from **cran.r-project.org/bin/windows/Rtools/**. 
+
+Download and install **Anaconda** for Windows, Python 3.X version, from **www.anaconda.com**.. 
+
+Start the **R x64** console. Enter the 
+
+command **install.packages("devtools")** and hit <Return>**.** 
+
+Now you can finally install Keras. The 
+
+commands: **devtools::install\_github("rstudio/keras") -** **library('keras') -** **install\_keras()**. 
+
+Installing the GPU version can be a bit more complex (believe it or not). A description can be found on the **Robot Wealth** blog. Depending on the Keras version, the way to install it might change from time to time, so check on their 
+
+website to be sure. 
+
+Now you're all set to use Keras in your strategy: **library('keras')** 
+
+## neural.train = function(model,XY) 
+
+## { 
+
+`  `**X <- data.matrix(XY[,-ncol(XY)])** 
+
+`  `**Y <- XY[,ncol(XY)]** 
+
+`  `**Y <- ifelse(Y > 0,1,0)** 
+
+`  `**Model <- keras\_model\_sequential()** 
+
+`  `**Model %>%** 
+
+`    `**layer\_dense(units=30,activation='relu',input\_shape = c(ncol(X))) %>%** 
+
+`    `**layer\_dropout(rate = 0.2) %>%** 
+
+## layer\_dense(units = 1, activation = 'sigmoid') 
+
+`  `**Model %>% compile(** 
+
+`    `**loss = 'binary\_crossentropy',** 
+
+`    `**optimizer = optimizer\_rmsprop(),     metrics = c('accuracy'))** 
+
+`  `**Model %>% fit(X, Y,** 
+
+`    `**epochs = 20, batch\_size = 20,** 
+
+`    `**validation\_split = 0, shuffle = FALSE)** 
+
+`  `**Models[[model]] <<- Model }** 
+
+## neural.predict = function(model,X) 
+
+## { 
+
+`  `**if(is.vector(X)) X <- t(X)** 
+
+`  `**X <- as.matrix(X)** 
+
+`  `**Y <- Models[[model]] %>% predict\_proba(X)   return(ifelse(Y > 0.5,1,0))** 
+
+## } 
+
+## neural.save = function(name) 
+
+## { 
+
+`  `**for(i in c(1:length(Models)))** 
+
+`    `**Models[[i]] <<- serialize\_model(Models[[i]])   save(Models,file=name)**  
+
+## } 
+
+## neural.load <- function(name) 
+
+## { 
+
+`  `**load(name,.GlobalEnv)** 
+
+`  `**for(i in c(1:length(Models)))** 
+
+`    `**Models[[i]] <<- unserialize\_model(Models[[i]]) }** 
+
+## neural.init = function() 
+
+## { 
+
+`  `**set.seed(365)** 
+
+`  `**Models <<- vector("list") }** 
+
+## *MxNet* 
+
+MxNet is Amazon’s answer on Google’s Tensorflow. It offers also tensor arithmetics and neural net building blocks on CPU and GPU, as well as high level 
+
+`  `**Models <<- vector("list")** 
+
+network functions similar to Keras; a future Keras version will also support MxNet. Just as with Tensorflow, CUDA is supported, but not (yet) OpenCL, so you’ll need a Nvidia graphics card to enjoy GPU support. The code for installing the MxNet CPU version:** 
+
+## cran <- getOption("repos") 
+
+## cran["dmlc"] <- 
+
+## "https://s3-us-west-2.amazonaws.com/apache-mxnet/R/CRAN/" options(repos = cran) 
+
+## install.packages('mxnet') 
+
+The MxNet R script: **library('mxnet')** 
+
+## neural.train = function(model,XY) 
+
+## { 
+
+`  `**X <- data.matrix(XY[,-ncol(XY)])** 
+
+`  `**Y <- XY[,ncol(XY)]** 
+
+`  `**Y <- ifelse(Y > 0,1,0)** 
+
+`  `**Models[[model]] <<- mx.mlp(X,Y,** 
+
+`    `**hidden\_node = c(30),** 
+
+`    `**out\_node = 2,** 
+
+`    `**activation = "sigmoid",** 
+
+`    `**out\_activation = "softmax",** 
+
+`    `**num.round = 20,** 
+
+`    `**array.batch.size = 20,** 
+
+`    `**learning.rate = 0.05,** 
+
+`    `**momentum = 0.9,** 
+
+`    `**eval.metric = mx.metric.accuracy) }** 
+
+## neural.predict = function(model,X) { 
+
+`  `**if(is.vector(X)) X <- t(X)** 
+
+`  `**X <- data.matrix(X)** 
+
+`  `**Y <- predict(Models[[model]],X)   return(ifelse(Y[1,] > Y[2,],0,1)) }** 
+
+## neural.save = function(name) { 
+
+`  `**save(Models,file=name)**  
+
+## } 
+
+## neural.init = function() { 
+
+`  `**mx.set.seed(365)** 
+
+## } 
+
+## *Remarks:* 
+
+If the deep network package is not properly installed, the training process will fail with the error message **NEURAL\_INIT: failed**. 
+
+Most deep learning packages are optimized for training and predicting a large batch of data samples. Algo trading methods however normally train with many samples, but predict with only a single sample derived from the current price curve. This is ok for live trading, but can render the backtest very slow. Especially with the H2O package, but to some extent also with other packages. If you can choose, use GPU support only for training, and CPU for testing and trading. 
+
+## Batch prediction can speed up backtests enormously. An example with code can be found on the Zorro user forum.

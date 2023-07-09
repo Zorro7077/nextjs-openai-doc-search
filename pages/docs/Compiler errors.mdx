@@ -1,0 +1,29 @@
+# ﻿Compiler errors 
+
+## *Error in line ...* 
+
+Wrong or missing token in the script code. Sometimes the line in question is ok, but some command in the preceding code was incomplete. Examples are 
+
+an **#ifdef** without an **#endif**, or a missing semicolon in the previous line, or an orphaned **{** **}** bracket in the previous function. Another not-obvious error is declaring a variable or function with the same name as a predefined system variable, such as **Stop** or **Lots**. 
+
+## *Wrong type ...* 
+
+Wrong variable type. You've used a numeric operation with wrong parameter types, for instance an **AND** or **OR** operation with a **float** or **var** type. Or you're using a variable with the same name as a predefined variable - look them up 
+
+in **variables.h**. Or you've called a function with a **var** although it needs a **series**, or vice versa. Example: "**Wrong type POINTER::DOUBLE**" means that the code expects a **double** (or **var**) and you gave it a **pointer** (or **series**) instead. 
+
+## *Pointer expected ...* 
+
+Function call with a wrong parameter type, for instance with a **var** when a **series** or an **array** is needed. 
+
+## *Undeclared identifier ...* 
+
+The given name or type is unknown. A common reason is an **#include** statement without including **<default.c>** before. **default.c** contains all language definitions, but is only automatically included when nothing else is included. 
+
+## *Can not translate ...* 
+
+Numerical operation with wrong parameter types, for instance 
+
+an **AND** or **OR** operation with a **float** or **var** type. In that case, **typecast** the 
+
+expression to the correct type.  

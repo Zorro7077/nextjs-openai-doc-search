@@ -1,0 +1,53 @@
+# ﻿Dataset handling 
+
+The following functions can be used for downloading and parsing data from various sources, and storing it in binary datasets. A dataset is a list of records, normally in time descending order. Any record begins with an 8-byte timestamp field that can also hold other 8-byte data in special cases. The subsequent fields have a size of 4 bytes and can contain floats, ints, or strings. The size of a record in bytes is therefore **4+fields\*4**. Datasets store option chains, order books, asset names, reports, earnings, interest rates, or any other data organized in rows and columns. Text strings can have any size and can occupy several adjacent fields. A dataset can be saved, loaded, imported or exported, searched, sorted, merged, split, resized, or used as indicator in backtests. The **.t1**, **.t2**, **.t6**, 
+
+and **.t8** historical data files are in fact datasets with 1, 2, 6, or 8 data fields plus 1 timestamp field. 
+
+The following functions are used to create or load a dataset: 
+
+## dataNew (int Handle, int Records, int Fields): void\* 
+
+Deletes the given dataset (if any), frees the memory, and creates a new dataset with the given number of **Records** and **Fields**. If they are **0**, the dataset is deleted, but no new dataset is created. Returns a pointer to the begin of the first record, or **0** when no new dataset was created.
+
+## dataLoad (int Handle, string Filename, int Fields): int 
+
+Reads a dataset from a binary file. **Fields** is the number of fields per record, including the timestamp field at the begin of any record. Thus, a **.t1** historical data file has 2 fields and a **.t8** file has 9 fields. The function returns the number of records read, or **0** when the file can not be read or has a wrong size.
+
+## dataCompress (int Handle, string Filename, int Fields, *var Resolution*): int 
+
+Like **dataLoad**, but reads only records that differ in at least one value other than the timestamp from the previous record, and are at 
+
+least **Resolution** milliseconds apart. On files with 2 fields, positive and negative column 1 values are compared separately for dealing with ask and bid quotes 
+
+of **.t1** files. Can be used to compress price history files by changing the resolution and eliminating records with no price change.
+
+## dataDownload (string Code, int Mode, int Period): int 
+
+Downloads the dataset with the given **Code** from Quandl™ or other price sources, and stores it in CSV format in the **History** folder. Returns the number of data records. Data is only downloaded when it is more recent than the last downloaded data plus the given **Period** in minutes (at **0** the data is always downloaded). **Zorro S** is required for loading Quandl datasets.
+
+## dataParse (int Handle, string Format, string Filename, *int Start, int Num*): int 
+
+Parses a part or all data records from the CSV file **Filename** and appends them at the start of the dataset with the given **Handle** number. For beginning a new dataset when content was already parsed, 
+
+call **dataNew(Handle,0,0)** before. **Num** records are parsed, beginning with the record **Start**. If both parameters are omitted or zero, the whole CSV file is parsed. 
+
+`  `Records can have time/date, floating point, integer, and text fields. CSV headers are skipped. Several CSV files can be appended to the same dataset when their record format is identical. The CSV file can be in ascending or descending chronological order, but the resulting dataset should normally be in descending order, i.e. the newest records are at the begin. Any record in the dataset begins with a time stamp field in **DATE** format; the other fields can be in arbitrary order determined by the **Format** string (see ***Parameters***). If the CSV file does not contain time stamps, the first field in the record is filled with zero. 
+
+`  `The function returns the number of records read, or **0** when the file can not be read or has a wrong format. Please see below under **Remarks** how to build a correct format string and how to debug the parsing.
+
+## dataParse (int Handle, string Format, string Filename, string Filter): int 
+
+As before, but parses only lines that contain the string **Filter**. The string is case sensitive and can include delimiters, so it can cover several adjacent fields. Use delimiters at begin and end for matching a whole field. Use **'\n'** as first filter character for matching the first field. This way only lines with a certain asset name, year number, or other content are parsed.
+
+## dataParseJSON (int Handle, string Format, string Filename): int 
+
+## dataParseString (int Handle, string Format, string Content): int 
+
+As before, but parses timestamp, prices, and volumes from the JSON 
+
+file **Filename** (with **".json"** extension) or from the given JSON string to the dataset with the given **Handle** number. The file or string is supposed to contain OHLC candles or BBO quotes as JSON objects in winged brackets {..}. Depending on **Format** (see ***Parameters***), the dataset is created either 
+
+in **T6** record format with 7 fields, or in **T2** format with 3 fields. The field names are given with the **Format** string in a fixed order. Data fields in the JSON file must contain valid numbers; they must not be empty or contain text like "NaN" or "null". **Content** is modified by the parsing process.The function returns the number of records read, or **0** when the file can not be read or has a wrong 
+
+format. 

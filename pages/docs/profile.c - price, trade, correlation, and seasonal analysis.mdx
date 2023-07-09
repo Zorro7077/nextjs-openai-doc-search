@@ -1,0 +1,895 @@
+# ﻿profile.c  -  price,  trade,  correlation,  and seasonal analysis 
+
+The **profile.c** library contains functions for generating price or trade profiles, MAE charts, or seasonal analysis charts in [***Test***] mode. The functions are normally used during strategy development for analyzing trade profits or for finding seasonal effects. They can also be used as templates for building user-specific profile charts. 
+
+## plotPriceProfile (int bars, int type) 
+
+Generates a price difference profile starting at the current bar. This function is normally called by a trade signal for checking its predictive power. It produces a histogram of the mean price movement following the signal. The red bars in the histogram are the averaged mean price difference to the entry point in pips, the blue/grey bars are their standard deviations, divided by 4 for better scaling. 
+
+Price difference profile at entering a trade with the workshop 4 system. Note the small 
+
+adverse excursion after 24 hours.
+
+## *Parameters:* 
+
+## ba Number of bars to plot in the price profile.. 
+
+## rs 
+
+## ty Type of the plot. 0 = plot price difference in pips to the first pe  bar. 1 = plot price change in pips from the previous bar. 2 = 
+
+plot negative price difference to the first bar (for short 
+
+trades). **3** = plot negative price change from the previous bar. 
+
+## plotTradeProfile (int bars) 
+
+Generates a profit distribution chart after the test run. The distribution shows the frequency of trades dependent on their profit or loss. The blue bars in the chart are the number of trades (right y axis), the red bars are the sum of their returns in pips (left y axis). The x axis is the trade profit or loss in pips. The example chart below shows a system with about 100 trades that hit their profit target at 100 pips, and about 30 trades that hit their stop at 100 pips loss. Inbetween there's a distibution of trades with mostly small losses. Note that the shown profit/loss is not exactly 100 pips due to spread and slippage. 
+
+Profit distribution of a system with **Stop** and **TakeProfit** distances both at 100 pips.
+
+## *Parameters:* 
+
+## bars >  Number of bars to plot in the profit distribution. The more bars, the finer the resolution. 0 
+
+## bars <  Step width of the profit distribution in pips per bar. The smaller the step width, the finer the 0  resolution. 
+
+## plotMAEGraph (int Type) plotMAEPercentGraph (int Type) plotMFEGraph (int Type) plotMFEPercentGraph (int Type) 
+
+Generates a Maximum Adverse Excursion / Maximum Favorable Excursion graph after the test run. The Maximum Adverse Excursion (MAE) is the worst drawdown of an individual trade, the difference of its highest interim profit to its worst interim loss. The Maximum Favorable Excursion (MFE) is the opposite. The graph displays any trade as a dot in a chart showing its MAE or MFE on the x axis and its profit on the y axis in pip units or in percent of the price. Winning trades are green, losing trades are red. This graph can be used for analyzing the exit behavior of the trades and finding the optimal stop or take profit distances. 
+
+MAE graph of the Workshop 5 system.
+
+## *Parameters:* 
+
+## Ty Not used yet - pe  always 0. 
+
+## plotDay (var value, int type) plotWeek (var value, int type) plotMonth (var value, int type) plotYear (var value, int type) 
+
+Seasonal analysis; generates a day, week, month or year distribution of a given value in a histogram (see also **seasonal strength**). This way seasonal effects of a trading system, a variable, or a price curve can be found. The red bars in the chart are the average value at a certain hour or day, the blue bars are their standard deviations divided by 4 for better scaling. 
+
+Week statistics with hourly returns of the workshop 4 EUR/USD system. Note the seasonal oscillation of the standard deviation - a price curve effect known as **heteroskedasticity**.
+
+## plotWFOCycle (var value, int type) 
+
+Analyzes the development of the value over a WFO cycle (x axis = trading days since cycle start). Can be used to determine if the profit deteriorates towards the end of the cycle, thus suggesting shorter cycles.*** 
+
+## *Parameters:* 
+
+## val Value to be evaluated, for instance price(0), Spread, Equity, ue  etc.. 
+
+## typ 0 = evaluate value difference to the season begin. 1 = 
+
+## e  evaluate value difference to the previous bar. 4 = evaluate 
+
+absolute value. 
+
+## plotDayProfit () plotWeekProfit () plotMonthProfit () plotQuarterProfit () plotWFOProfit () 
+
+Plots bars equivalent to the gain or loss of the previous day, week, month, quarter, or WFO cycle in a new window in the price chart (thus, clicking [***Result***] is required). The blue bars are the profit in units of the account currency, the red bars are the loss. Since the bars represent the previous period, they are shifted by one period. 
+
+Quarterly profit/loss of the Workshop 4 EUR/USD system.  
+
+## plotCorrelogram(var Value, int Lag) plotCorrelogram(var Value1, var Value2, int Lag) 
+
+Generates in the **EXITRUN** a histogram of the correlation of a variable with itself, or with another variable, for sequential values of lag. On random data, such autocorrelations should be near zero for all time lags. But if the data is non-random, one or more of the autocorrelations will be significantly non-zero. 
+
+The above correlogram displays a significant correlation (0.14) of the variable with its value from the previous bar. The correllations with earlier bars (2...49) are not as significant. 
+
+## *Parameters:* 
+
+## Valu First variable to be evaluated, for e1  instance price(0)-price(1). 
+
+## Valu Second variable to be evaluated. 
+
+## e2 
+
+## Lag  Maximum autocorrelation lag. 
+
+## plotHeatmap(string name, var\* Data, int Rows, int Cols) plotHeatmap(string name, mat Matrix) 
+
+Plots a heatmap in the **EXITRUN** from the given **Matrix** or the **Data** array of size **Rows\*Cols**, usually a correlation matrix. The matrix elements must be in the **0..1** range, and are displayed as squares with a color range from blue (**0**) to red (**1**). Since the heatmap is simulated with colored dots, you might need to scale the chart before exporting so that it looks nice. Examples of heatmap usage can be found on **Financial Hacker**. A different type of heatmap - a contour chart - can be plotted with the **dataChart** function. 
+
+## *Parameters:* 
+
+## Data  Pointer of a var array 
+
+with **Rows** \* **Cols** elements. **Rows,**  Array size. 
+
+## Cols 
+
+## plotBuyHold(string Benchmark, int Color) 
+
+Compares the equity curve with a benchmark. Call this function at any **run** for plotting the buy-and-hold profit curve of the given **Benchmark** asset - for instance, **"SPY"** - in the given **Color**. **Leverage**, **Capital**, and **Lots** are considered. The equity curve is displayed with a blue line for better comparison.
+
+## plot2(string Name,var Value,int Type,int Select,int Color1,int Color2) 
+
+Like **plot**, but plots a two-color curve. **Select** nonzero plots it in **Color1** and **Select** at **0** in **Color2**. 
+
+## *Remarks:* 
+
+All profile functions are contained in source code 
+
+in **include\profile.c**, and can be used as templates for writing other chart plotting or analysis functions of any kind. 
+
+For adding the profile functions, the line **#include <profile.c>** must be added at the begin of the script. 
+
+Price profile or distribution histograms should normally only be plotted for a single asset and algorithm, since every market and every system will generate a different profile. In a portfolio strategy, temporarily disable the other assets and algos for plotting a profile of a component. 
+
+Only one histogram can be plotted, not several at the same time; unused plot commands must be commented out for not interfering with the active chart. Histograms are only plotted in [***Test***] mode, not in [***Train***] and [***Trade***] mode.  
+
+The size and resolution of the histogram can be set up with the **plot parameters**. Label spacing at the x axis can be set up with **PlotLabels**. 
+
+Week, month, and year analysis is based on trading days, not calendar days. Therefore the week has 5 days, the month 22 days, and the year 252 days. Due to the different number of trading days (20..23) in a month, they are normalized to 22, so day 22 is always the last trading day of the month. 
+
+The standard deviations (blue bars in the chart) show how much the values differ from their average, and thus indicate the significance of a nonzero average. The smaller the blue bar and the bigger the red bar, the more significant is the seasonal effect. In the case of prices or returns, the standard deviation is a measure of volatility. 
+
+When developing a strategy, it is helpful to examine the price difference profile at every trade entry bar for verifying the trade entry rules and for determining the exit rules. 
+
+## *Examples:* 
+
+## #include <profile.c>* 
+
+## *// Price difference profile* 
+
+## function run() 
+
+## { 
+
+`  `**vars Trend = series(LowPass(series(price()),500));   if(valley(Trend)) {** 
+
+`    `**plotPriceProfile(40,0);** 
+
+`    `**enterLong();** 
+
+`  `**} else if(peak(Trend)) {** 
+
+`    `**plotPriceProfile(40,2);** 
+
+`    `**enterShort();** 
+
+`  `**}** 
+
+## } 
+
+## #include <profile.c>  
+
+## *// Trade distribution or quarterly profit/loss* function run() 
+
+## { 
+
+`  `**vars Trend = series(LowPass(series(price()),500));   Stop = 100\*PIP;** 
+
+`  `**TakeProfit = 100\*PIP;** 
+
+`  `**if(valley(Trend))** 
+
+`    `**enterLong();** 
+
+`  `**else if(peak(Trend))     enterShort();** 
+
+`  `**PlotHeight1 = 320;** 
+
+`  `**PlotScale = 4;** 
+
+`  `**plotTradeProfile(50);** 
+
+## } 
+
+## #include <profile.c> 
+
+## *// Weekly return analysis or quarterly profit/loss* function run() 
+
+## { 
+
+`  `**vars Trend = series(LowPass(series(price()),500));** 
+
+`  `**if(valley(Trend))** 
+
+`    `**enterLong();** 
+
+`  `**else if(peak(Trend))     enterShort();** 
+
+`  `**PlotHeight1 = 320;** 
+
+`  `**PlotScale = 3;** 
+
+`  `**set(PLOTNOW);** 
+
+`  `**plotWeek(Equity,1);** 
+
+`  `**//plotQuarterProfit();** 
+
+## } 
+
+## #include <profile.c> 
+
+## *// Correlogram of High-to-High differences of selected asset* function run() 
+
+## { 
+
+`  `**PlotHeight1 = 320;** 
+
+`  `**PlotScale = 10;** 
+
+`  `**plotCorrelogram(priceHigh(0)-priceHigh(1),50);** 
+
+## } 
+
+## #define DAYS  252 *// 1 year* 
+
+## #define NN    30  *// max number of assets* 
+
+## #include <profile.c> 
+
+## *// plot a heatmap of asset correlations* 
+
+## function run() 
+
+## { 
+
+`  `**BarPeriod = 1440;** 
+
+`  `**StartDate = NOW;** 
+
+`  `**LookBack = DAYS;** 
+
+`  `**vars Returns[NN];** 
+
+`  `**var Correlations[NN][NN]; *// NN\*NN matrix*   int N=0;** 
+
+## while(asset(loop("USD/CAD","EUR/USD","GBP/USD","USD/JPY")))      Returns[N++] = series(RET(1)); 
+
+`  `**int i,j;** 
+
+`  `**if(is(EXITRUN)) {** 
+
+`    `**for(i=0; i<N; i++)** 
+
+`      `**for(j=0; j<N; j++)** 
+
+`        `**Correlations[N\*i+j] = Correlation(Returns[i],Returns[j],DAYS);** 
+
+`    `**plotHeatmap("Correlation",Correlations,N,N);** 
+
+`  `**}** 
+
+## } 
+
+## *// Plot a 2-color RSI* 
+
+## var RSI2(vars Data,int TimePeriod) 
+
+## { 
+
+`  `**var RSIVal = RSI(Data,RSIPeriod);** 
+
+`  `**plot2("RSI2",RSIVal,BARS,RSIVal > 50.,GREEN,RED);   return RSIVal;** 
+
+## } 
+
+## color (var Value*,* int Color1, int Color2, *int Color3, int Color4*) : int 
+
+Returns the color corresponding to a position within a range of up to 4 colors; used for plotting heatmaps or multiple curves.*** 
+
+## *Parameters:* 
+
+## Value  The color position within the range in percent; from 0 for color1 until 100 for color Color1..Colo The color range, starting with color1 and ending with color4. For 2-color or 3-color r4  ranges, color3 and color4 can be omitted. See Colors for the color format. *Returns* 
+
+Color within the range 
+
+## colorScale (int Color, var Scale) : int 
+
+Returns the color multiplied with a scaling factor. ***Parameters:*** 
+
+## Col The color to be scaled. 
+
+## or 
+
+## Sca The scaling factor in percent, < 100 for reducing the brightness and > 100 for increasing le  it. 
+
+## *Returns* 
+
+## Color \* Factor.*** 
+
+## *Remarks:* 
+
+## color(Value,WHITE,BLACK) produces a greyscale. colorScale(Color,110) increases the brightness of Color by 
+
+10%.   ***Example:*** 
+
+## for(i=0; i<N; i++)   for(j=0; j<N; j++) 
+
+## plotGraph("Heatmap",j+1,-i-1,SQUARE,color(Correlations[i][j ]\*100,BLUE,RED)); 
+
+## assetHistory(string Name, int Mode): int 
+
+Loads price history either from the currently selected broker or data feed, or from a specified online price source in CSV or JSON format. Stores the data in a dataset or in a **.t6** or **.t1** file in the **History** folder. Online price sources can be user defined; some popular sources such as Quandl, Stooq etc. are predefined. ***Parameters:*** 
+
+## Na Asset symbol or code specifying the price source, or the asset name from the asset list, or me  symbol. 
+
+## Mo 0 - download tick (T1) data from the selected broker (Zorro S required). 1 - download on de  brokers, plus Bittrex, CryptoCompare).. 2 - download hourly (H1) data (Bittrex, CryptoCom
+
+(D1) data (all online sources, and IB). **4** - download data in **LookBackResolution** (all brok nothing, but get the data from **History\history.csv** (for test purposes).  **+FROM\_SOURC** user defined online source (see **assetSource**; **Zorro S** required). **+FROM\_GOOGLE** - from **Google Finance** (currently unavailable). **+FROM\_QUANDL** - download daily (D1) d **S** and Quandl key required). **+FROM\_AV** - download daily (D1) data from **AlphaVantage** download daily (D1) data from **Stooq**. **+FROM\_EOD** - download daily (D1) data from **E** download daily (D1) data from **Yahoo Finance.** **+FROM\_IEX** - download daily (D1) data fr **Cloud**. **+FROM\_BITTREX** - download M1, H1, or D1 data from **Bittrex** (**Zorro S** require download M1, H1, or D1 data from **CryptoCompare** (**Zorro S** required).  (If no online sou downloaded from the selected broker).  **+UNADJUSTED** - download unadjusted prices remarks below). **+OVERRIDE** - download price data even when history is up to date, i.e. period. **+IMMEDIATE** - download at least one tick of recent price data; for getting a live pr source. **+VOLATILE** - store the data in a temporary **dataset** whose handle is returned (o sources). **+FOR\_ASSET** - store the file under the name of the current asset selected w
+
+## *Returns:* 
+
+## 0 when nothing was downloaded due to an error or because the data was up to date. Otherwise a nonzero value or the dataset handle. 
+
+## assetSource(string Filename, string URL, string Header, 
+
+## string Body, string Format) 
+
+Sets up all parameters of a price source website or REST API for a subsequent **assetHistory(...,FROM\_SOURCE**) call. See examples. ***Parameters:*** 
+
+## Filena Name of the file for storing or appending the downloaded data, or 0 for using the default s me 
+
+## URL  Target URL for the data request, including request parameters. 
+
+## Header  Request header, or 0 if no header is required. Some online sources requre an API key or ac Body  Request body for a HTTP POST request, or 0 for a HTTP GET request. 
+
+## Format  Format string for converting the received data, as described under dataParse. If the format 
+
+format is assumed, otherwise CSV format. If 0 or empty, the data is not converted, bu under **history.csv** or **history.json**. 
+
+## *Remarks:* 
+
+Price history is stored in the **History** folder 
+
+under **Name** plus **.t6** extension for D1 data, or **Name** plus **.t1** for T1 data. The file name can be modified with the **History** string. T1 or M1 data downloaded from a broker is split into separate years, EOD data or data from an online source is stored in a single file. The Quandl database name, an appended **".US"** by Stooq, and **'/'**, **'.'**, or **':'** characters are automatically stripped from the historical data file names. If the name is otherwise different to the asset name, use **file\_copy** to copy the downloaded file to the correct asset name 
+
+(f.i. **file\_copy("History\\ICE.t6","History\\LONDONICE.t6")**. 
+
+Price history is only downloaded in the **INITRUN** or in 
+
+the **main** function, and only when existing price history is not **already up to date**. For this the most recent online price is compared with the history file date, and if the difference is less than half the data resolution, no new history is downloaded. If **FOR\_ASSET** is set, **UpdateDays** are also considered. For downloading data after the **INITRUN** and regardless of existing history, set the **OVERRIDE** flag. 
+
+If the same price history is downloaded **multiple times**, for instance by several different scripts, make sure that the begin of already existing data matches the longest needed data period. Newly downloaded data is only merged to the end of existing history, but not to the begin. 
+
+The **raw data** from online sources (Google, Quandl, etc) is stored in **History\history.csv** or **History\history.json**. If the price source does not deliver price data, but some error message instead, a **"invalid response"** error is displayed. The error message can then be read from the downloaded raw file. The **assetHistory** function will attempt twice to 
+
+download the data before giving up. 
+
+If a **download failed** for some reason, delete the resulting partial history file (if any). Otherwise subsequent downloads might attempt to append to it or assume that the data is up to date. Usual reasons for failed downloads from online sources are wrong symbols or exceeding a quoata limit. The reason can be normally found in the 
+
+downloaded **history.csv** or **history.json** file, which contains the response from the online source. 
+
+When downloading data from a broker, the asset is subscribed automatically. The recent values of the asset's **Spread**, **PipCost**, etc. are updated to the **Assets.csv** file even if no price history is downloaded. This way new assets can be added and available assets can be set up to their current parameter values for further simulations. 
+
+Price history from brokers is downloaded either for the number of recent years given by **NumYears**, or for the time period given 
+
+by **StartDate** and **EndDate** plus optionally a **LookBack** year. 
+
+If **FOR\_ASSET** is set, the start and end dates are kept exactly, otherwise the download period is from Jan 1 to Dec 31 (or the current date) of the given years. If **NumYears** is set to **-1**, no data is downloaded, 
+
+but **Log\Assets.csv** is still updated. Price history from online sources is downloaded for a fixed number of years up to the current day, depending on the source. 
+
+Price data from a broker or from online sources with limited history (**FROM\_IEX**, **FROM\_CRYPTOC**, **FROM\_SOURCE**) is **appended at the begin** of an existing data file. Price data from other sources is not appended, but **replaces** the previous file unless it's already up to date. Make sure that the time resolution of the downloaded prices matches the resolution of the historical data files. Normally the resolution is 1 tick for .t1 or .t2 files, 1 minute for .t6 files with year number, or 1 day for .t6 files without year number. 
+
+For **backtesting price history**, **BarPeriod** must be at or above the price history resolution. Set it to **1440** for testing D1 price data. For testing only parts of a multi-year **.t6** file, use an 8-digit **StartDate** or **EndDate**. 
+
+Price history from online sources is **temporarily stored** in a dataset of T6 or T2 records with handle **H\_HISTORY**. It can be used to evaluate the data without loading the history file. 
+
+Check the correct spelling of the asset name or code. Spelling often differs slightly, f.i. the same stock can be named **BRK.B**, **BRK\_B**, **BRK-B**, or **BRK-B.US** dependent on the website or price source. 
+
+## Outliers in the price history are automatically fixed on download dependent on the Outlier variable. The first detected outlier will 
+
+trigger **Warning 035**. Some high volatility assets, such as cryptocurrencies or penny stocks, could require a higher outlier tolerance when downloading prices. Candles with duplicate time stamps are automatically removed on 
+
+downloading **.t6** files. 
+
+A price history file with length **0** is skipped in the backtest and prevents downloading prices for that particular year. This way, by storing an empty file, price data that is unavailable or of bad quality can be excluded from download and backtests. 
+
+For T1 data, the price server of the broker must support quote-based price data; this is the case for FXCM, but not for Oanda, IB, or MT4/MT5 brokers. Dependent on the price server speed, downloading T1 prices can take a long time, such as a whole day for one year of price quotes. If 
+
+the **LEAN** flag is not set, ask and bid prices are stored in the **.t1** file, otherwise only ask prices.  
+
+## Adjusted prices can be split-adjusted, dividend-adjusted, or both. For short-term trading backtests is split-adjustment the best choice, for long-term trading dividend- and split-adjustment. Since dividend adjustment has little effect on short-term backtests, you normally use dividend- and split-adjusted prices for all backtests. 
+
+Comments about some predefined data sources (all trademarks are property of their owners): 
+
+## Google prices are adjusted for splits only, unadjusted prices are not available. Google download is known to fail on certain assets for no apparent reason, even though they can be downloaded manually. The service was recently not available. 
+
+## Yahoo data is split and dividend adjusted; UNADJUSTED is supported. Yahoo EOD data was reported to contain 2 entries on dividend payment days, one with the current and one with previous day's data. Yahoo data of some European assets could be of poor quality; check the resulting price curve if in doubt. 
+
+## AlphaVantage data loads relatively slow when there is much traffic. The data has good quality. UNADJUSTED is supported. The AV API key must be present under "AVApiKey = ..." in Zorro.ini. Free data is limited to 5 requests per minute and 500 requests per day. 
+
+## Stooq requires a country identifier appended to stock or ETF names. If it is missing, ".US" is automatically appended. The data loads fast and is of good quality. UNADJUSTED is supported. There is a limit to the number of downloads per day, identified through the IP address. 
+
+## EOD requires a country identifier appended to stock or ETF names. If it is missing, ".US" is automatically appended. The free subscription only supports one year data and only 20 requests per day. Prices are split and dividend adjusted, UNADJUSTED is supported. The key token must be entered under "EODKey = ...."  in Zorro.ini. Zorro users get a discount on the all-in-one data package when they order on this link. 
+
+## Quandl data from 
+
+the **WIKI** (stocks), **CHRIS/CME** and **CHRIS/ICE** (futures), **BITFINEX**  and **GDAX** (Bitcoin and other cryptocurrencies) EOD databases are supported. Databases may be discontinued, so check it before on the Quandl website. Quandl databases in different formats can be downloaded with the **dataDownload** function. Quandl data loads fast and has usually good quality. The Quandl key must be present under **"QuandlKey = ..."** in **Zorro.ini** and the asset's database code (f.i. **"WIKI/AAPL"** or **"BITFINEX/ETHBTC"**) must be passed 
+
+to **Name**. 
+
+## IEX provides EOD data for US equities. UNADJUSTED is supported; otherwise data is split- and dividend-adjusted. The IEX API token must be present under "IEXlKey = ..." in Zorro.ini. 
+
+## Bittrex provides recent price history for a large number of        cryptocurrencies. Format: BTC-ETH returns ETH prices in BTC. The history length is normally several years for D1 data, several months for H1 data, and several days for M1 data. It is recommended to        insert a 4 seconds delay between subsequent loadHistory calls. 
+
+## CryptoCompare provides recent price history for almost all existing cryptocurrencies. Format: ETH/BTC returns ETH prices in BTC. The history length is up to 3 years for D1 data, 1 year for H1 data, and 1 month for M1 data. Since digital currencies are not traded at a central exchange, prices from different sources can be different. 
+
+## MT4/MT5 servers usually have no long price history, so the command will print an error message or only partially download the history. 
+
+## IB market data must be subscribed before it can be downloading. For downloading stock M1 data, send 
+
+a **SET\_PRICETYPE,2** command for switching to the last traded price, because ask/bid prices are sometimes in poor quality. 
+
+## FCXM servers provide tick price history from 2002 for currencies, and from 2008 for index CFDs. 
+
+Free historical data is also available on the Zorro download page. History in M1 resolution and options EOD data for US stocks can be purchased from oP group. 
+
+Some data sources, such as Quandl, AlphaVantage, EOD, provide also earnings reports and other fundamental data in JSON format. It can be retrieved with **http\_transfer** and parsed 
+
+with **strstr** and **strvar** commands. 
+
+## *Example:* 
+
+## *// Update M1 price history of all assets from selected broker* function main() 
+
+## { 
+
+`  `**NumYears = 2;** 
+
+`  `**while(loop(Assets))** 
+
+`    `**assetHistory(Loop1,1); }** 
+
+## *// Download D1 prices from Quandl* 
+
+## string Name; 
+
+## while(Name = loop("AAPL","MSFT","GOOGL")) 
+
+`  `**assetHistory(strf("WIKI/%s",Name),FROM\_QUANDL);** 
+
+## *// Download and plot Bitcoin prices from Bitfinex* function run() 
+
+## { 
+
+`  `**BarPeriod = 1440;** 
+
+`  `**assetHistory("BITFINEX/BTCUSD",FROM\_QUANDL);** 
+
+`  `**assetAdd("BTCUSD");** 
+
+`  `**asset("BTCUSD");** 
+
+`  `**set(PLOTNOW);** 
+
+## } 
+
+## *// Download unadjusted SPY data and store it in "SPYuna.t6"* History = "\*una.t6"; assetHistory("SPY",FROM\_STOOQ|UNADJUSTED); 
+
+## *// Download AAPL prices from Stooq, using assetSource* assetSource("AAPL.t6", "https://stooq.pl/q/d/l/?s=AAPL.US&d1=20000101&d2=20201024& i=d", 
+
+## 0,0,"+%Y-%m-%d,f3,f1,f2,f4,f6"); assetHistory(0,FROM\_SOURCE); 
+
+## *// Download Bitcoin OHLC prices from Coin.io* 
+
+## int Month, Year = 2019, MinutesPerMonth = 31\*1440; for(Month = 1; Month <= 12; Month++) { 
+
+`  `**string URL = strf("https://rest.coinapi.io/v1/ohlcv/BTC/USD/history?peri od\_id=1MIN&time\_start=%04d-%02d-01T00:00:00&limit=%d",** 
+
+`    `**Year,Month,MinutesPerMonth);** 
+
+`  `**string Name = strf("BTCUSD\_%04d.t6",Year);** 
+
+`  `**assetSource(Name,URL,** 
+
+`    `**"X-CoinAPI-Key: my-coin-api-key",0,** 
+
+## "[,time\_period\_end,%Y-%m-%dT%H:%M:%SZ,price\_high,price\_low, price\_open,price\_close,,volume\_traded"); 
+
+`  `**assetHistory(0,FROM\_SOURCE);** 
+
+
+## } 
+
+## *// Download Bitcoin BBO ticks from Kraken via Coin.io* var From = dmy(20190101), To = dmy(20200101); 
+
+## for(; From < To; From += 1.) { 
+
+`  `**string Start = strdate("%Y-%m-%dT00:00:00",From),     End = strdate("%Y-%m-%dT00:00:00",From+1.);** 
+
+`  `**assetSource("BTCUSD\_2019.t2",** 
+
+## strf("https://rest.coinapi.io/v1/quotes/KRAKEN\_SPOT\_BTC\_USD /history?time\_start=%s&time\_end=%s&limit=100000", 
+
+`      `**Start,End),** 
+
+`    `**"X-CoinAPI-Key: my-coin-api-key",0,** 
+
+## "[,time\_exchange,%Y-%m-%dT%H:%M:%SZ,ask\_price,ask\_size,bid\_ price,bid\_size"); 
+
+`  `**assetHistory(0,FROM\_SOURCE);** 
+
+## } 
+
+## *See also:* 
+
+## saveStatus(string FileName) loadStatus(string FileName) 
+
+Saves and loads the current trading status to a **.trd** file in the **Data** folder. The file contains the status of open real and phantom trades, the status of the sliders, and component specific variables (**AlgoVar**). This function can be used to resume trading at the last stored state in case of a server crash or reboot, or to let a fallback server take over the trading in case of a hardware failure. ***Parameters:*** 
+
+## FileNa Name and path of the file, or 0 for a default name me  like "Data\\scriptname.trd". 
+
+## SaveMode 
+
+This variable determines by several flags what's saved or loaded in the **.trd** file in [***Trade***] mode or when calling the **saveStatus**/**loadStatus** functions.*** 
+
+## *Flags:* 
+
+## SV\_SLIDERS  - save/load slider positions (default). 
+
+## SV\_ALGOVARS  - save/load all AlgoVars (default). 
+
+## SV\_ALGOVARS2 - save/load all AlgoVars2. 
+
+## SV\_TRADES  - save/load all open trades (default). 
+
+## SV\_STATS  - save/load statistics data, to be continued in the next session. SV\_BACKUP  - after loading, save a backup of the .trd file (default). 
+
+
+## SV\_HTML  - after loading trades in [*Test*] mode, generate a HTML file with the list of open trades.*** 
+
+## *Type:* 
+
+## int *Remarks:* 
+
+Depending on **SaveMode**, the system status is automatically loaded in [***Trade***] mode at session start from a **Data\\*.trd** file.The file is updated at any trade or at the end of a **trading** session. Set **SaveMode = 0** for preventing the automatic saving and loading. In [***Test***] mode 
+
+the **saveStatus**/**loadStatus** functions can be used for saving or loading. 
+
+The flags can be combined by adding (see example), and can be separately set or reset with the **setf** and **resf** macros. 
+
+For properly resuming statistics from the previous session, the end of that session must be within the **LookBack** period of the current session. 
+
+All needed assets and algos must have been selected in the initial run for loading their **AlgoVars**; slider ranges must have been set in the initial run for loading slider positions. 
+
+Trades can be alternatively loaded directly from the broker account with the **brokerTrades** function. In that case make sure that 
+
+the **SV\_TRADES** flag is not set. The broker API must support 
+
+the **GET\_TRADES** command. 
+
+## *Example:* 
+
+## function run() 
+
+## { 
+
+`  `**if(Bar >= 1) { *// default asset is selected after first run*     AlgoVar[0] = 123;** 
+
+`    `**SaveMode = SV\_ALGOVARS+SV\_ALGOVARS2;**  
+
+`    `**saveStatus("Data\\Test.trd");** 
+
+`    `**AlgoVar[0] = 456;** 
+
+`    `**printf("\n %.0f",AlgoVar[0]);** 
+
+`    `**loadStatus("Data\\Test.trd");** 
+
+`    `**printf("\n %.0f",AlgoVar[0]);** 
+
+`    `**quit("ok!");** 
+
+`  `**}** 
+
+## } 
+
+## putvar (string FileName, string VarName, var Value) getvar (string FileName, string VarName): var 
+
+Writes, updates, or reads a variable to or from a file or the Windows registry. Can be used for storing data globally or exchanging data between different scripts or Zorro instances.*** 
+
+## *Parameters:* 
+
+## FileNa Name of the file. If it does not exist, it is created. If 0, the variable is stored in the Windo me  registry. 
+
+## VarNa Name of the variable. 
+
+## me 
+
+## Value  Value to be written or updated. 
+
+## *Returns:* 
+
+Current variable value (**getvar**). If the variable does not yet exist, **0** is returned. ***Remarks:*** 
+
+If several Zorro instances access the same variable at the same time, it should be **locked** between reading and writing. 
+
+The variables are stored in a normal text file that can be viewed with a text editor or spreadsheet program. But it must not be manually edited or modified unless it is ensured that the file size does not change. Any variable in the file has a fixed line length for speedier access. 
+
+## *Example:* 
+
+## function increase\_global\_counter(string Name) { 
+
+`  `**string FileName = "\\Log\\Counters.csv";** 
+
+`  `**lock();** 
+
+`  `**int Counter = getvar(FileName,Name);** 
+
+`  `**putvar(FileName,Name,Counter+1);** 
+
+`  `**unlock();** 
+
+## } 
+
+## login (int mode): int 
+
+Logs in or out to the broker API.. ***Parameters:*** 
+
+## mode - 0 for checking the login state, 1 for logging in, 2 for logging out, 4 for completely closing the broker API.** 
+
+## *Returns:* 
+
+## 1 when Zorro is logged in, 0 otherwise. *Remarks:* 
+
+For recovering from a broker API crash, call **login(4)**, then **login(1)**. 
+
+Zorro normally logs in and out automatically, so this function is for special purposes only. 
+
+## exec(string Program, string Options, int Mode) 
+
+Execute an external program, open a document or URL, or run a script or batch file.*** 
+
+## *Parameters:* 
+
+## Program - file name of the exe, batch file, document, URL to be opened. 
+
+Use **"Editor"** for opening the script editor, **"Zorro"** for another Zorro instance. 
+
+## Options - command line parameter string to be passed to the program, or 0 for no command line options. 
+
+## Mode - 1 for waiting until the external program was terminated, otherwise 0. *Returns:* 
+
+## 0 if the program was not found or could not be started, otherwise the return code of the program in mode 1, or the process ID in mode 0.*** 
+
+## *Remarks:* 
+
+The **Program** parameter can specify a full path (from the root), a partial path (from the Zorro folder), or just a filename. In the latter case the **exec** function first looks for the file in the Zorro folder, and then in the in the folders specified by the system's PATH environment variable. 
+
+If the **Program** string does not have a filename extension, 
+
+the **exec** function first tries the .COM extension, then the .EXE extension, then the .BAT extension, and finally the .CMD extension. 
+
+If the **Program** string contains a URL or the name of a document, the standard internet browser or the standard editor for that document is opened. 
+
+## '\' characters in strings, like for file paths, have to be given in C-Notation as "\\". 
+
+The external program can be controlled with the **keys** function. 
+
+Data can be exchanged with the executed program through a text file; an example can be found under **Python**. 
+
+## *Examples (see also Python):* 
+
+## exec("notepad","test.txt",0); *// open notepad* exec("Editor",strf("Log\\%s.csv",Script),0); *// open a .csv file in the Log folder with the editor* 
+
+## exec("c:\\program files\\internet explorer\\iexplore.exe","https://zorro-project.com",0); *// open an URL with Internet Explorer* exec("https://zorro-project.com",0,0); *// open an URL with the standard browser* 
+
+## exec("Zorro","-run Myscript.c",1); *// run a Zorro script in another instance* 
+
+## exec("Zorro",strf("-train %s",Script),0); *// train current script in another Zorro instance* 
+
+## keys(string format, ...) 
+
+Sends key strokes and mouse clicks to the active window or dialog. This way a script can 'remote control' other external programs, f.i. for placing orders in the browser window of a trade web platform.*** 
+
+## *Parameters:* 
+
+## format - string containing the key characters to be sent, in the same format as in printf. Within the string, the following tokens in square barackets have a 
+
+special meaning: 
+
+## [Ctrl-] - the following character is sent together with the [Ctrl]-key. 
+
+## [Alt-]  - the following character is sent together with the [Alt]-key. 
+
+## [Shift-] - the following character is sent together with the [Shift]-key. 
+
+## [Win-] - the following character is sent together with the [Window]-key. 
+
+## [Click x,y] - mouse click on the spot given by the x,y coordinates relative to the window's upper left corner. 
+
+## [...]   - special function keys, such as [enter], [tab], [del], [f1] etc. are given in square brackets. Use [cur], [cul], [cuu], [cud] for the cursor keys. 
+
+## []], [[] - the right and left square bracket can be given in square brackets. *Remarks:* 
+
+The keys are sent to the active window's message loop. This will work for all normal Windows applications, but not for special programs that don't use a message loop. 
+
+The function returns as soon as the key strokes are sent, but the reaction of the controlled program can take more time. If the key stroke opens a dialog window, use **window** to wait until the dialog is active before sending further keys. 
+
+This function should not be used to send keys to Zorro itself. Therefore, it should not be called when Zorro is the active window. However, it can be used to send keys to other instances of Zorro. 
+
+## *Example:* 
+
+## *// Opens Notepad, writes something, saves it, and closes Notepad.* 
+
+## function main() 
+
+## { 
+
+## *// start Notepad before*  
+
+`   `**while(!window("Editor")) wait(100);  *// wait until Notepad is open*** 
+
+`   `**keys("Zorro is cool!"); *// write something*** 
+
+`   `**keys("[Ctrl-]s");               *// open Save dialog (Ctrl-S)***  
+
+`   `**while(!window(NULL)) wait(100);      *// wait until the dialog window is open*** 
+
+`   `**keys("cool.txt[Enter][Alt-][F4]"); *// save as "cool.txt", and exit (Alt-F4)*** 
+
+## } 
+
+## mouse(int\* x, int\* y, HWND hWnd): int 
+
+Returns the mouse button state and mouse coordinates, relative to a window or to the screen.*** 
+
+## *Parameters:* 
+
+## x, y - pointers to int variables to be filled with the mouse coordinates. 
+
+## hWnd - window handle as returned by the window function, or 0 for returning the mouse position in screen coordinates. 
+
+## *Returns:* 
+
+## 0 for no mouse button pressed down, 1 for left, 2 for right, 4 for middle button. *Remarks:* 
+
+The **mouse** function can be used for calibrating the positions of "Buy" and "Sell" buttons on a broker's web interface, f.i. for binary options. Automated buying and selling can then be performed by clicking those buttons with the **keys** function. 
+
+## *Example:* 
+
+## void main() 
+
+## { 
+
+`  `**while(wait(50)) {** 
+
+`    `**int x,y;** 
+
+`    `**HWND h = window("Script Editor");** 
+
+`    `**int button = mouse(&x,&y,h);** 
+
+`    `**printf("\r%04d %04d %d",x,y,button);   }** 
+
+## } 
+
+## window(string title) : HWND 
+
+Returns a handle to the active window when its title bar contains the **title** string. Can be used to wait until a certain window or dialog becomes active. ***Parameters:*** 
+
+## title - part of the window title (case sensitive), or 0 for returning the handle to the window that recently became active. 
+
+## *Returns:* 
+
+## HWND of the found active window. Otherwise 0. *Remarks:* 
+
+Normally Zorro's own window is the active window, unless another application was started or a Windows dialog became active. 
+
+## *Example:* See keys. 
+
+## email (string To, string From, string Subject, string Body, string Server, string User, string Password): int 
+
+Sends an email to a given recipient. Useful for receiving emails when Zorro opens or closes a trade, or for status reports.*** 
+
+## *Parameters:* 
+
+## To - Recipient address as required by the server. Usually in angular brackets like "<me@myself.com>". 
+
+## From - Sender address, usually in angular brackets. 
+
+## Subject - Subject line of the email, and optionally content types. 
+
+## Body - Text content of the email, max 16k. 
+
+## Server - SMTP/SMTPS server with optional port address, 
+
+f.i. **"smtp://smtp.1und1.de"** or **"smtps://smtp.gmail.com:465"**. 
+
+## User - Login name for the SMTP server, often identical to the sender address. Passwort - Login password for the SMTP server.*** 
+
+## *Returns:* 
+
+## 0 if the email could not be sent, otherwise nonzero. *Remarks:* 
+
+Check with your email provider about any special requirements for sending emails from their SMTP server.  
+
+The following instruction for sending from Gmail accounts was provided by a user. Log in to your google account. In Google Security turn off "Less Secure Apps". Enable 2-Step authentication. Search for "App Passwords", and under "Select app" select "Other", under "Device type" enter "Zorro", then press the [Generate] button. This produces a 16-digit passcode that you can then used in the email function in place of your Gmail account password. For the server, use "smtps://smtp.gmail.com:465". 
+
+For special content types, f.i. HTML, use a new line at the end of the **Subject** line, f.i. **"My subject \nContent-Type: text/html; charset=UTF-8\n";**. 
+
+## *Example:* 
+
+## void main() 
+
+## { 
+
+`  `**string To = "<me@myself.org>";** 
+
+`  `**string From = "<zorro\_alert@gmail.com>";** 
+
+`  `**string Subject = "Zorro Message";** 
+
+`  `**string Body = "Zorro has sent you a message!";** 
+
+`  `**string Server = "smtps://smtp.gmail.com:465";** 
+
+`  `**string User = "zorro\_alert@gmail.com";** 
+
+`  `**string Password = "zorros\_password";** 
+
+`  `**email(To,From,Subject,Body,Server,User,Password);** 
+
+## report (int Number) : string 
+
+Returns a string with content dependent on the given **Number**.  ***Number:*** 
+
+## 1  Temporary string containing the current performance report. 
+
+## 2  Content of the Zorro.ini file. Use strvar or strtext for parsing. 
+
+## 3  Temporary string containing the command line. 
+
+## 4  Content of the .par parameters file, if any. Empty in the initial run. 5  Content of the .c rules file, if any. Empty in the initial run. 
+
+## 6  Content of the .fac factors file, if any. Empty in the initial run. 
+
+## 1 Temporary list of open trades similar to the status page. Empty when no trade was 0  opened. 
+
+## 1 User name from the [*Login*] field. 
+
+## 2 
+
+## 2 Broker name selected with the scrollbox, f.i "MT4" or "FXCM". 
+
+## 0 
+
+## 2 Account name from the Name field in the account list. 
+
+## 1 
+
+## 2 Account identifier from the Account field in the account list. 
+
+## 3 
+
+## 2 Account currency from the CCY field in the account list. 
+
+## 4 
+
+## 2 Current script folder. 
+
+## 6 
+
+## 3 QuandlKey from zorro.ini. 
+
+## 2 
+
+## 3 AVApiKey from zorro.ini. 
+
+## 3 
+
+## 3 IEXKey from zorro.ini. 
+
+## 4 
+
+## 3 EODKey from zorro.ini. 
+
+## 5 
+
+## *Remarks* 
+
+Frequently used **system strings** can be directly accessed through their name. 
+
+Temporary strings are only valid until the next **report()** call. 
+
+## *Example:* 
+
+## *// send a performance report every day by email* if(Live && dow(0) != dow(1))) 
+
+`  `**email(TO,FROM,"Zorro Report",report(1),SERVER,USER,PASSWORD);**

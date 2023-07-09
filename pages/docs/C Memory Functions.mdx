@@ -1,0 +1,173 @@
+# ﻿C Memory Functions 
+
+## malloc(long size): void\* 
+
+Allocates a contiguous memory area with the given size in bytes. This can be used to create arrays of dynamic size. This function is slow, so it is recommended to use it for allocating memory areas in the initial run.  If there is not enough memory, **0** is returned.
+
+## realloc(void\* ptr, long size): void\* 
+
+Reallocates the memory area given by **ptr**. It must have been previously allocated by **malloc**. Returns a pointer to the new memory area. The old memory area is freed, the old content is copied over to the new area. This function is slow. If there is not enough memory, the old memory area is not freed and **0** is returned.
+
+## zalloc(long size): void\* (temporary) 
+
+Like **malloc**, but returns a pointer to a temporary memory area that is initialized to zero and preserved until the next **zalloc** call. This function is fast, and the memory area needs not be freed. Use this for allocating a single temporary array inside functions.*** 
+
+## *Parameters:* 
+
+## size - Size of the allocated memory area, in bytes. *Returns:* 
+
+## void\* pointer to the allocated memory area, or 0 when the allocation failed. 
+
+## free(void\* ptr) 
+
+Releases a contiguous memory area that was allocated with **malloc**. ***Parameter:*** 
+
+## ptr - void\* pointer to the allocated memory area. 
+
+## memcpy(void\* dest, void\* src, long size) 
+
+Copies **size** bytes from **src** to **dest**. Can be used to copy a whole struct or array with a single function.*** 
+
+## *Parameters:* 
+
+## dest - Target address. 
+
+## src - Source address. 
+
+## size - Number of bytes to copy. 
+
+## memset(void\* dest, int c, long size) 
+
+Sets the first **size** characters of **dest** to the character **c**. Can be used to initialize 
+
+a whole struct or array to zero. ***Parameters:*** 
+
+## dest - Target address. 
+
+## c - value to copy, 0..255. 
+
+## size - Number of bytes to copy. 
+
+## memcmp(void\* buffer1, void\* buffer2, long size) 
+
+Compares **buffer1** with **buffer2**. Returns **0** when both are identical, otherwise nonzero.*** 
+
+## *Parameters:* 
+
+## buffer1 - First buffer. 
+
+## buffer2 - Second buffer. 
+
+## size - Number of bytes to compare. 
+
+## *Remarks:* 
+
+Memory allocated in a function with **malloc** must be released - normally at the end of the function - with **free**. This is not needed when allocating memory with **zalloc**. For conveniently freeing globally allocated memory areas, define a **cleanup** function that releases the memory. 
+
+It is recommended to set pointers to released memory areas to zero. Accessing a memory area after it's released will result in a crash. 
+
+Check the allocation size carefully. Exceeding the allocated size will result in a delayed crash, usually when freeing the memory. 
+
+## *Example (see also http):* 
+
+## var calculate\_something() 
+
+## { 
+
+`  `**var \*Buffer = zalloc(100\*sizeof(var));   int i;** 
+
+`  `**for(i=1; i<100; i++)** 
+
+`    `**buffer[i] = buffer[i-1]+1;** 
+
+`  `**return Buffer[99]; *// last element*** 
+
+## } 
+
+## memory(int mode): size\_t 
+
+Returns the current memory consumption of the script. ***Parameters:*** 
+
+## mode - 
+
+`   `**0:** Current total memory allocation in bytes, including virtual memory and cache pages that have been written to. 
+
+`   `**1:** Sum of all memory allocations in bytes by functions, price data, and series during the script run. 
+
+`   `**2:** Current number of allocated memory areas by functions, price data, and 
+
+series. 
+
+`   `**4:** Memory allocation in bytes per asset for historical price data. 
+
+## *Returns:* 
+
+See **mode**. ***Remarks:*** 
+
+Divide by 1024 for getting kBytes and by (1024\*1024) for getting 
+
+MBytes. 
+
+This function was reported not to return the correct memory allocation under Linux/Wine with **mode == 0**. 
+
+Assets, bars, series, trades, and charts consume memory. The memory requirement per asset in bytes can be estimated with the formula **Years / BarPeriod \* 15 MB**, where **Years** is the number of backtest years including the **LookBack** period (use **1** for live trading). The **LEAN** and **LEANER** flags reduce the memory requirement by about 50%, the **TICKS** flag increases it by 32 bytes per historical price 
+
+tick. **Series** allocate 8 bytes per element and asset, **plot** commands allocate 8..24 bytes per bar and asset. 
+
+For backtests with large memory requirement, use **Zorro64**.  
+
+## *Example:* 
+
+## function run() 
+
+## {  
+
+`  `**BarPeriod = 1;** 
+
+`  `**LookBack = 1;** 
+
+`  `**...** 
+
+`  `**printf("\rMemory %i areas %i kb",memory(2),memory(0)/1024);   plot("Memory",memory(0),NEW,RED);** 
+
+## } 
+
+## window(string title) : HWND 
+
+Returns a handle to the active window when its title bar contains the **title** string. Can be used to wait until a certain window or dialog becomes active. ***Parameters:*** 
+
+## title - part of the window title (case sensitive), or 0 for returning the handle to the window that recently became active. 
+
+## *Returns:* 
+
+## HWND of the found active window. Otherwise 0. *Remarks:* 
+
+Normally Zorro's own window is the active window, unless another application was started or a Windows dialog became active. 
+
+## *Example:* See keys. 
+
+## quit (string Text): int 
+
+Terminates or aborts the session or simulation cycle, and prints the text to the message window.*** 
+
+## *Returns* 
+
+## 1 if Text begins with '!' or '#', otherwise 0. *Remarks:* 
+
+A **quit** call does not return immediately from the current **run** function, which will continue until the end. For returning immediately from a function, place a **return** statement before **quit()** (see example). 
+
+If **Text** begins with **'!'**, the session or simulation will abort 
+
+without **EXITRUN** and end statistics, as if [***Stop***] was pressed. No further cycles will be excecuted. 
+
+If **Text** begins with **'+'**, the session or simulation will restart from the first bar on. 
+
+Otherwise the current session or simulation cycle will prematurely end, the **EXITRUN** flag will be set, open trades closed, statistics calculated, and the simulation will then proceed to the next training or simulation cycle, if any. At the end of all cycles, the simulation stops 
+
+and **Text** is printed to the message window. 
+
+## *Example:* 
+
+## if(Equity < 100) 
+
+`  `**return quit("!Out of money!");**

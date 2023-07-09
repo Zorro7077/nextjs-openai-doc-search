@@ -1,0 +1,59 @@
+# ﻿Trade  Mode,  Phantom  Trades,  Equity  Curve Trading 
+
+## Phantom trades are "what-if" trades that are not sent to the broker. Instead the win or loss of a phantom trade is calculated from the price curve and the current slippage and trading costs. It is recorded in the Short/Long statistics, but not in the Total statistics. This way the performances of phantom and real trades can be evaluated separately. Phantom trades are used for equity curve trading or for Virtual Hedging. 
+
+## Equity curve trading is a method of limiting losses by skipping unfavorable market periods. The strategy monitors the equity curves of any component of a portfolio strategy. When unusual losses are recognized, real trading with that component is suspended. For detecting whether it's worth to resume trading, the subsequent trades are then entered in phantom mode until their returns indicate that the market is getting profitable again. In this way the strategy switches in and out of phantom mode dependent on the market situation. 
+
+Several methods can be used for determining if the market it profitable or not. In the example below, the equity curve is permanently compared with its own long-term average by lowpass filtering. It the equity is below average and still falling, trading switches to phantom mode; it goes back to normal as soon as the equity curve is rising again. Other methods may be based on the balance instead of the equity curve, or on the ratio of winning to losing trades. 
+
+Equity curve trading is not a 'holy grail'. It does not improve the performance when there is no clear distinction between profitable and unprofitable market periods or when the strategy filters unprofitable periods anyway (as it should). But it can often improve the perception of a live trading system, and can prevent losses by expiration of a market inefficiency. An example of a system that suddenly became unprofitable is the 'Luxor' strategy in the **script examples**; here equity curve trading would have saved the day by stopping trading in December 2011. 
+
+Phantom trades and the overall trade behavior can be controlled with the following variable: 
+
+## TradeMode 
+
+Determines with the flags listed below how trades are placed. Use **setf** and **resf** for setting and resetting flags.*** 
+
+## *Range:* 
+
+## TR\_PHANT Enter trades in phantom mode. The trades are simulated and not sent to the br
+
+## OM 
+
+## TR\_BSTOP  Enter trades as bracket orders with a stop loss at distance Stop\*StopFactor on N
+
+broker API (see remarks).  
+
+## TR\_GTC  Enter trades in GTC (good-till-cancelled) mode, if supported by the broker API. K TR\_AON  Enter trades in AON (all-or-nothing) mode, if supported by the broker API. TR\_FILLED  Treat the trade as if it were completely filled; for GTC trades when the trade stat
+
+## *Type:* 
+
+## int *Remarks:* 
+
+## TR\_BSTOP emulates a distant 'safety net' stop loss on NFA accounts. Since a NFA compliant trade cannot have a stop loss, it is sent as a separate stop order (in fact it's a limit order in reverse direction). Dependent on the broker API, this order might stay alive even when the original trade was closed, possibly triggering an unwanted position in reverse direction. So use this command in special cases only, for instance with option contracts or when Zorro does not control the trade. 
+
+## TR\_GTC prevents Zorro from cancelling the order when it is not immediately executed. Use this for orders that take a long time for execution, for instance option combos. The broker plugin must support the SET\_ORDERTYPE command with order type 2. 
+
+If a GTC order is not immediately filled, the partial fill amount is contained in the **TradeLots** variable. If the trade status is unavailable via broker API, either use **TR\_GTC|TR\_FILLED** for treating the GTC trade as completely filled. Or retrieve the current position size via **GET\_POSITION** and calculate the fill amount from it. You can find an example under **TMF**. 
+
+## *Example (equity curve trading):* 
+
+## *// don't trade when the equity curve goes down* 
+
+## *// and is below its own lowpass filtered value* 
+
+## function checkEquity() 
+
+## { 
+
+## *// generate equity curve including phantom trades* 
+
+`  `**vars EquityCurve = series(EquityLong+EquityShort);** 
+
+`  `**vars EquityLP = series(LowPass(EquityCurve,10));** 
+
+`  `**if(EquityLP[0] < LowPass(EquityLP,100) && falling(EquityLP))** 
+
+`    `**setf(TradeMode,TR\_PHANTOM); *// drawdown -> phantom trades*   else** 
+
+`    `**resf(TradeMode,TR\_PHANTOM); *// profitable -> normal trades* }** 

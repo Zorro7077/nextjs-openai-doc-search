@@ -1,0 +1,35 @@
+# ﻿Error messages 
+
+Below you'll find a list of possible errors that can occur during compilation or at runtime, together with suggestions for finding the reason of the error. Messages related to opening and closing positions are listed under **Log**; known issues with brokers are commented on the related page (**FXCM**, **IB**, **Oanda**, **MT4**, etc...) in this manual. 
+
+Error messages must never be ignored. Even when your script runs and produces a result, an error message always indicates that something is seriously wrong and must be fixed. Warning messages can be ignored in some cases, but only when you know and understood their reason. You can encounter three types of warning or error messages: 
+
+## Compiler errors are simply caused by wrong syntax: Mistyping something, forgetting a bracket or semicolon, or calling a function the wrong way. Even experienced programmers see those errors all the time. The script name and line in question is displayed in the error message, so the error is easy to fix. Some syntax errors cause error messages in 
+
+subsequent lines.   
+
+## Runtime errors occur while the script is running, either in the message window, or in a separate message box. 
+
+If **watch("?...")** statements are placed in the script, their argument is displayed at the end of most error messages for identifying the position in the code. Some non-critical runtime errors can be suppressed by 
+
+calling **ignore(ErrorNumber)**. For instance**, ignore(53);** lets Zorro start a trading session with no Error 053 message even when some assets are 
+
+unavailable.   
+
+## Broker messages are printed with an explamation mark. They come from the broker API, for instance when using a wrong symbol, exceeding some API limit, or trading outside market hours. The error or warning by the broker is displayed and recorded in the Zorro log. In the case of MT4/MT5 the error or warning messages are recorded in the terminal's experts log. 
+
+For dealing with error messages by script, two functions are available: 
+
+## error (string Message) 
+
+User-supplied function that is called on any runtime error message or 
+
+any **print/printf** call that contains the word **"Error"**, **"Warning"**, or **"Info"**. This function can be used to sound an **alert** or send an **email** about a potential problem. It is not in sync with other functions or I/O operations, so use 
+
+the **call** scheduler when modifying global variables or accessing non-reentrant 
+
+parts of the broker API.
+
+## allow (int Number) 
+
+Call this function for not generating messages on runtime errors or warnings with the given number. For instance, **allow(73)** suppresses all **Error 073** messages. Not all errors can be suppressed; fatal errors that terminate the script will still generate a message.   

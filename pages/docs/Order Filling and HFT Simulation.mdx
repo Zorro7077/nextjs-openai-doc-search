@@ -1,0 +1,393 @@
+# ﻿Order Filling and HFT Simulation 
+
+The **Fill** variable supports several modes for simulating naive or realistic order filling, as well as a HFT simulation mode. **HFT** (**High Frequency Trading**) is a trading method that exploits inefficiencies on the millisecond or microsecond time scale. It is very different to normal algorithmic trading. Usual trading accessories such as candles or indicators, are not used. The deciding factor is speed. HFT systems do normally not run on a trading platform - even Zorro would be not fast enough - but are directly programmed in a high speed language, such as C, Pentium assembler, shader language (HLSL) or hardware design language (VHDL). 
+
+Zorro can be used for testing HFT systems in **Fill** mode 8. In this mode, only direct trading, receiving price quotes, and plotting data are supported; indicators, series, or the **run** function are not used. Use the **main** function for initializing the system and for looping through bars. The maximum number of bars must be set up with **MaxBars**. Trades are opened and closed only 
+
+with **enter** and **exit** commands; TMFs, limits, stops or targets are not used in HFT mode. **Hedge** mode must be 2. Price quotes are entered to the system with the **priceQuote** function. Any price quote must include the exchange time stamp, since the system is synchronized to it. The two-way latency between exchange and PC location is set up with **OrderDelay** and determines the price quote at which the enter or exit order will be filled. 
+
+An introduction into HFT testing with Zorro, and an example of a HFT system can be found on **Financial Hacker**. 
+
+For determining the latency of your system, make sure that your PC clock is exactly in sync with the clock used at the exchange, then compare the exchange time stamp of incoming live price quotes with the arrival time stamp. Double this time for getting the roundtrip latency and add the reaction time of your hardware and software. As a rule of thumb, the time stamp difference is about 1 ms per any 300 km distance to the exchange (light travels at 300.000 km/sec), plus about 1..2 ms additional delay due to signal routing. **OrderDelay** can be set up with a precision of 1 microsecond. Price quote data by data vendors has usually a precision of 1 ms. 
+
+## Fill 
+
+Determines how order fills are simulated in [***Test***] and [***Train***] mode and how orders entries affect other open trades.*** 
+
+## *Range:* 
+
+## 0 Naive order filling. Trades open or close at the current market price or at their Entry, Stop, or
+
+latency, **slippage**, or intrabar price movement. Accidental 'cheating' - generating unrealistic profit
+
+stop or profit limits in a **TMF**. This mode can be used for special purposes, such as comparing Zo by other platforms. 
+
+## 1 Realistic order filling (default). Trades open or close at the most recent price quote plus Slipp
+
+When **Slippage** and **Penalty** are **0**, this mode simulates a latency-free connection to the market t price quote. If an entry or exit limit is hit and no **Penalty** is set, the position is filled at a price repli as possible with a slight pessimistic bias (see details below). 'Cheating' is not possible. With trading right before the market closes. 
+
+## 3 Delayed order filling. Trades open or close at the next price quote plus Slippage or Penalty.
+
+simulates trading at the market open price of the next day. 
+
+## 8 HFT fill mode. Trades open or close at the entered priceQuote whose time stamp is most re plus OrderDelay. This mode can be used to simulate the effect of a script-defined latency. 
+
+## *Type:* 
+
+## int *Remarks:* 
+
+High resolution price data for HFT simulation often has outliers. Use the **Outlier** variable to filter out extreme prices. 
+
+Delayed order filling affects trade statistics separately for entering and for filling the order. As long as the order is not filled, it is assumed pending. Thus, **NumPendingTotal** is increased when the order is entered, and **NumOpenTotal** when it is filled. 
+
+Fill modes **0, 1, 3** can be changed in real time, f.i. for entering a trade at the next day open and exiting it at the current day close. 
+
+Fill modes have no effect on the display of trade start or end points on the **chart**, which are always placed on the first and last bar of the trade. 
+
+## Entry, Stop, or Takeprofit fill prices are determined by the current fill mode, the slippage, penalty, and the historical tick that hit the price level. In naive fill mode or when Penalty is set, the fill price is the given price level plus or minus Penalty, depending on trade direction. In realistic 
+
+fill mode, the fill price is calculated with the following algorithm: Long 
+
+Entry stop: max of Entry and tick end price + slippage. Long Entry limit: 
+
+Entry + slippage. Short Entry stop: min of Entry and tick end price + 
+
+slippage. Short Entry limit: Entry + slippage. Long OrderDelay. max of 
+
+Entry and tick mid price + slippage. Short OrderDelay. min of Entry and 
+
+tick mid price + slippage. Long Stop: min of Stop and tick start price + 
+
+slippage. Long TakeProfit: TP price + slippage. Short Stop: max of Stop 
+
+and tick start price + slippage. Short TakeProfit: TP price + slippage.  ***Example:*** 
+
+## function run() 
+
+## { 
+
+`  `**BarPeriod = 1440;** 
+
+`  `**Fill = 3; *// enter trades at next day's open*    ...** 
+
+## } 
+
+## *HFT simulation framework:* 
+
+## *// Simulate a stock trading HFT system* 
+
+## #define LATENCY  2.5   *// simulate 2.5 milliseconds latency* 
+
+## typedef struct QUOTE { 
+
+`  `**char  Name[24];** 
+
+`  `**var  Time,Price,Size;** 
+
+## } QUOTE; *// Quote struct by the NxCore plugin* 
+
+## int callback(QUOTE \*Quote) *// called by the plugin* 
+
+## { 
+
+`  `**static int Counter = 0; *// quote counter*** 
+
+`  `**if(0 == (++Counter % 1000)) { *// every 1000 quotes...*     if(!wait(0)) return 0; *// check if [Stop] was clicked*   }** 
+
+`  `**asset(Quote->Name+1); *// NxCore adds "e" to the asset name*   priceQuote(Quote->Time,Quote->Price);** 
+
+`  `**...** 
+
+## *// trade algorithm here, generate TradeSignalLong/Short* 
+
+`  `**...** 
+
+`  `**if(!(NumOpenLong+NumPendingLong) && TradeSignalLong) {** 
+
+`    `**exitShort();** 
+
+`    `**enterLong();** 
+
+`  `**} else if(!(NumOpenShort+NumPendingShort) && TradeSignalShort) {** 
+
+`    `**exitLong();** 
+
+`    `**enterShort();** 
+
+`  `**}** 
+
+`  `**return 1;** 
+
+## } 
+
+## function main() 
+
+## { 
+
+`  `**if(Broker != "NxCore") {** 
+
+`    `**quit("Please select NxCore plugin!");     return;** 
+
+`  `**}** 
+
+`  `**StartDate = 20170103;   EndDate = 20170131;   LookBack = 0;** 
+
+
+`  `**set(LOGFILE);** 
+
+`  `**assetList("AssetsHFT");** 
+
+`  `**OrderDelay = LATENCY/1000.;   Hedge = 2;** 
+
+`  `**Fill = 8;** 
+
+`  `**Lots = 1;** 
+
+`  `**Verbose = 3;** 
+
+## *// process the NxCore history tape files, one for each day*   login(1);  *// for initilizing the plugin* 
+
+`  `**int NxDate;** 
+
+`  `**for(NxDate = StartDate; NxDate = EndDate; NxDate++) {** 
+
+`    `**string NxHistory = strf("History\\NxTape%8d.nx2",NxDate);     printf("\nProcessing tape %s..",NxHistory);** 
+
+`    `**brokerCommand(SET\_HISTORY,NxHistory);** 
+
+`    `**if(!wait(0)) break; *// check if [Stop] was clicked*** 
+
+`  `**}** 
+
+## } 
+
+## Verbose 
+
+Determines the verbosity of trade, error, and diagnostics messages (see **Log**). The more verbose, the slower the execution of large backtests.*** 
+
+## *Range:* 
+
+## 0  Few messages. Less important warnings are suppressed. Bars are only printed to t
+
+trades are open. 
+
+## 1  More messages (default). All bars and all major events, such as entering or closing 
+
+in [***Trade***] mode also displayed in the window.. 
+
+## 2  Even more messages, including the trade parameters at any trade entry and exit. In drawdown, and CBI is printed once per day. In [*Test*] mode with TICKS flag the tick
+
+The prices of the selected asset are printed at any bar in the form **Open/High\Low**
+
+## 3  Even more messages, including skipped trades, possible price outliers, and functio displayed with more digits. In [*Trade*] mode all open trades are listed once per day.
+
+## 7  Extensive diagnostics messages, including all memory allocations that exceed 2 M
+
+execution times. 
+
+## +DIAG  (+8) Additional flag to activate a 'black box recorder' for diagnostics. A ...diag.txt file
+
+contains a list with the 1000 last events and can be used to determine the reason o
+
+leads to the termination of the script. For details see **troubleshooting**. Black box recordin program speed, so do not use this flag unnecessarily. 
+
+## +ALERT  (+16) Additional flag to display critical messages, such as suspicious asset parameters, p
+
+broker API errors, or **print(TO\_ALERT,..)** calls, in a separate alert box. **DIAG** record event, so the details leading to the situation can be evaluated from the black box lo continues when the alert box is closed. 
+
+## +SILENT  (+32) Suppress all printf messages. Messages by print(TO\_WINDOW,...) are still p +LOGM (+512) Additional flag to print the log also to the message window. 
+
+## SG 
+
+## *Type:* 
+
+## int *Remarks:* 
+
+In the daily trade list at **Verbose** >= 2, the state of any trade is printed in the form **[Trade ID] - Profit/Loss - Stop - Current price - Entry**, f.i. **[AUD/USD:CY:S4400] +116$ s0.8733** **c0.8729 e0.8731**. The same list is printed on a click on the [***Result***] button. 
+
+If **Verbose** >= 2 and the system is in a drawdown from a previous equity peak ("Adverse Excursion"), its depth and width, as well as the **Cold Blood Index** are once per day printed to the log in the form **Last DD: xx% in yy days, CBI zz%**. 
+
+In "black box" mode a file ending with "**..diag.txt**" is generated in 
+
+the **Log** folder. It contains a list with the last events and **printf** commands, and can be used to determine the reason of a crash or other problem that leads to the termination of the script. For details see **troubleshooting**. 
+
+Verbosity and black box recording can heavily reduce the training and test speed, so do not use this feature unnecessarily. 
+
+## *Example:* 
+
+## function run() 
+
+## { 
+
+`  `**Verbose = 7+DIAG; *// extensive messages plus black box recorder***  
+
+`  `**...** 
+
+## } 
+
+## saveStatus(string FileName) loadStatus(string FileName) 
+
+Saves and loads the current trading status to a **.trd** file in the **Data** folder. The file contains the status of open real and phantom trades, the status of the sliders, and component specific variables (**AlgoVar**). This function can be used to resume trading at the last stored state in case of a server crash or reboot, or to let a fallback server take over the trading in case of a hardware failure. ***Parameters:*** 
+
+## FileNa Name and path of the file, or 0 for a default name me  like "Data\\scriptname.trd". 
+
+## SaveMode 
+
+This variable determines by several flags what's saved or loaded in the **.trd** file in [***Trade***] mode or when calling the **saveStatus**/**loadStatus** functions.*** 
+
+
+## *Flags:* 
+
+## SV\_SLIDERS  - save/load slider positions (default). 
+
+## SV\_ALGOVARS  - save/load all AlgoVars (default). 
+
+## SV\_ALGOVARS2 - save/load all AlgoVars2. 
+
+## SV\_TRADES  - save/load all open trades (default). 
+
+## SV\_STATS  - save/load statistics data, to be continued in the next session. SV\_BACKUP  - after loading, save a backup of the .trd file (default). SV\_HTML  - after loading trades in [*Test*] mode, generate a HTML file with the list of open trades.*** 
+
+## *Type:* 
+
+## int *Remarks:* 
+
+Depending on **SaveMode**, the system status is automatically loaded in [***Trade***] mode at session start from a **Data\\*.trd** file.The file is updated at any trade or at the end of a **trading** session. Set **SaveMode = 0** for preventing the automatic saving and loading. In [***Test***] mode 
+
+the **saveStatus**/**loadStatus** functions can be used for saving or loading. 
+
+The flags can be combined by adding (see example), and can be separately set or reset with the **setf** and **resf** macros. 
+
+For properly resuming statistics from the previous session, the end of that session must be within the **LookBack** period of the current session. 
+
+All needed assets and algos must have been selected in the initial run for loading their **AlgoVars**; slider ranges must have been set in the initial run for loading slider positions. 
+
+Trades can be alternatively loaded directly from the broker account with the **brokerTrades** function. In that case make sure that 
+
+the **SV\_TRADES** flag is not set. The broker API must support 
+
+the **GET\_TRADES** command. 
+
+## *Example:* 
+
+## function run() 
+
+## { 
+
+`  `**if(Bar >= 1) { *// default asset is selected after first run*     AlgoVar[0] = 123;** 
+
+`    `**SaveMode = SV\_ALGOVARS+SV\_ALGOVARS2;**  
+
+`    `**saveStatus("Data\\Test.trd");** 
+
+`    `**AlgoVar[0] = 456;** 
+
+`    `**printf("\n %.0f",AlgoVar[0]);** 
+
+`    `**loadStatus("Data\\Test.trd");** 
+
+`    `**printf("\n %.0f",AlgoVar[0]);** 
+
+`    `**quit("ok!");** 
+
+`  `**}** 
+
+## } 
+
+## BarMode 
+
+Determines bar creation and trading behavior when the market is inactive, as on weekends, outside market hours, and on business holidays. By default, any bar contains at least one valid price quote. When no price quotes arrive due to market inactivity, or when it's weekend or a holiday, no bars are created. This behavior can be changed with the following **BarMode** flags. Use **|** or **+** for combining flags and **setf** and **resf** for setting and resetting single flags.*** 
+
+## *Flags:* 
+
+## BR\_FLAT  Generate bars even when they contain no price quote. These bars get flat candle
+
+quote. For special purposes only; price and indicators series should normally skip fl bar creation and must be set before the first **asset** call. 
+
+## BR\_WEEKE Don't generate bars that end on holidays or at or after EndWeek and before Sta ND  (BarZone), even when they contain price quotes. This flag is set by default. It is fo
+
+EOD bars. It affects bar creation and must be set or reset before the first **asset BR\_MARKET**  Don't generate bars that end at or after **EndMarket** and before **StartMarket** in th
+
+even when they contain price quotes. This flag is for intraday bars only. It affects 
+
+before the first **asset** call. 
+
+## BR\_NOSHIF Don't shift data series on intraday bars that end at or after EndMarket and befor
+
+## T  zone (BarZone). This prevents series-based indicators from updating or generat
+
+hours. Start and end time and zone can be individually set up in the **asset list**. **BR\_LOCAL**  Automatically set **Start/EndMarket** on any **asset** call to the local asset market hou
+
+converted from **AssetMarketZone** to **BarZone**.  
+
+## BR\_LEISUR Don't enter or manage trades at or after EndMarket and before StartMarket, on E  by EndWeek/StartWeek in the bar time zone (BarZone). 
+
+## BR\_SLEEP  Don't request or process price quotes when the market is closed due to BR\_WEEK
+
+Since no prices are updated, **tick** functions will not run and price-dependent ev that time. Use this for special purposes only. 
+
+## BR\_LOGOFF  Log off on weekends or when the market is closed. BR\_SLEEP and BR\_WEEKEN
+
+API **settings**, such as order texts or price or volume types, are usually reset when l special purposes only, such as working around server maintenance or API unresp Some broker APIs do not support logging off during a trading session; in that case session until it is manually restarted. 
+
+## *Type:* 
+
+## int *Remarks:* 
+
+When **BR\_FLAT** is not set, the historical time stamps of the 
+
+first **asset** in a portfolio strategy determine the bar creation. The order of assets does not matter for bar creation when **BR\_FLAT** is set. 
+
+When **BR\_MARKET** is set, make sure that the timestamp of at least one bar per day falls within market hours - otherwise the day will have no valid bar (see **Error 014**). 
+
+When **BR\_LEISURE** is set, but the system is supposed to trade around the clock on working days, set **StartMarket = EndMarket = 0;**. 
+
+When no bars are generated due to weekends, holidays, or market closure, the [***Status***] window displays "Closed". 
+
+For trading assets even at weekends, such as cryptocurrencies, reset **BR\_WEEKEND** before sampling bars. 
+
+When **BR\_MARKET** or **BR\_WEEKEND** are used, make sure that weekend and market hours are also set up correctly in UTC or in 
+
+the **BarZone**. When multiple assets have different market hours, set them up before selecting the asset. 
+
+For not updating prices after or before a certain time, use 
+
+a **tick** function and the **NOPRICE** flag. 
+
+## *Example:* 
+
+## function run() 
+
+## { 
+
+`  `**...** 
+
+`  `**StartWeek = 10400; *// start Monday 4 am*** 
+
+`  `**EndWeek = 51900; *// end Friday 7 pm*** 
+
+`  `**BarMode = BR\_WEEKEND+BR\_SLEEP; *// don't process quotes during the weekend and don't generate bars*** 
+
+`  `**...** 
+
+## } 
+
+## AssetMode 
+
+Asset specific flags that affect the currently selected asset. The following flags can be set or reset with the **setf** and **resf** macros:*** 
+
+## *Flags:* 
+
+## NOPRICE  Prevents price updates in live trading while set. Can reduce bandwidth when an ass
+
+price is not relevant. 
+
+## SOFTSW Causes rollover to be continuously accumulated, rather than once per day. 
+
+## AP 
+
+## *Remarks:* 
+
+An asset must be selected before setting or resetting its flags. ***Example:*** 
+
+## setf(AssetMode,NOPRICE);  *// disable asset updates* 

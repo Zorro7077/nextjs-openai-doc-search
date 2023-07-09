@@ -1,0 +1,873 @@
+# ﻿Time and Calendar Functions 
+
+## year (int offset): int 
+
+Year number of the given bar, f.i. **2011**. 
+
+## month (int offset): int 
+
+Month number of the given bar, **1..12**. 
+
+## week (int offset): int 
+
+Week number of the given bar, **0..53**, with Monday as first day of week. **day (int offset): int** 
+
+Day of month of the given bar, **1..31**.
+
+## dom (int offset): int 
+
+Number of days of the month of the given bar, **28..31**.
+
+## tdm (int offset): int 
+
+Trading day of the month of the given bar, **1..23**. Uses **BarZone** for determining Weekends and Holidays (see **BarMode**) when counting trading days.
+
+## tom (int offset): int 
+
+Total number of trading days of the month of the given 
+
+bar, **20..23**. **(tom(offset)-tdm(offset))** gives the days until the last trading day of the month. 
+
+## dow (int offset): int 
+
+Day of week of the given bar, **MONDAY** (**1**), **TUESDAY** (**2**) ... **SUNDAY** (**7**).
+
+## ndow (int offset): int 
+
+Number of the current day of week in the current month; to be used f.i. for finding the first Monday (**1**), the third Friday (**3**), etc.
+
+## ldow (int zone,int offset): int 
+
+Local day of week of the given bar in the given time zone 
+
+(see **timeOffset** below), considering daylight saving time (see **dst** below). 
+
+## hour (int offset): int 
+
+Closing hour of the given bar, **0..23**, with 1 second precision. **hour(0)** gives the current hour and can be used to apply different trade tactics in the US, European, or Asia-Pacific session. 
+
+## lhour (int zone, int offset): int 
+
+Closing local hour of the given bar in the given time zone 
+
+(see **timeOffset** below), considering daylight saving time (see **dst** below). F.i. **lhour(EST)** returns the current hour at the New York Stock Exchange. 
+
+## minute (int offset): int 
+
+Closing minute of the given bar, **0..59**, with 1 ms precision. **minute(0)** gives the current minute.
+
+## tod (int offset): int 
+
+Time of day of the given bar in the form **hhmm**, f.i. **2107** for 9:07 pm. A time in hhmm can be converted to minutes with **int MinuteOfDay = ((tod(0)/100)\*60 + (tod(0)%100);**.
+
+## ltod (int zone, int offset): int 
+
+Local time of day of the given bar in the form **hhmm**.
+
+## tow (int offset): int 
+
+Time of week of the given bar in the form **dhhmm**. **d** is the weekday number starting with Monday(1), f.i. **52107** = Friday 9:07 pm. See 
+
+also **StartWeek**, **EndWeek**.
+
+## ltow (int zone, int offset): int 
+
+Local time of week of the given bar in the form **dhhmm**.
+
+## second (): var 
+
+Closing second of the current bar. The decimals give the fraction of the second with 1 ms precision. The current second number of the day can be calculated with **var SecondOfDay = modf(wdate(0),0)\*24\*60\*60;**.
+
+## second (var Time): var 
+
+Second of the given **Time** value in Windows **DATE** format. The decimals give the fraction of the second with 1 ms precision. The returned value can be different to the seconds printed by **strdate**, which are rounded to the next full second.  
+
+## minutesAgo (int bar): int 
+
+Total number of minutes between the end of the bar with the given offset and the end of the current bar.
+
+## minutesWithin (int bar): var 
+
+Total number of minutes from start to end of the bar with the given offset. Normally identical to **BarPeriod**, but can be different due to weekends, holidays, daylight saving time, gaps due to lack of price quotes, or when called from an intrabar function. 
+
+## workday (int offset): bool 
+
+Returns **true** when the given date or the end of the given bar is not a holiday or a weekend determined by **Holidays**, **StartWeek**, and **EndWeek**.
+
+## market (int zone, int offset): bool 
+
+Returns **true** when the end of the given bar is within market hours given by **StartMarket** and **EndMarket** (see also **suspended()**).
+
+## at (int hhmm): bool 
+
+Returns **true** when the given time in **hhmm** format is at the end or inside the current bar in the **BarZone**.
+
+## dst (int zone, int offset): int 
+
+Returns **1** when daylight saving time is active at the end of the given bar, otherwise **0**. A simplified daylight saving schedule is used, based on US east coast daylight saving periods for all time zones in America, Sydney daylight saving periods for Australian and Pacific time zones, and European daylight saving periods for all other time zones. UTC and JST time zones have no daylight saving time. For years between 2000 and 2024 the real historical time switching dates are used, for all other years estimated dates from an average of the historical dates. 
+
+## *Parameters:* 
+
+## bar  Offset of the bar for which the date or time is returned; 0 for the current bar, 1 for the pre
+
+multiple time frames are used, bar offsets are multiplied with **TimeFrame**. 
+
+## offs Offset of the bar for which the date or time is returned; or NOW for the current PC time; or et  with no decimals. 
+
+## zon UTC for UTC/GMT time, WET for London, CET for Frankfurt, EST for New York, CST for C e  Tokyo, AEST for Sydney, or the zone offset in hours, from -12...+12 (with daylight saving) o
+
+(without daylight saving). For the daylight saving period, US periods are used for time zones are used for time zones 10, 11, 12, and European periods for all other time zones. Note th as **UTC+9** since Japan uses no daylight saving. 
+
+## *Usage:* 
+
+## hour(1) returns the hour of the previous bar. 
+
+## wdate (int offset): var 
+
+Returns UTC date and time of the given bar **offset** in Windows **DATE** format. 
+
+## ldate (int zone, int offset): var 
+
+Returns date and time in the given time **zone** of the given bar **offset** in **DATE** format. 
+
+## wdateBar (int n): var 
+
+Returns UTC date and time of the bar with the given bar number (**0...NumBars-1**) in **DATE** format.
+
+## wdatef (string Format, string DateTime): var 
+
+Returns date and time in **DATE** format of the given **DateTime** string. Can be 
+
+used to parse date/time fields in CSV files in various **formats**. Seconds are read with decimals.
+
+## strdate (string Format, int offset): string 
+
+## strdate (string Format, int zone, int offset): string strdate (string Format, var Date): string 
+
+Returns a temporary string in the given **Format** with the date and time of the given bar offset or **DATE** variable; can be used in **printf** statements. Predefined formats are **YMD**, **HM, HMS**, **YMDHMS**. If the **Format** string ends with **"%S."**, milliseconds are added; otherwise seconds are rounded to the next full second. Examples: **strdate(YMD,0)** returns a string with the date of the current bar, 
+
+and **strdate("%y-%m-%d %H:%M:%S.",NOW)** returns the current date and time in millisecond precision. 
+
+## nthDay(int Year, int Month, int Dow, int N): var 
+
+Returns the Windows DATE format of the Nth given weekday of the given month. For instance, **nthDay(2016,11,FRIDAY,3)** returns the date of the third friday in November 2016. Source code in **contract.c**, which must be included for this function.
+
+## dmy (int YYYYMMDD): var ymd (var Date): int 
+
+Convert a date in the **YYYYMMDD** format to the Windows **DATE** format and vice versa. For instance, **ymd(wdate(NOW) - 10)** returns the date from 10 days ago in the YYYYMMDD format.
+
+## utm (var Date): int 
+
+## mtu (int UnixTime): var 
+
+Convert a date in Windows **DATE** format to Unix time in seconds since 1-1-1970, resp. from Unix time to **DATE**. Unix time in milliseconds can be converted to seconds by dividing by 1000.*** 
+
+## *Parameters:* 
+
+## Format  Format string, see format codes. Some often used format strings are predefined i
+
+"**%Y%m%d**";   **HMS** = "**%H:%M:%S**";    **YMDHMS** = "**%y%m%d %H:%M:%S**". 
+
+## offset  Bar offset, 0 for the current bar, 1 for the previous bar and so on, or NOW for the cu YYYYMM Date as integer, f.i. 20180403 for April 3, 2018. 
+
+## DD 
+
+## Date  Date/time in Windows DATE format, as returned from wdate(). Days are represent
+
+starting on Saturday, 30 December 1899, midnight UTC. The time of the day is re
+
+the number. This format allows easy and precise date comparison down to a micr **DateTime**  Date/time string in various formats, see **format codes**. 
+
+## *Usage:* 
+
+## printf("\nDate: %s",strdate(YMD,0)); prints the current bar date in YYYYMMDD format. wdatef("%d.%m.%y","15.9.16") returns the DATE value of September 15, 2016. 
+
+## timeOffset (int zone, int days, int hour, int minute): int 
+
+Returns the offset (in bars) of the last bar closing at the given time, or a negative offset for a bar in the future.*** 
+
+## *Parameters:* 
+
+## zone  UTC for UTC time, ET for New York, WET for London, CET for Frankfurt, AEST for Sydne
+
+giving the zone offset in hours to UTC. Daylight saving time is considered in non-UTC zones from **days**  Number of days in the past, or **0** for the day of the current bar, or a negative number for da
+
+## hour  Hour of the day, 0..23. If above 23, days is adjusted accordingly. 
+
+## minu Minute of the hour, 0..59. If above 59, hour is adjusted accordingly. 
+
+## te 
+
+## *Usage:* 
+
+## timeOffset(ET,1,16,0) returns the bar offset of yesterday's NYSE closing time. timeOffset(ET,0,9,30) returns 0 when the NYSE is just opening. if(0 == timeOffset(0,0,TIME/100,TIME%100)) is fulfilled when the current time is at the HHMM value given by TIME.  
+
+## *Remarks:* 
+
+If not stated otherwise, all dates and times reflect the time stamp of the Close price at the **end of the bar**. Dates and times are normally UTC, also called "GMT" or "Zulu" time (Greenwich mean time without daylight saving time). Timestamps in historical data are supposed to be either UTC, or to be a date only with no additional time part, as for daily bars. It is possible to use historical data with local timestamps in the backtest, but this must be considered in the script since the date and time functions will then return the local time instead of UTC, and time zone functions cannot be used. 
+
+All date and time functions return **0** or invalid values in 
+
+the **INITRUN** when no asset was yet loaded and thus the bars and date ranges are not yet set up. For getting the current time at script start, 
+
+use **NOW** for the offset. When **offset** is **0** or omitted, the end time of the current bar is returned. When **offset** is set to **NOW**, the current UTC time of the PC clock is returned. When a value > 30000 is used for **offset**, it is assumed a day number in **DATE** format, and the corresponding year, month, or day is returned. The **offset** parameter is affected 
+
+by **TimeFrame**, f.i. when **TimeFrame** is **6** and **offset** is **3**, the time of **3\*6 =** 
+
+
+## 18 bars ago is returned. Note that not all time/date functions support the special offset values. 
+
+Be careful when checking time, because not all hours or minutes have an associated bar. For instance, **if(hour == 17)** will fail when no bar ends between 17:00:00 and 17:59:59 UTC. Better use the **at** function or check a time range. 
+
+Date and time functions require a **LookBack** period of at least the highest used or returned bar offset. 
+
+Most date and time functions return **int**, but some return **var** - take care of that when using the functions in a **printf** statement. 
+
+In live trading the time functions are based on the broker's server time when supported by the API; otherwise on the PC time. The script must take care that rounding differences and small time deviations don't cause problems. For instance, the weekday (**dow(0)**) exactly at midnight can return different values depending on whether the server time is a second slower or faster than the PC time. So a tick can have a 23:59:59 time stamp, while the PC clock has already the next day at 00:00:00. When using daily bars, check the whole time and not only the day, or set the **bar offset** so that the bars do not change exactly at midnight. 
+
+Time printing uses the Windows COleDateTime class, which rounds a **DATE** value to the next second. Therefore, minutes and seconds in time strings can differ by about 0.5 seconds to 
+
+the **minute** and **second** functions, which round the time to the next millisecond. 
+
+## *Examples:* 
+
+## *// buy at UTC midday on the last day of the month,*  
+
+## *// sell 2 trading days later* 
+
+## if(NumOpenLong == 0) { *// nothing yet bought this month*   if((tom(0) == tdm(0)) && hour() >= 12) 
+
+`    `**enterLong();** 
+
+## } else if(tdm(0) >= 2) 
+
+`    `**exitLong();** 
+
+## *// print New York local time to the log* printf(strdate("# NY: %H:%M",EST,0)); 
+
+## *// close all position at 16:15 local time* if(at(1615)) { 
+
+`  `**printf("\nClosing all positions");** 
+
+`  `**exitLong("\*\*");** 
+
+`  `**exitShort("\*\*");** 
+
+## } 
+
+## *// convert a time stamp from EST to UTC* 
+
+## TimeStamp -= (EST+dst(EST,TimeStamp))/24.; 
+
+## crossOver (vars Data1, vars Data2) : bool crossUnder (vars Data1, vars Data2) : bool crossOver (vars Data, var Border) : bool crossUnder (vars Data, var Border) : bool 
+
+Determines if the **Data1** series crosses over or under the **Data2** series, or over or under a fixed **Border** value between the previous and the current bar. Often used for trade signals.
+
+## crossOver (vars Data1, vars Data2, int TimePeriod) : int crossUnder (vars Data1, vars Data2, int TimePeriod) : int crossOver (vars Data, var Border, int TimePeriod) : int crossUnder (vars Data, var Border, int TimePeriod) : int 
+
+Returns the bar offset of the last crossing (**1** = between the previous and the current bar), or **0** when no crossing occurred within the **TimePeriod**. 
+
+## touch (vars Data1, vars Data2) : bool touch (vars Data, var Border) : bool 
+
+Determines if the **Data1** series touches or crosses the **Data2** series or a fixed **Border** value from any direction.*** 
+
+## *Parameters:* 
+
+## Data1  First time series. 
+
+## Data2  Second time series 
+
+## Border  Border value 
+
+## TimePeri Number of series elements to od  test 
+
+## *Returns:* 
+
+## true or bar offset if the first series crosses the second, false or 0 otherwise. *Modifies* 
+
+## rMomentum - Data movement in percent per time frame at the time of the crossing; indicates the 'speed' of the crossover.*** 
+
+## *Algorithms:* 
+
+## bool crossOver(var\* Data1,var\* Data2) { return (Data1[0] > Data2[0]) && (Data1[1] <= Data2[1]); } 
+
+## bool crossUnder(var\* Data1,var\* Data2) { return (Data1[0] < Data2[0]) && (Data1[1] >= Data2[1]); } 
+
+## bool crossOver(var\* Data,var Border) { return (Data[0] > Border) && (Data[1] <= Border); } 
+
+## bool crossUnder(var\* Data,var Border) { return (Data[0] < Border) && (Data[1] >= Border); } 
+
+## *Remarks:* 
+
+The **data** series must have a minimum length of **2**, 
+
+resp. **TimePeriod**. 
+
+For a fuzzy logic version that also detects 'almost crossovers', 
+
+use **crossOverF** / **crossUnderF**. 
+
+For checking if a crossover occurred exactly **n** bars before, 
+
+use **crossOver(Data1+n,Data2+n)**. 
+
+For getting the Close price at the last crossover, 
+
+use **priceC(crossOver(Data1,Data2,LookBack))**. 
+
+For predicting a future crossover, or for detecting only 'strong crossovers', use the **predict** function. 
+
+Identical values of the two series for several bars will not produce a crossover signal. If that is desired, use the **touch** function. 
+
+## *Example:* 
+
+## function run() 
+
+## { 
+
+`  `**vars Price = series(priceClose());** 
+
+`  `**vars SMA100 = series(SMA(Price,100));   vars SMA30 = series(SMA(Price,30));** 
+
+`  `**if(crossOver(SMA30,SMA100))** 
+
+`    `**enterLong();** 
+
+`  `**else if(crossUnder(SMA30,SMA100))     enterShort();** 
+
+## } 
+
+## peak(vars Data) : bool valley(vars Data) : bool 
+
+Determines if the **Data** series had a maximum (**peak**) or minimum (**valley**) at the previous bar.
+
+## peak(vars Data, int TimePeriod) : int valley(vars Data, int TimePeriod) : int 
+
+Returns the bar offset of the last maximum (**peak**) or minimum (**valley**) of the **Data** series, or **0** when the series had no peak or valley within 
+
+the **TimePeriod**.*** 
+
+## *Parameters:* 
+
+## Data  Time series 
+
+## TimePeri Number of series elements to od  test 
+
+## *Returns:* 
+
+## true or bar offset at the peak or valley, false or 0 if no peak and valley was found.*** 
+
+## *Modifies* 
+
+## rMomentum - Data movement in percent per time frame; indicates the 'sharpness' of the peak or valley.*** 
+
+## *Algorithm:* 
+
+## bool peak(var\* Data) {  
+
+`  `**rMomentum = min(Data[1]-Data[2],Data[1]-Data[0])/Data[0]\*100.;** 
+
+`  `**return (Data[2] <= Data[1]) && (Data[1] > Data[0]);  }** 
+
+## bool valley(var\* Data) { 
+
+`  `**rMomentum = min(Data[2]-Data[1],Data[0]-Data[1])/a[0]\*100.;** 
+
+`  `**return (Data[2] >= Data[1]) && (Data[1] < Data[0]);  }**   
+
+## *Remarks:* 
+
+The **Data** series must have a minimum length of **3** resp. the 
+
+given **TimePeriod**.. 
+
+A 'flat line' of the **Data** series for several bars will not produce a peak or valley signal. 
+
+For a fuzzy logic version that also detects 'almost peaks' and 'almost valleys', use **peakF** / **valleyF**. 
+
+For detecting only 'strong peaks' or 'strong valleys', 
+
+compare **rMomentum** with a percent threshold. 
+
+For checking if a peak occurred exactly **n** bars before, 
+
+use **peak(Data+n)**. 
+
+For predicting a future peak or valley, use the **predict** function. 
+
+## *Example:* 
+
+## function run() 
+
+## { 
+
+`  `**vars Trends = series(LowPass(series(price()),1000),3);   if(valley(Trends))** 
+
+`    `**enterLong();** 
+
+`  `**if(peak(Trends))** 
+
+`    `**enterShort();** 
+
+## } 
+
+## rising (vars Data) : bool falling (vars Data) : bool 
+
+Determines if a series rises or falls, i.e. if **Data[0]** is above or below **Data[1]**.*** 
+
+
+## Da Data ta  series. *Returns:* 
+
+## true if the series rises or falls, false otherwise. *Modifies* 
+
+## rMomentum - Data movement in percent per time frame; indicates the 'speed' of the rising or falling.*** 
+
+## *Remarks:* 
+
+The **data** series must have a minimum length of **2**. 
+
+For a fuzzy logic version, use **risingF**/**fallingF**. 
+
+For checking if the series was rising **n** bars before, 
+
+use **rising(Data+n)**. 
+
+For checking the amount of rising or falling over a given time period, use the **slope** function. 
+
+## *Example:* 
+
+## function run() 
+
+## { 
+
+`  `**...** 
+
+`  `**vars Price = series(price());   if(rising(Price))**  
+
+`    `**enterLong();** 
+
+`  `**else** 
+
+`    `**exitLong();** 
+
+## } 
+
+## slope (int Type, vars Data, int TimePeriod) : var 
+
+Connects the two highest maxima or lowest minima of the **Data** series within the given **TimePeriod**, and returns the slope of the connecting line. This function can be used to calculate traditional divergence or convergence (triangle) patterns. ***Parameters:*** 
+
+## Type  PEAK for a line through the maxima, VALLEY for a line through the 
+
+minima. 
+
+## Data  Time series. 
+
+## TimePeri Period to be examined. 
+
+## od 
+
+## *Returns:* 
+
+Slope (movement per bar, positive for a rising, negative for a falling line), or **0** if the series is flat or no minima/maxima are found.*** 
+
+## *Modifies* 
+
+## rMin, rMinIdx - value and bar offset of the lower connecting point. rMax, rMaxIdx - value and bar offset of the higher connecting point. 
+
+## line (int Offset) : var 
+
+Returns the value of a straight line at the bar with the given **Offset** (0 = current bar). The line is defined as connecting 
+
+the **rMin**, **rMinIdx**, **rMax**, **rMaxIdx** coordinates which can be either set directly, or generated with **slope** or with **Min/Max/MinIndex/MaxIndex**.***  
+
+## *Parameters:* 
+
+## Offs Bar et  offset *Returns:* 
+
+Value of the line at the given **Offset**. ***Remarks:*** 
+
+The **slope** function is used for the **Support**, **Resistance**, and **Divergence** indicators. 
+
+Source code in **indicators.c**. 
+
+## *Example:* 
+
+## var HighsDn[10] = { 1,1,1,2,1,1,1,3,1,1 }; *// mind the reverse order* 
+
+## var LowsUp[10] = { 1,1,1,0.7,1,1,1,0.5,1,1 }; 
+
+## function main() 
+
+## { 
+
+`  `**printf("\nSlope dn %.3f",slope(PEAK,HighsDn,10));   printf("\nSlope up %.3f",slope(VALLEY,LowsUp,10)); }** 
+
+## sortData (var\* Data, int Length) 
+
+Sorts the **Data** array in ascending (**Length > 0**) or descending (**Length < 0**) order.
+
+## sortIdx (var\* Data, int Length): int\* 
+
+Does not affect the **Data** array, but returns a sorted **int** array of the indices from the smallest to the greatest **Data** value.
+
+## sortRank (var\* Ranks, var\* Data, int Length): int\* 
+
+Stores the rank of any **Data** element in 0..1 range in the **Ranks** array, from 0 for the smallest to 1 for the greatest element. If the elements are OHLC prices, candle patterns can be encoded this way for machine learning algorithms.
+
+## findIdx (var\* Data, int Length, var Value): int 
+
+Returns the index of the highest **Data** element below or equal to **Value**, or **-1** when no such element was found.***  
+
+## Data  var / double array or series to be sorted 
+
+## Rank  var / double array to receive the Data ranks. 
+
+## Leng Length of the Data array; negative for sorting in descending th  order. 
+
+## Valu Value to be found in the Data array., 
+
+## e 
+
+## *Returns* 
+
+## sortIdx, sortRank: Pointer to a temporary int array of size Length containing the numbers of the Data values after sorting. The array will be overwritten by the next sortIdx or sortRank call. Returns 0 when a parameter is invalid. 
+
+## *Remarks* 
+
+For sorting or searching arrays, the standard C 
+
+functions **qsort** and **bsearch** can alternatively be used. They are available in the **stdio.h** include file. 
+
+## *Example:* 
+
+## *// Spearman trend indicator* 
+
+## var Spearman(var\* Data,int Period) 
+
+## { 
+
+`  `**Period = clamp(Period,2,g->nLookBack);** 
+
+`  `**int\* Idx = sortIdx(Data,Period);** 
+
+`  `**var sum = 0;** 
+
+`  `**int i,n;** 
+
+`  `**for(i=0,n=Period-1; i<Period; i++,n--)** 
+
+`    `**sum += (n-Idx[i])\*(n-Idx[i]);** 
+
+`  `**return 1. - 6.\*sum/(Period\*(Period\*Period-1.)); }** 
+
+## shift (vars Data, var Value, int Length) 
+
+Shift the first **Length** elements of **Data** by one position, and fill **Data[0]** with **Value**.***  
+
+## *Parameters:* 
+
+## Data  Series or array to be shifted. 
+
+## Valu New value for the first element. 
+
+## e 
+
+## Leng Number of elements to be shifted. If negative, the array is shifted th  backwards. 
+
+## *Remarks* 
+
+The functions can be used to shift static or dynamic series under certain conditions or in a **tick** or **tock** function. Dynamic series are otherwise automatically shifted at any time frame. 
+
+## *Example:* 
+
+
+## function run() 
+
+## { 
+
+`  `**...** 
+
+`  `**vars Data10 = series(0,-10); *// create a static series*   if(SomeCondition) shift(Data10,NewValue,10);** 
+
+`  `**...** 
+
+## rev(vars Data, int Length): vars 
+
+Generates a reverse copy of the **Data** series which starts with the oldest elements. Useful for sending data series to other software that needs the series in old-to-new order.
+
+## conv(float\* fData, int Length): vars 
+
+Converts a **float** array to a temporary **var** series, for passing it to functions as a series parameter.*** 
+
+## *Parameters:* 
+
+## Data  Series or array. 
+
+## leng The number of elements; LookBack if th  0. 
+
+## *Returns* 
+
+Generated series. ***Remarks*** 
+
+The **rev** function generates a dynamic **series** and thus must be called in a fixed order in the script. 
+
+The **conv** function generates a temporary series that only keeps its content until the next **conv** call. 
+
+## *Example:* 
+
+## *// generate reverse price series (latest prices last)* vars O = rev(seriesO(),0), 
+
+`  `**H = rev(seriesH(),0),** 
+
+`  `**L = rev(seriesL(),0),** 
+
+`  `**C = rev(seriesC(),0));** 
+
+## diff (var x, int Period): var 
+
+Returns the difference of **x** to its value from **Period** bars before. ***Parameters:*** 
+
+## x Variable for difference 
+
+calculation. 
+
+## *Returns* 
+
+## x - previous x *Remarks* 
+
+This function generates a **series** and thus must be called in a fixed order in the script. 
+
+## diff(log(x),1) returns the log return of x , since log(a/b) = log(a) - 
+
+## log(b). *Example:* 
+
+## *// generate a price difference serie* 
+
+## vars Changes = series(diff(priceClose(),1)); 
+
+## filter (var\* Data, int Length, var Kernel[6]) : var\* 
+
+Applies a 5-element convolution filter with the given **Kernel** to the **Data** array. Each **Data** element is added to its local neighbors, weighted by the **Kernel**, using this formula: ***Data[i] = Kernel[0]\*Data[i-2] + Kernel[1]\*Data[i-1] + Kernel[2]\*Data[i] + Kernel[3]\*Data[i+1] + Kernel[4]\*Data[i+2] +*** 
+
+## *Kernel[5]*.  This function can be used for data smoothing, summing up, subtraction, sharpening, edge enhancement, or similar data array manipulation operations.*** 
+
+## *Parameters:* 
+
+## Data  Array or series to be filtered. 
+
+## Leng Number of elements to be filtered. 
+
+## th 
+
+## Kern Vector of 5 weights plus constant to be el  added. 
+
+## *Returns* 
+
+Modified **Data** 
+
+## renorm (var\* Data, int Length, var Sum) : var\* 
+
+Modifies the **Data** array by multiplying all elements with a factor so that they sum up to **Sum**. This function can be used to normalize a list of weights to a certain total.*** 
+
+## *Parameters:* 
+
+## Data  Array or series to be normalized. Leng Number of elements to be 
+
+## th  normalized. 
+
+## Sum  Resulting sum of elements. *Returns* 
+
+Modified **Data** 
+
+## *Remarks:* 
+
+Use the **renorm** function on the kernel when the weight sum must be 1. 
+
+For boundary handling, **Data[0]** and **Data[Length-1]** are extended. Some examples of filter kernels: 
+
+Identity  **{ 0, 0, 1, 0, 0, 0 }**  
+
+Sharpen  **{ -1, -1, 4, -1, -1, 0 }**   
+
+Smooth  **{ 0.2, 0.2, 0.2, 0.2, 0.2,** 
+
+## 0 } 
+
+Gaussian  **{ 0.1, 0.2, 0.4, 0.2, 0.1,** 
+
+## 0 } 
+
+Shift to the  **{ 0, 1, 0, 0, 0, 0 }** 
+
+right 
+
+Mean  **{ 0, 0, 1, 0, 0, -mean }**  subtraction 
+
+Fill with  **{ 0, 0, 0, 0, 0, constant** constant  **}**  
+
+## *Example:* 
+
+## var\* Filter = { 1,2,3,2,1,0 }; filter(Data,Length,renorm(Filter,5,1)); 
+
+## randomize(int Method, var \*Out, var \*In, int Length): var 
+
+Randomizes a data array by different methods. ***Returns:*** 
+
+Last value of the resulting data array; usually the accumulated return. ***Parameters:*** 
+
+## Meth BOOTSTRA Randomize the data differences by bootstrap with replacement. 
+
+## od  P 
+
+## SHUFFLE  Randomize the data differences by montecarlo permutation. 
+
+## DETREND  Detrend the data before randomizing, by subtracting the mean data differen Out  Array to be filled with the randomized data, or In for modifying the original array. 
+
+## In  Array containing the original data. 
+
+## Lengt Number of elements of the In and Out arrays. 
+
+## h 
+
+## *Remarks:* 
+
+This function can be used for generating randomized return distributions f.i. for White's Reality Check. The random number generator uses the **Lehmer algorithm** with a period of 2,147,483,646. 
+
+Randomized data curves can contain negative data. If this is not desired, test the minimum and randomize again until it is above zero. 
+
+## *Example:* 
+
+## var OriginalReturn = EquityCurve[Length-1]; var RandomizedReturn = randomize(BOOTSTRAP,0,EquityCurve,Length); 
+
+## randomize(int Method, var \*Out, var \*In, int Length): var 
+
+Randomizes a data array by different methods.*** 
+
+## *Returns:* 
+
+Last value of the resulting data array; usually the accumulated return. ***Parameters:*** 
+
+## Meth BOOTSTRA Randomize the data differences by bootstrap with replacement. 
+
+## od  P 
+
+## SHUFFLE  Randomize the data differences by montecarlo permutation. 
+
+## DETREND  Detrend the data before randomizing, by subtracting the mean data differen Out  Array to be filled with the randomized data, or In for modifying the original array. 
+
+## In  Array containing the original data. 
+
+## Lengt Number of elements of the In and Out arrays. 
+
+## h 
+
+## *Remarks:* 
+
+This function can be used for generating randomized return distributions f.i. for White's Reality Check. The random number generator uses the **Lehmer algorithm** with a period of 2,147,483,646. 
+
+Randomized data curves can contain negative data. If this is not desired, test the minimum and randomize again until it is above zero. 
+
+## *Example:* 
+
+## var OriginalReturn = EquityCurve[Length-1]; var RandomizedReturn = randomize(BOOTSTRAP,0,EquityCurve,Length); 
+
+## predict (int Type, vars Data, int TimePeriod, var Threshold): int 
+
+Predicts an event, such as a crossover of two curves or a peak of a curve, several bars before it happens. A **polynomial regression** function is used for the prediction. This function can be used to generate early trade signals. 
+
+Most trade systems analyze the recent price curve with functions or indicators that introduce more or less lag. This means that trade signals are always late, which reduces the profit of a system. One way to minimize lag is using low-lag functions (for instance, higher-order **lowpass filters** instead of moving averages). Another way is predicting the signals before they actually occur. This is the purpose of the **predict** function that works by extrapolating signal curves into the future. 
+
+## *Parameters:* 
+
+## Type  Event to be predicted: 
+
+## CROSSOVER - crossing of Data over the zero line PEAK - Data peak 
+
+## VALLEY - Data valley 
+
+
+## +PARABOLIC - use parabolic instead of linear regression. 
+
+## Data  Data series to be predicted, with a minimum length of TimePeriod. 
+
+## TimePeri Number of Data points used for the prediction. Do not use more date than a typical ' od  curve. 
+
+## Threshol Prediction threshold, or 0 for no threshold. 
+
+## d 
+
+## *Returns* 
+
+Bar offset (negative) of the predicted event, in 
+
+the **-TimePeriod..0** range. **0** predicts that the event will happen in the next bar. **-TimePeriod** is returned when no event is predicted.*** 
+
+## *Modifies* 
+
+## rMomentum - Predicted Data movement per bar at the time of the event. *Remarks:* 
+
+The **predict** function does not peek into the future, but uses past data for predicting events on the future curve. 
+
+It does not detect real crossovers or peaks/valleys, but predicts them only on future bars. For adding real detection of an event at a previous bar, use **crossOver** or **peak**/**valley**. 
+
+For predicting a crossover of two data series, or a series crossing over a fixed value, call **predict** with a series of the differences, f.i. **vars Difference = series(Data1[0] - Data2[0]);**. For a crossunder, reverse the differences (see example). 
+
+Crossovers are detected with better precision and less false signals than peaks or valleys. 
+
+## Threshold can be used to filter out 'weak' signals, f.i. from a crossing of two almost parallel lines. It is the minimum momentum of 
+
+the **Data** line divided by the correlation coefficient. 
+
+For parabolic regression, add **+PARABOLIC** to the **type**. It detects events earlier than linear regression, but tends to produce more false signals. 
+
+## *Examples:* 
+
+## function run() 
+
+## { 
+
+`  `**vars Prices = series(price());   var LP50 = LowPass(Prices,50);   var LP150 = LowPass(Prices,150);** 
+
+`  `**var CO = predict(CROSSOVER,series(LP50-LP150),10,0.5\*PIP); *// predict crossover*** 
+
+`  `**var CU = predict(CROSSOVER,series(LP150-LP50),10,0.5\*PIP); *// predict crossunder*** 
+
+`  `**plot("LP50",LP50,0,RED);** 
+
+`  `**plot("LP150",LP150,0,BLUE);** 
+
+`  `**plot("CrossOver",CO,NEW,BLUE);** 
+
+`  `**plot("CrossUnder",CU,0,RED);** 
+
+## } 
+
+## *// Trading with crossover vs. trading with prediction* #define USE\_PREDICT 
+
+## function run()  
+
+## { 
+
+`  `**BarPeriod = 1440;** 
+
+`  `**asset("SPX500");** 
+
+`  `**vars Osc = series(StochEhlers(series(price()),10,20,10)); #ifndef USE\_PREDICT  *// use normal crossover*** 
+
+`  `**if(crossOver(Osc,0.8))**  
+
+`    `**enterShort();** 
+
+`  `**if(crossUnder(Osc,0.2))** 
+
+`    `**enterLong();** 
+
+## #else                *// use predicted crossover* 
+
+`  `**if(predict(CROSSOVER,series(Osc[0]-0.8),10,0.01) > -5)      enterShort();** 
+
+`  `**if(predict(CROSSOVER,series(0.2-Osc[0]),10,0.01) > -5)      enterLong();** 
+
+## #endif 
+
+## } 

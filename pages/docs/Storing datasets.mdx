@@ -1,0 +1,15 @@
+# ﻿Storing datasets 
+
+## dataSave (int Handle, string Filename, *int Start, int Num*) 
+
+Stores the dataset with the given **Handle** as a binary file. **Num** records are stored, beginning with the record **Start**. If both parameters are omitted or zero, the whole dataset is stored.
+
+## dataSaveCSV (int Handle, string Format, string Filename, *int Start, int Num*) 
+
+The opposite to **dataParse**; stores a part or all of the dataset with the 
+
+given **Handle** number in a CSV file with the given **FileName**. The type and order of the CSV fields can be defined by the **Format** string in the same way as 
+
+for **dataParse**, except that no header line is stored. Usage example 
+
+in **CSVfromHistory.c**. 
